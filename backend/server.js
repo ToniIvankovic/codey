@@ -20,7 +20,7 @@ mongoose.connect('mongodb://localhost:27017/test')
 // Define a model for your data
 const ExercisesModel = mongoose.model('exercises',{});
 // Define a route to get all data
-app.get('/api/data/exercises', async (req, res) => {
+app.get('/api/v1/data/exercises', async (req, res) => {
   const data = await ExercisesModel.find();
   res.send(data);
 });
@@ -28,7 +28,7 @@ app.get('/api/data/exercises', async (req, res) => {
 // Define a model for your data
 const LessonsModel = mongoose.model('lessons',{});
 // Define a route to get all data
-app.get('/api/data/lessons', async (req, res) => {
+app.get('/api/v1/data/lessons', async (req, res) => {
   const data = await LessonsModel.find();
   res.send(data);
 });
@@ -36,7 +36,7 @@ app.get('/api/data/lessons', async (req, res) => {
 // Define a model for your data
 const LessonGroupsModel = mongoose.model('lesson_groups',{});
 // Define a route to get all data
-app.get('/api/data/lesson_groups', async (req, res) => {
+app.get('/api/v1/data/lesson_groups', async (req, res) => {
   const data = await LessonGroupsModel.find();
   res.send(data);
 });
