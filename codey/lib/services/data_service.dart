@@ -1,30 +1,16 @@
-import 'package:http/http.dart' as http;
-import '/models/exercises_response.dart';
-import 'dart:convert';
+
+import 'package:codey/repositories/lesson_groups_repository.dart';
 
 abstract class DataService {
   const DataService();
   void doSomething();
 }
 
-class DataServiceV1 extends DataService {
+class DataServiceV1 implements DataService {
   DataServiceV1() {
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    const String apiUrl = 'http://localhost:3000/api/v1/data/exercises';
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
-      final ExercisesResponse exercisesResponse =
-          ExercisesResponse.fromJson({"exercises": jsonDecode(response.body)});
-      print('Exercises: ${exercisesResponse.exercises}');
-    } else {
-      // If the server returns an unsuccessful response code, throw an exception.
-      throw Exception('Failed to load data');
-    }
+    var lgr = LessonGroupsRepository();
+    var lg = lgr.fetchLessonGroups();
+    print(lg);
   }
 
   @override
