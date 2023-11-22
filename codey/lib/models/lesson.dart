@@ -1,5 +1,3 @@
-import 'package:codey/models/exercise.dart';
-
 class Lesson {
   String id;
   String lessonGroupId;

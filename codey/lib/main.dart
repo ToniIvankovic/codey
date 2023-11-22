@@ -50,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
     final lgRepo = Provider.of<LessonGroupsRepository>(context);
     return Scaffold(
       backgroundColor:
