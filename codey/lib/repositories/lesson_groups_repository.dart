@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:codey/models/lesson_group.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class LessonGroupsRepository {
   final String apiUrl = 'http://localhost:3000/api/v1/data/lesson_groups';
@@ -10,6 +11,14 @@ class LessonGroupsRepository {
   Future<List<LessonGroup>> fetchLessonGroups() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
+
+      Future<void> sleep() async {
+        await Future.delayed(Duration(seconds: 3));
+      }
+
+      // Usage:
+      await sleep();
+
       if (response.statusCode == 200) {
         // Parse the response body and extract the lesson groups
         final List<dynamic> data = json.decode(response.body);
@@ -33,5 +42,3 @@ class LessonGroupsRepository {
     return Future.value(_lessonGroupsCache);
   }
 }
-  
-
