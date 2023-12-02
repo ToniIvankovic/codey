@@ -1,5 +1,4 @@
 import 'package:codey/lesson_groups_list.dart';
-import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:flutter/material.dart';

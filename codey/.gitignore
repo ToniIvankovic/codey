@@ -42,3 +42,141 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter/Dart specific
+**/build/
+**/ios/Pods/
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Android
+**/android/build/
+**/android/app/build/
+**/android/gradle/wrapper/gradle-wrapper.properties
+**/android/gradle.properties
+**/android/local.properties
+**/android/.gradle/
+
+# iOS
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/FlutterPluginRegistrant.m
+**/ios/Podfile.lock
+**/ios/Pods/
+**/ios/Runner.xcodeproj/
+**/ios/Runner.xcworkspace/
+
+# Web
+**/web/flutter_service_worker.js
+**/web/index.html
+**/web/main.dart.js
+**/web/favicon.ico
+**/web/assets/
+
+# macOS
+**/macos/Flutter/FlutterPluginRegistrant.m
+**/macos/Flutter/Flutter-Generated.xcconfig
+
+# Linux
+**/linux/flutter/generated_plugin_registrant.cc
+
+# Windows
+**/windows/Flutter/FlutterPluginRegistrant.cpp
+
+# IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# Flutter related configuration
+.dart_tool/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# Gradle
+**/build/
+**/gradle/
+**/gradlew
+**/gradlew.bat
+**/*.iml
+.gradle/
+local.properties
+
+# Android Studio
+**/*.iws
+**/*.iml
+**/*.ipr
+**/*.iws
+.idea/
+*.jks
+*.jks.old
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Flutter/Dart
+**/doc/api/
+**/doc/site/
+**/*.dartdoc
+
+# Android
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/.gradle/
+**/android/captures/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+*.code-workspace
+
+# Visual Studio Code related
+.vscode/
+.history/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Flutter build
+**/build/
+
+# Flutter Package Dependency Management
+.pub/
+
+# Dart
+.pub-cache/
+.pub/
+
+# Flutter
+**/ios/Pods/
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/macos/Flutter/flutter_assets/
+**/macos/Flutter/flutter_export_environment.sh
+**/web/flutter_assets/
+**/web/bundle_config.dill
+**/web/flutter_export_environment.sh
+**/web/index.html
+**/web/manifest.json
+**/web/favicon.png
+**/web/assets/
+**/windows/Flutter/flutter_assets/
+**/windows/Flutter/flutter_export_environment.bat
+**/build/
