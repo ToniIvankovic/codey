@@ -1,6 +1,4 @@
 using CodeyBE.API;
-using CodeyBE.Contracts.Repositories;
-using CodeyBE.Data.DB.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 

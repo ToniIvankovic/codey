@@ -26,7 +26,7 @@ namespace CodeyBE.Data.DB.Repositories
             return await _collection.Find(_ => true).ToListAsync();
         }
 
-        public abstract Task<TEntity?> GetByIdAsync(ObjectId id);
+        public abstract Task<TEntity?> GetByIdAsync(int id);
 
     }
 }

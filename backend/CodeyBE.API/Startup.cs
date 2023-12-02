@@ -29,6 +29,16 @@ namespace CodeyBE.API
                 IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
                 return new LessonGroupsRepository(dbContext);
             });
+            services.AddScoped<ILessonsRepository>(provider =>
+            {
+                IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
+                return new LessonsRepository(dbContext);
+            });
+            services.AddScoped<IExercisesRepository>(provider =>
+            {
+                IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
+                return new ExercisesRepository(dbContext);
+            });
 
             // Other configurations...
         }
