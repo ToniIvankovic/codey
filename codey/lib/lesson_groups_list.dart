@@ -1,36 +1,34 @@
+import 'package:codey/lessons_screen.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Item {
-  Item({
-    required this.expandedValue,
-    required this.headerValue,
+class ListItem {
+  ListItem({
+    required this.lessonGroup,
     this.isExpanded = false,
   });
 
-  String expandedValue;
-  String headerValue;
+  final LessonGroup lessonGroup;
   bool isExpanded;
 }
 
 class LessonGroupsList extends StatelessWidget {
-  const LessonGroupsList({super.key, required this.title});
-
   final String title;
+  LessonGroupsRepository lessonGroupsRepository;
 
-  Future<List<LessonGroup>> _fetchLessonGroups(context) {
-    final lgRepo = Provider.of<LessonGroupsRepository>(context);
-    return lgRepo.lessonGroups;
-  }
+  LessonGroupsList({
+    super.key,
+    required this.title,
+    required this.lessonGroupsRepository,
+  });
 
   @override
   Widget build(BuildContext context) {
-    List<Item> data = [];
+    List<ListItem> data = [];
     return FutureBuilder<List<LessonGroup>>(
-      future:
-          _fetchLessonGroups(context), // Replace this with your actual Future
+      future: lessonGroupsRepository.lessonGroups,
       builder:
           (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -44,10 +42,9 @@ class LessonGroupsList extends StatelessWidget {
         } else {
           var lg = snapshot.data!;
           data = lg
-              .map<Item>(
-                (item) => Item(
-                  expandedValue: item.tips,
-                  headerValue: item.name,
+              .map<ListItem>(
+                (item) => ListItem(
+                  lessonGroup: item,
                   isExpanded: false,
                 ),
               )
@@ -60,8 +57,10 @@ class LessonGroupsList extends StatelessWidget {
   }
 }
 
+
+
 class LGListView extends StatefulWidget {
-  final List<Item> data;
+  final List<ListItem> data;
 
   const LGListView({
     Key? key,
@@ -73,7 +72,7 @@ class LGListView extends StatefulWidget {
 }
 
 class _LGListViewState extends State<LGListView> {
-  late List<Item> data;
+  late List<ListItem> data;
   @override
   void initState() {
     super.initState();
@@ -83,38 +82,45 @@ class _LGListViewState extends State<LGListView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Container(
-        child: ExpansionPanelList(
-          expansionCallback: (int index, bool isExpanded) {
-            setState(() {
-              data[index].isExpanded = isExpanded;
-              for (int i = 0; i < data.length; i++) {
-                if (i != index) {
-                  data[i].isExpanded = false;
-                }
+      child: ExpansionPanelList(
+        expansionCallback: (int index, bool isExpanded) {
+          setState(() {
+            data[index].isExpanded = isExpanded;
+            for (int i = 0; i < data.length; i++) {
+              if (i != index) {
+                data[i].isExpanded = false;
               }
-            });
-          },
-          children: data.map<ExpansionPanel>((Item item) {
-            return ExpansionPanel(
-              headerBuilder: (BuildContext context, bool isExpanded) {
-                return ListTile(
-                  title: Text(
-                    item.headerValue,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+            }
+          });
+        },
+        children: data.map<ExpansionPanel>((ListItem item) {
+          return ExpansionPanel(
+            headerBuilder: (BuildContext context, bool isExpanded) {
+              return ListTile(
+                title: Text(
+                  item.lessonGroup.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            },
+            body: ListTile(
+              title: Text(item.lessonGroup.tips),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        LessonsScreen(lessonGroup: item.lessonGroup),
                   ),
                 );
               },
-              body: ListTile(
-                title: Text(item.expandedValue),
-              ),
-              isExpanded: item.isExpanded,
-              canTapOnHeader: true,
-            );
-          }).toList(),
-        ),
+            ),
+            isExpanded: item.isExpanded,
+            canTapOnHeader: true,
+          );
+        }).toList(),
       ),
     );
   }

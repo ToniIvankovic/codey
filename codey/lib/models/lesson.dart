@@ -2,19 +2,22 @@ class Lesson {
   String id;
   String lessonGroupId;
   List<String> exerciseIds;
+  String name;
   String? specificTips;
 
   Lesson({
     required this.id,
     required this.lessonGroupId,
     required this.exerciseIds,
+    required this.name,
     this.specificTips,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     return Lesson(
-      id: json['id'],
-      lessonGroupId: json['lessonGroup'],
+      id: json['privateId'].toString(),
+      lessonGroupId: json['lessonGroupId'].toString(),
+      name: json['name'],
       exerciseIds: json['exercises'].cast<String>(),
       specificTips: json['specificTips'],
     );

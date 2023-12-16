@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class LessonGroupsRepository {
-  final String apiUrl = 'http://localhost:3000/api/v1/data/lesson_groups';
+  final String apiUrl = 'http://localhost:5052/lessonGroups';
   List<LessonGroup>? _lessonGroupsCache;
 
   Future<List<LessonGroup>> fetchLessonGroups() async {

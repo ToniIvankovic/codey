@@ -11,7 +11,7 @@ class LessonGroup {
 
   factory LessonGroup.fromJson(Map<String, dynamic> json) {
     return LessonGroup(
-      id: json['id'],
+      id: json['privateId'],
       name: json['name'],
       tips: json['tips'],
     );

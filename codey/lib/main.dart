@@ -1,17 +1,21 @@
 import 'package:codey/lesson_groups_list.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
+import 'package:codey/repositories/lessons_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/data_service.dart';
 
 void main() {
-  runApp(Provider<DataService>(
+    runApp(Provider<DataService>(
       create: (_) => DataServiceV1(),
       child: Provider<ExercisesRepository>(
-          create: (_) => ExercisesRepository(),
-          child: Provider<LessonGroupsRepository>(
-              create: (_) => LessonGroupsRepository(), child: const MyApp()))));
+        create: (_) => ExercisesRepository(),
+        child: Provider<LessonGroupsRepository>(
+          create: (_) => LessonGroupsRepository(),
+          child: Provider<LessonsRepository>(
+            create: (_) => LessonsRepository(),
+            child: const MyApp())))));
 }
 
 class MyApp extends StatelessWidget {
@@ -46,13 +50,13 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(title),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(30.0),
+      body: Padding(
+        padding: const EdgeInsets.all(30.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              LessonGroupsList(title: 'A',),
+              LessonGroupsList(title: 'A', lessonGroupsRepository: Provider.of<LessonGroupsRepository>(context)),
             ],
           ),
         ),
