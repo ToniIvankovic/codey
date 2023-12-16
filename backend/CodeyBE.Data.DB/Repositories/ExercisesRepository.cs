@@ -15,5 +15,10 @@ namespace CodeyBE.Data.DB.Repositories
         {
             return await _collection.Find(exercise => exercise.PrivateId == id).FirstOrDefaultAsync();
         }
+
+        public IEnumerable<Exercise> GetExercisesByID(IEnumerable<int> ids)
+        {
+            return _collection.Find(exercise => ids.Contains(exercise.PrivateId)).ToList();
+        }
     }
 }

@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeyBE.Contracts\CodeyBE.Contracts.csproj" />
     <ProjectReference Include="..\CodeyBE.Data.DB\CodeyBE.Data.DB.csproj" />
+    <ProjectReference Include="..\CodeyBe.Services\CodeyBe.Services.csproj" />
   </ItemGroup>
 
 </Project>

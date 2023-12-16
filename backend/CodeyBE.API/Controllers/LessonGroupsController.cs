@@ -1,5 +1,6 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
+using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -11,12 +12,12 @@ namespace CodeyBE.API.Controllers
     public class LessonGroupsController : ControllerBase
     {
         const string version = "v2";
-        private readonly ILessonGroupsRepository lessonGroupsRepository;
         private readonly ILogger<LessonGroupsController> _logger;
+        private readonly ILessonGroupsService lessonGroupsService;
 
-        public LessonGroupsController(ILogger<LessonGroupsController> logger, ILessonGroupsRepository lgRepo)
+        public LessonGroupsController(ILogger<LessonGroupsController> logger, ILessonGroupsService lessonGroupsService)
         {
-            lessonGroupsRepository = lgRepo;
+            this.lessonGroupsService = lessonGroupsService;
             _logger = logger;
         }
 
@@ -25,14 +26,14 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<LessonGroup>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<LessonGroup>> GetAllLessonGroups()
         {
-            return await lessonGroupsRepository.GetAllAsync();
+            return await lessonGroupsService.GetAllLessonGroupsAsync();
         }
 
         [HttpGet("{id}", Name = "getLessonGroupByID")]
         [ProducesResponseType(typeof(LessonGroup), (int)HttpStatusCode.OK)]
         public async Task<LessonGroup?> GetLessonGroupByID(int id)
         {
-            return await lessonGroupsRepository.GetByIdAsync(id);
+            return await lessonGroupsService.GetLessonGroupByIDAsync(id);
         }
     }
 }

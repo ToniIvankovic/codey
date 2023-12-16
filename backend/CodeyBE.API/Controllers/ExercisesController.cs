@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
+using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -12,26 +13,33 @@ namespace CodeyBE.API.Controllers
 
         const string version = "v2";
         private readonly ILogger<ExercisesController> _logger;
-        private readonly IExercisesRepository exercisesRepository;
+        private readonly IExercisesService exercisesService;
 
-        public ExercisesController(ILogger<ExercisesController> logger, IExercisesRepository exercisesRepository)
+        public ExercisesController(ILogger<ExercisesController> logger, IExercisesService exercisesService)
         {
             _logger = logger;
-            this.exercisesRepository = exercisesRepository;
+            this.exercisesService = exercisesService;
         }
 
         [HttpGet(Name = "getAllExercises")]
         [ProducesResponseType(typeof(IEnumerable<Exercise>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Exercise>> GetAllLessons()
         {
-            return await exercisesRepository.GetAllAsync();
+            return await exercisesService.GetAllExercisesAsync();
         }
 
         [HttpGet("{id}", Name = "getExerciseByID")]
         [ProducesResponseType(typeof(Exercise), (int)HttpStatusCode.OK)]
         public async Task<Exercise?> GetExerciseByID(int id)
         {
-            return await exercisesRepository.GetByIdAsync(id);
+            return await exercisesService.GetExerciseByIDAsync(id);
+        }
+
+        [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
+        [ProducesResponseType(typeof(IEnumerable<Exercise>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<Exercise>> GetExercisesForLesson(int lessonId)
+        {
+            return await exercisesService.GetExercisesForLessonAsync(lessonId);
         }
     }
 }

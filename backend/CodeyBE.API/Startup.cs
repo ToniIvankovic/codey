@@ -1,4 +1,6 @@
-﻿using CodeyBE.Contracts.Repositories;
+﻿using CodeyBe.Services;
+using CodeyBE.Contracts.Repositories;
+using CodeyBE.Contracts.Services;
 using CodeyBE.Data.DB.Configurations;
 using CodeyBE.Data.DB.Repositories;
 
@@ -9,8 +11,6 @@ namespace CodeyBE.API
     {
         public static void ConfigureServices(IServiceCollection services)
         {
-            // Other services...
-
             // Configure the MongoDB context
             services.AddScoped<IMongoDbContext>(provider =>
             {
@@ -24,6 +24,7 @@ namespace CodeyBE.API
                 return new ApplicationDbContext(connectionString, databaseName);
             });
 
+            // Configure the repositories
             services.AddScoped<ILessonGroupsRepository>(provider =>
             {
                 IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
@@ -40,10 +41,20 @@ namespace CodeyBE.API
                 return new ExercisesRepository(dbContext);
             });
 
-            // Other configurations...
+            // Configure the services
+            services.AddScoped<ILessonGroupsService>(provider =>
+            {
+                return new LessonGroupsService(provider.GetRequiredService<ILessonGroupsRepository>());
+            });
+            services.AddScoped<ILessonsService>(provider =>
+            {
+                return new LessonsService(provider.GetRequiredService<ILessonsRepository>(), provider.GetRequiredService<ILessonGroupsService>());
+            });
+            services.AddScoped<IExercisesService>(provider =>
+            {
+                return new ExercisesService(provider.GetRequiredService<IExercisesRepository>(), provider.GetRequiredService<ILessonsService>());
+            });
         }
-
-        // Other methods...
     }
 
 }
