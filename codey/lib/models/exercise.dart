@@ -5,7 +5,7 @@ import 'package:codey/models/exercise_type.dart';
 
 abstract class Exercise {
   final int id;
-  final double difficulty;
+  final int difficulty;
   final ExerciseType type;
   final String? statement;
   final String? statementCode;

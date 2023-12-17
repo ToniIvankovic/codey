@@ -3,7 +3,7 @@ import 'dart:convert';
 import '/models/exercise.dart';
 
 class ExercisesRepository {
-  final String apiUrl = 'http://localhost:3000/api/v1/data/exercises';
+  final String apiUrl = 'http://localhost:5052/exercises';
   final Map<String, List<Exercise>> cache = {};
 
   Future<List<Exercise>> fetchExercises(String lessonId) async {
@@ -11,7 +11,7 @@ class ExercisesRepository {
       return cache[lessonId]!;
     }
 
-    final response = await http.get(Uri.parse('$apiUrl?lessonId=$lessonId'));
+    final response = await http.get(Uri.parse('$apiUrl/lesson/$lessonId'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       final exercises = data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodeyBE.Contracts.Enumerations;
 
 namespace CodeyBE.Contracts.Entities
 {
@@ -19,7 +18,7 @@ namespace CodeyBE.Contracts.Entities
         public int PrivateId { get; set; }
 
         [BsonElement("type")]
-        public LessonType Type { get; set; }
+        public string Type { get; set; }
 
         [BsonElement("difficulty")]
         public int Difficulty { get; set; }
@@ -34,7 +33,7 @@ namespace CodeyBE.Contracts.Entities
         public string? Question { get; set; } = string.Empty;
         
         [BsonElement("answerOptions")]
-        public object? AnswerOptions { get; set; }
+        public Dictionary<string, string>? AnswerOptions { get; set; }
         
         [BsonElement("correctAnswer")]
         public string? CorrectAnswer { get; set; } = string.Empty;

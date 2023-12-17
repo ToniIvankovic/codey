@@ -6,8 +6,8 @@ class ExerciseSA extends Exercise {
   dynamic answerChecker;
 
   ExerciseSA({
-    required int id,
-    required double difficulty,
+    required id,
+    required difficulty,
     type = ExerciseType.SA,
     String? statement,
     String? statementCode,
@@ -27,7 +27,7 @@ class ExerciseSA extends Exercise {
 
   factory ExerciseSA.fromJson(Map<String, dynamic> json) {
     return ExerciseSA(
-      id: json['id'],
+      id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementCode: json['statementCode'],

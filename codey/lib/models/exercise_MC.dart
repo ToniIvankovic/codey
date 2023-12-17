@@ -3,12 +3,12 @@ import 'package:codey/models/exercise_type.dart';
 import 'exercise.dart';
 
 class ExerciseMC extends Exercise {
-  List<String> answerOptions;
+  Map<String, dynamic> answerOptions;
   String correctAnswer;
 
   ExerciseMC({
-    required int id,
-    required double difficulty,
+    required id,
+    required difficulty,
     type = ExerciseType.MC,
     String? statement,
     String? statementCode,
@@ -28,13 +28,13 @@ class ExerciseMC extends Exercise {
 
   factory ExerciseMC.fromJson(Map<String, dynamic> json) {
     return ExerciseMC(
-      id: json['id'],
+      id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementCode: json['statementCode'],
       question: json['question'],
       specificTip: json['specificTip'],
-      answerOptions: json['answerOptions'].cast<String>(),
+      answerOptions: json['answerOptions'],
       correctAnswer: json['correctAnswer'],
     );
   }
