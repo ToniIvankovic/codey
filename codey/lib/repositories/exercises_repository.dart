@@ -7,16 +7,12 @@ class ExercisesRepository {
   final Map<String, List<Exercise>> cache = {};
 
   Future<List<Exercise>> fetchExercises(String lessonId) async {
-    if (cache.containsKey(lessonId)) {
-      return cache[lessonId]!;
-    }
-
     final response = await http.get(Uri.parse('$apiUrl/lesson/$lessonId'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       final exercises = data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
       cache[lessonId] = exercises;
-      return exercises;
+      return List.of(exercises);
     } else {
       throw Exception('Failed to fetch exercises');
     }
@@ -24,7 +20,7 @@ class ExercisesRepository {
 
   Future<List<Exercise>> getExercisesForLesson(String lessonId) {
     if (cache.containsKey(lessonId)) {
-      return Future.value(cache[lessonId]);
+      return Future.value(List.of(cache[lessonId]!));
     }
     return fetchExercises(lessonId);
   }

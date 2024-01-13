@@ -1,6 +1,6 @@
-import 'package:codey/lessons_screen.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
+import 'package:codey/screens/lessons_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

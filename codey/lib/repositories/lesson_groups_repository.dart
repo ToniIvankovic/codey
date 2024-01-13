@@ -12,13 +12,6 @@ class LessonGroupsRepository {
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      Future<void> sleep() async {
-        await Future.delayed(Duration(seconds: 3));
-      }
-
-      // Usage:
-      await sleep();
-
       if (response.statusCode == 200) {
         // Parse the response body and extract the lesson groups
         final List<dynamic> data = json.decode(response.body);

@@ -1,21 +1,32 @@
-import 'package:codey/lesson_groups_list.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/screens/lesson_groups_list.dart';
+import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'services/data_service.dart';
 
 void main() {
-    runApp(Provider<DataService>(
-      create: (_) => DataServiceV1(),
-      child: Provider<ExercisesRepository>(
-        create: (_) => ExercisesRepository(),
-        child: Provider<LessonGroupsRepository>(
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<ExercisesRepository>(
+          create: (_) => ExercisesRepository(),
+        ),
+        Provider<LessonGroupsRepository>(
           create: (_) => LessonGroupsRepository(),
-          child: Provider<LessonsRepository>(
-            create: (_) => LessonsRepository(),
-            child: const MyApp())))));
+        ),
+        Provider<LessonsRepository>(
+          create: (_) => LessonsRepository(),
+        ),
+        Provider<ExercisesService>(
+          create: (context) =>
+              ExercisesServiceV1(context.read<ExercisesRepository>()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,7 +47,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -45,7 +55,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(title),
@@ -56,7 +66,10 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              LessonGroupsList(title: 'A', lessonGroupsRepository: Provider.of<LessonGroupsRepository>(context)),
+              LessonGroupsList(
+                  title: 'A',
+                  lessonGroupsRepository:
+                      Provider.of<LessonGroupsRepository>(context)),
             ],
           ),
         ),

@@ -1,7 +1,7 @@
-import 'package:codey/exercises_screen.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/screens/exercises_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Replace with the actual path
 
@@ -21,8 +21,10 @@ class LessonsScreen extends StatelessWidget {
         lessonsRepository.getLessonsForGroup(lessonGroup.id.toString());
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       appBar: AppBar(
-        title: Text(lessonGroup.name), // Set the title of the lessonGroup
+        title: Text(lessonGroup.name), 
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,// Set the title of the lessonGroup
       ),
       body: FutureBuilder<List<Lesson>>(
         future: lessonsFuture,
@@ -55,7 +57,7 @@ class LessonsScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text('Exercises'),
+                        child: const Text('Play'),
                       ),
                     ],
                   )
