@@ -1,7 +1,7 @@
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
-import 'package:codey/screens/lesson_groups_list.dart';
+import 'package:codey/widgets/lesson_groups_list.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -60,16 +60,13 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
+      body: const Padding(
+        padding: EdgeInsets.all(30.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              LessonGroupsList(
-                  title: 'A',
-                  lessonGroupsRepository:
-                      Provider.of<LessonGroupsRepository>(context)),
+              LessonGroupsList(title: 'A'),
             ],
           ),
         ),

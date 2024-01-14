@@ -1,6 +1,6 @@
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
-import 'package:codey/screens/lessons_screen.dart';
+import 'package:codey/widgets/screens/lessons_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,17 +16,18 @@ class ListItem {
 
 class LessonGroupsList extends StatelessWidget {
   final String title;
-  LessonGroupsRepository lessonGroupsRepository;
 
-  LessonGroupsList({
+  const LessonGroupsList({
     super.key,
     required this.title,
-    required this.lessonGroupsRepository,
   });
 
   @override
   Widget build(BuildContext context) {
+    LessonGroupsRepository lessonGroupsRepository =
+        context.read<LessonGroupsRepository>();
     List<ListItem> data = [];
+
     return FutureBuilder<List<LessonGroup>>(
       future: lessonGroupsRepository.lessonGroups,
       builder:
@@ -56,8 +57,6 @@ class LessonGroupsList extends StatelessWidget {
     );
   }
 }
-
-
 
 class LGListView extends StatefulWidget {
   final List<ListItem> data;

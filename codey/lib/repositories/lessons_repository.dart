@@ -26,7 +26,7 @@ class LessonsRepository {
         throw Exception('Failed to fetch lessons for group: $lessonGroup');
       }
     } catch (e) {
-      throw Exception('Failed to fetch lessons for group: $lessonGroup,' + e.toString());
+      throw Exception('Failed to fetch lessons for group: $lessonGroup,$e');
     }
   }
 

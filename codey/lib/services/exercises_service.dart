@@ -1,7 +1,5 @@
 import 'package:codey/models/exercise.dart';
-import 'package:codey/models/exercise_LA.dart';
 import 'package:codey/models/exercise_MC.dart';
-import 'package:codey/models/exercise_SA.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 
@@ -22,6 +20,7 @@ class ExercisesServiceV1 implements ExercisesService {
   bool _isSessionActive = false;
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
+  @override
   Exercise? get currentExercise {
     return _currentExercise;
   }
@@ -47,6 +46,7 @@ class ExercisesServiceV1 implements ExercisesService {
     _sessionExercises = exercises;
   }
 
+  @override
   Exercise? getNextExercise() {
     if (_sessionExercises == null) {
       throw Exception('Session not active');

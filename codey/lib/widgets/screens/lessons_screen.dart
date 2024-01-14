@@ -1,7 +1,7 @@
 import 'package:codey/models/lesson.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lessons_repository.dart';
-import 'package:codey/screens/exercises_screen.dart';
+import 'package:codey/widgets/screens/exercises_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Replace with the actual path
 

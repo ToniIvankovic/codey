@@ -1,18 +1,14 @@
-import 'package:codey/models/exercise.dart';
-import 'package:codey/models/exercise_LA.dart';
-import 'package:codey/models/exercise_MC.dart';
-import 'package:codey/models/exercise_SA.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/widgets/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'single_exercise_widget.dart';
 
 class ExercisesScreen extends StatelessWidget {
   final Lesson lesson;
 
-  ExercisesScreen({required this.lesson});
+  const ExercisesScreen({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {

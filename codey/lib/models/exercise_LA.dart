@@ -1,5 +1,4 @@
 import 'package:codey/models/exercise_type.dart';
-
 import 'exercise.dart';
 
 class ExerciseLA extends Exercise {

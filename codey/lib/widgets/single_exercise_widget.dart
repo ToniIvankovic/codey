@@ -182,10 +182,10 @@ class ExerciseSAWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const TextField(
+        TextField(
           decoration: InputDecoration(
             labelText: 'Answer',
           ),
@@ -205,10 +205,10 @@ class ExerciseLAWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const TextField(
+        TextField(
           decoration: InputDecoration(
             labelText: 'Answer',
           ),
