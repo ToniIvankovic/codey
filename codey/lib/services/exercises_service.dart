@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:codey/models/exercise.dart';
+import 'package:codey/models/exercise_LA.dart';
 import 'package:codey/models/exercise_MC.dart';
+import 'package:codey/models/exercise_SA.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
+import 'package:http/http.dart' as http;
 
 abstract class ExercisesService {
   const ExercisesService();
@@ -11,15 +16,19 @@ abstract class ExercisesService {
   Exercise? getNextExercise();
   Exercise? get currentExercise;
   void endSession();
-  bool checkAnswer(Exercise exercise, dynamic answer);
+  Future<bool> checkAnswer(Exercise exercise, dynamic answer);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
+  String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
+      "http://localhost:5052/exercises/${exercise.id}";
   final ExercisesRepository exRepo;
-  ExercisesServiceV1(this.exRepo);
   bool _isSessionActive = false;
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
+
+  ExercisesServiceV1(this.exRepo);
+
   @override
   Exercise? get currentExercise {
     return _currentExercise;
@@ -66,9 +75,22 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  bool checkAnswer(Exercise exercise, dynamic answer) {
+  Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
     if (exercise is ExerciseMC) {
       return exercise.correctAnswer == answer;
+    } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
+      //make a post request to endpoint
+      final response = await http.post(
+        Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
+        body: json.encode(answer),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['isCorrect'];
+      } else {
+        throw Exception('Failed to validate answer');
+      }
     } else {
       throw Exception('Unknown exercise type');
     }

@@ -77,10 +77,22 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                     ),
                   if (exercise is ExerciseSA)
                     ExerciseSAWidget(
-                        key: ValueKey(exercise.id), exercise: exercise),
+                        key: ValueKey(exercise.id),
+                        exercise: exercise,
+                        onAnswerSelected: (answer) {
+                          setState(() {
+                            this.answer = answer;
+                          });
+                        }),
                   if (exercise is ExerciseLA)
                     ExerciseLAWidget(
-                        key: ValueKey(exercise.id), exercise: exercise),
+                        key: ValueKey(exercise.id),
+                        exercise: exercise,
+                        onAnswerSelected: (answer) {
+                          setState(() {
+                            this.answer = answer;
+                          });
+                        }),
                 ],
               ),
             )),
@@ -94,10 +106,13 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           ),
           onPressed: correct == null
               ? () {
-                  setState(() {
-                    correct =
-                        widget.exercisesService.checkAnswer(exercise!, answer);
-                  });
+                  widget.exercisesService.checkAnswer(exercise!, answer).then(
+                    (value) {
+                      setState(() {
+                        correct = value;
+                      });
+                    },
+                  );
                 }
               : () {
                   setState(() {
@@ -176,20 +191,23 @@ class ExerciseSAWidget extends StatelessWidget {
   const ExerciseSAWidget({
     super.key,
     required this.exercise,
+    required this.onAnswerSelected,
   });
 
   final Exercise exercise;
+  final ValueChanged<String> onAnswerSelected;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Answer',
           ),
           maxLines: 1,
+          onChanged: (value) => onAnswerSelected(value),
         ),
       ],
     );
@@ -201,18 +219,22 @@ class ExerciseLAWidget extends StatelessWidget {
   const ExerciseLAWidget({
     super.key,
     required this.exercise,
+    required this.onAnswerSelected,
   });
+
+  final ValueChanged<String> onAnswerSelected;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Answer',
           ),
           maxLines: null,
+          onChanged: (value) => onAnswerSelected(value),
         ),
       ],
     );
