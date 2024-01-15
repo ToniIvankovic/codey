@@ -12,5 +12,7 @@ namespace CodeyBE.Contracts.Services
         public Task<IEnumerable<Exercise>> GetAllExercisesAsync();
         public Task<Exercise?> GetExerciseByIDAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
+
+        public Task<bool> ValidateAnswer(string exerciseId, string answer);
     }
 }

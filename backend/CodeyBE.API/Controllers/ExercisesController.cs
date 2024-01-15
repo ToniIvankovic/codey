@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +23,28 @@ namespace CodeyBE.API.Controllers
         }
 
         [HttpGet(Name = "getAllExercises")]
-        [ProducesResponseType(typeof(IEnumerable<Exercise>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Exercise>> GetAllLessons()
+        [ProducesResponseType(typeof(IEnumerable<ExerciseDTO>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<ExerciseDTO>> GetAllExercises()
         {
-            return await exercisesService.GetAllExercisesAsync();
+            return (await exercisesService.GetAllExercisesAsync()).Select(exercise =>
+            {
+                if (exercise.Type == "MC")
+                {
+                    return new ExerciseMC_DTO(exercise);
+                }
+                else if (exercise.Type == "SA")
+                {
+                    return new ExerciseSA_DTO(exercise);
+                }
+                else if (exercise.Type == "LA")
+                {
+                    return new ExerciseLA_DTO(exercise);
+                }
+                else
+                {
+                    return new ExerciseDTO(exercise);
+                }
+            });
         }
 
         [HttpGet("{id}", Name = "getExerciseByID")]
@@ -36,10 +55,35 @@ namespace CodeyBE.API.Controllers
         }
 
         [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
-        [ProducesResponseType(typeof(IEnumerable<Exercise>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Exercise>> GetExercisesForLesson(int lessonId)
+        [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
         {
-            return await exercisesService.GetExercisesForLessonAsync(lessonId);
+            return (await exercisesService.GetExercisesForLessonAsync(lessonId)).Select<Exercise, object>(exercise =>
+            {
+                if (exercise.Type == "MC")
+                {
+                    return new ExerciseMC_DTO(exercise);
+                }
+                else if (exercise.Type == "SA")
+                {
+                    return new ExerciseSA_DTO(exercise);
+                }
+                else if (exercise.Type == "LA")
+                {
+                    return new ExerciseLA_DTO(exercise);
+                }
+                else
+                {
+                    throw new Exception("Unknown exercise type");
+                }
+            }); ;
+        }
+
+        [HttpPost("{exerciseId}", Name = "validateAnswer")]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        public Task<bool> ValidateAnswer(string exerciseId, string answer)
+        {
+            return exercisesService.ValidateAnswer(exerciseId, answer);
         }
     }
 }
