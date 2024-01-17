@@ -23,7 +23,7 @@ class ExercisesServiceV1 implements ExercisesService {
   String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
       "http://localhost:5052/exercises/${exercise.id}";
   final ExercisesRepository exRepo;
-  bool _isSessionActive = false;
+  // bool _isSessionActive = false;
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
 
@@ -50,7 +50,7 @@ class ExercisesServiceV1 implements ExercisesService {
     // if (_isSessionActive) {
     //   throw Exception('Session already active');
     // }
-    _isSessionActive = true;
+    // _isSessionActive = true;
     var exercises = await getAllExercisesForLesson(lesson);
     _sessionExercises = exercises;
   }
@@ -70,7 +70,7 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   void endSession() {
-    _isSessionActive = false;
+    // _isSessionActive = false;
     _sessionExercises = null;
   }
 

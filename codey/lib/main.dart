@@ -1,15 +1,21 @@
+import 'package:codey/auth/authenticated_client.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/services/auth_service.dart';
 import 'package:codey/widgets/lesson_groups_list.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:codey/widgets/screens/login_screen.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
+        Provider<AuthenticatedClient>(
+          create: (_) => AuthenticatedClient(),
+        ),
         Provider<ExercisesRepository>(
           create: (_) => ExercisesRepository(),
         ),
@@ -22,6 +28,9 @@ void main() {
         Provider<ExercisesService>(
           create: (context) =>
               ExercisesServiceV1(context.read<ExercisesRepository>()),
+        ),
+        Provider<AuthService>(
+          create: (context) => AuthService(context.read<AuthenticatedClient>()),
         ),
       ],
       child: const MyApp(),
@@ -47,10 +56,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool loggedIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -58,15 +74,17 @@ class MyHomePage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
+        title: Text(widget.title),
       ),
-      body: const Padding(
+      body: Padding(
         padding: EdgeInsets.all(30.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              LessonGroupsList(title: 'A'),
+              loggedIn
+                  ? LessonGroupsList(title: 'A')
+                  : LoginScreen(onLogin: () => setState(() => loggedIn = true)),
             ],
           ),
         ),
