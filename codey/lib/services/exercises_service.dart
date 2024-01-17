@@ -79,12 +79,15 @@ class ExercisesServiceV1 implements ExercisesService {
     if (exercise is ExerciseMC) {
       return exercise.correctAnswer == answer;
     } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
-      //make a post request to endpoint
+      
       final response = await http.post(
         Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
-        body: json.encode(answer),
-        headers: {'Content-Type': 'application/json'},
+        body: json.encode({"answer": answer}),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return data['isCorrect'];

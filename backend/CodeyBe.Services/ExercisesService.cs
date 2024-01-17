@@ -40,7 +40,7 @@ namespace CodeyBe.Services
             return _exercisesRepository.GetExercisesByID(exerciseIDs);
         }
 
-        public async Task<bool> ValidateAnswer(string exerciseId, string answer)
+        public async Task<AnswerValidationResult> ValidateAnswer(string exerciseId, string answer)
         {
             Exercise? exercise = await _exercisesRepository.GetByIdAsync(int.Parse(exerciseId));
             if (exercise == null)
@@ -50,15 +50,21 @@ namespace CodeyBe.Services
             return ValidateAnswer(exercise, answer);
         }
 
-        private bool ValidateAnswer(Exercise exercise, string answer)
+        private AnswerValidationResult ValidateAnswer(Exercise exercise, string answer)
         {
             if (exercise.Type == "SA")
             {
-                return ValidateAnswerSA(exercise, answer);
+
+                bool correct = ValidateAnswerSA(exercise, answer);
+                return new AnswerValidationResult(exercise,
+                                                  correct,
+                                                  answer,
+                                                  expectedAnswers: exercise.CorrectAnswers);
             }
             else if (exercise.Type == "LA")
             {
-                return ValidateAnswerLA(exercise, answer);
+                bool correct = ValidateAnswerLA(exercise, answer);
+                return new AnswerValidationResult(exercise, correct, answer, expectedAnswers: exercise.CorrectAnswers);
             }
             else
             {

@@ -13,6 +13,6 @@ namespace CodeyBE.Contracts.Services
         public Task<Exercise?> GetExerciseByIDAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 
-        public Task<bool> ValidateAnswer(string exerciseId, string answer);
+        public Task<AnswerValidationResult> ValidateAnswer(string exerciseId, string answer);
     }
 }

@@ -80,10 +80,12 @@ namespace CodeyBE.API.Controllers
         }
 
         [HttpPost("{exerciseId}", Name = "validateAnswer")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public Task<bool> ValidateAnswer(string exerciseId, string answer)
+        [ProducesResponseType(typeof(AnswerValidationResultDTO), (int)HttpStatusCode.OK)]
+        public async Task<AnswerValidationResultDTO> ValidateAnswer(string exerciseId, [FromBody]Dictionary<string,string> body)
         {
-            return exercisesService.ValidateAnswer(exerciseId, answer);
+            var answer = body["answer"];
+            var result = await exercisesService.ValidateAnswer(exerciseId, answer);
+            return new AnswerValidationResultDTO(result);
         }
     }
 }
