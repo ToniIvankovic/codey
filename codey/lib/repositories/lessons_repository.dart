@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:codey/models/lesson.dart';
 import 'package:http/http.dart' as http;
 
-
 class LessonsRepository {
   final String apiUrl = 'http://localhost:5052/Lessons';
   final Map<String, List<Lesson>> _cache = {};
+  final http.Client _authenticatedClient;
+
+  LessonsRepository(this._authenticatedClient);
 
   Future<List<Lesson>> _fetchLessonsForGroup(String lessonGroup) async {
     if (_cache.containsKey(lessonGroup)) {
@@ -14,8 +16,8 @@ class LessonsRepository {
     }
 
     try {
-      final response =
-          await http.get(Uri.parse('$apiUrl/lessonGroup/$lessonGroup'));
+      var response = await _authenticatedClient
+          .get(Uri.parse('$apiUrl/lessonGroup/$lessonGroup'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final lessons =
@@ -23,10 +25,11 @@ class LessonsRepository {
         _cache[lessonGroup] = lessons;
         return lessons;
       } else {
-        throw Exception('Failed to fetch lessons for group: $lessonGroup');
+        throw Exception(
+            'Failed to fetch lessons for group: $lessonGroup, Error ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Failed to fetch lessons for group: $lessonGroup,$e');
+      rethrow;
     }
   }
 

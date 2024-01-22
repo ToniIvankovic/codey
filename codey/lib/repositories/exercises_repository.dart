@@ -5,9 +5,12 @@ import '/models/exercise.dart';
 class ExercisesRepository {
   final String apiUrl = 'http://localhost:5052/exercises';
   final Map<String, List<Exercise>> cache = {};
+  final http.Client _authenticatedClient;
+
+  ExercisesRepository(this._authenticatedClient);
 
   Future<List<Exercise>> fetchExercises(String lessonId) async {
-    final response = await http.get(Uri.parse('$apiUrl/lesson/$lessonId'));
+    final response = await _authenticatedClient.get(Uri.parse('$apiUrl/lesson/$lessonId'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       final exercises = data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();

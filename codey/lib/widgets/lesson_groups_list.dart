@@ -1,5 +1,6 @@
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
+import 'package:codey/services/auth_service.dart';
 import 'package:codey/widgets/screens/lessons_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,19 +15,41 @@ class ListItem {
   bool isExpanded;
 }
 
-class LessonGroupsList extends StatelessWidget {
+class LessonGroupsList extends StatefulWidget {
   final String title;
+  final VoidCallback onLogout;
 
   const LessonGroupsList({
     super.key,
     required this.title,
+    required this.onLogout,
   });
+
+  @override
+  State<LessonGroupsList> createState() => _LessonGroupsListState();
+}
+
+class _LessonGroupsListState extends State<LessonGroupsList> {
+  String? username;
 
   @override
   Widget build(BuildContext context) {
     LessonGroupsRepository lessonGroupsRepository =
         context.read<LessonGroupsRepository>();
     List<ListItem> data = [];
+    final authService = context.read<AuthService>();
+    if (username == null) {
+      authService.getUserEmail().then((email) {
+        print(email);
+        setState(() {
+          username = email;
+        });
+      }).catchError((error) {
+        print('Error occurred: $error - Logging out');
+        authService.logout();
+        widget.onLogout();
+      });
+    }
 
     return FutureBuilder<List<LessonGroup>>(
       future: lessonGroupsRepository.lessonGroups,
@@ -51,7 +74,24 @@ class LessonGroupsList extends StatelessWidget {
               )
               .toList();
 
-          return LGListView(data: data);
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(username!),
+              LGListView(data: data),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    authService
+                        .logout(); // Call the logout method from AuthService
+                    widget.onLogout();
+                  },
+                  child: const Text('Logout'),
+                ),
+              ),
+            ],
+          );
         }
       },
     );

@@ -17,17 +17,21 @@ void main() {
           create: (_) => AuthenticatedClient(),
         ),
         Provider<ExercisesRepository>(
-          create: (_) => ExercisesRepository(),
+          create: (context) =>
+              ExercisesRepository(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonGroupsRepository>(
-          create: (_) => LessonGroupsRepository(),
+          create: (context) =>
+              LessonGroupsRepository(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonsRepository>(
-          create: (_) => LessonsRepository(),
+          create: (context) =>
+              LessonsRepository(context.read<AuthenticatedClient>()),
         ),
         Provider<ExercisesService>(
-          create: (context) =>
-              ExercisesServiceV1(context.read<ExercisesRepository>()),
+          create: (context) => ExercisesServiceV1(
+              context.read<ExercisesRepository>(),
+              context.read<AuthenticatedClient>()),
         ),
         Provider<AuthService>(
           create: (context) => AuthService(context.read<AuthenticatedClient>()),
@@ -77,15 +81,25 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Padding(
-        padding: EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(30.0),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              loggedIn
-                  ? LessonGroupsList(title: 'A')
-                  : LoginScreen(onLogin: () => setState(() => loggedIn = true)),
-            ],
+          child: FutureBuilder<String?>(
+            future: AuthenticatedClient.getToken(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData && snapshot.data != null) {
+                return LessonGroupsList(
+                    title: 'A',
+                    onLogout: () => setState(() => loggedIn = false));
+              } else {
+                return LoginScreen(
+                  onLogin: () => setState(() => loggedIn = true),
+                );
+              }
+            },
           ),
         ),
       ),

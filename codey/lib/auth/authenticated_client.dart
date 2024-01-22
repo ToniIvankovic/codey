@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthenticatedClient extends http.BaseClient {
   final http.Client _inner = http.Client();
 
-  Future<String?> getToken() async {
+  static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }

@@ -2,6 +2,7 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,16 +10,15 @@ namespace CodeyBE.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "STUDENT")]
     public class ExercisesController
     {
 
         const string version = "v2";
-        private readonly ILogger<ExercisesController> _logger;
         private readonly IExercisesService exercisesService;
 
-        public ExercisesController(ILogger<ExercisesController> logger, IExercisesService exercisesService)
+        public ExercisesController(IExercisesService exercisesService)
         {
-            _logger = logger;
             this.exercisesService = exercisesService;
         }
 

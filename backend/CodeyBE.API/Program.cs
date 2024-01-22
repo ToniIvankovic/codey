@@ -1,5 +1,4 @@
 using CodeyBE.API;
-using MongoDB.Bson;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,9 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 //IoC
-Startup.ConfigureServices(builder.Services);
+Startup.ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
@@ -43,6 +41,7 @@ app.Use(async (context, next) =>
     await next(context);
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 //app.UseMiddleware<ExceptionMiddleware>();

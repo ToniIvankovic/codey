@@ -7,10 +7,13 @@ import 'dart:async';
 class LessonGroupsRepository {
   final String apiUrl = 'http://localhost:5052/lessonGroups';
   List<LessonGroup>? _lessonGroupsCache;
+  final http.Client _authenticatedClient;
+
+  LessonGroupsRepository(this._authenticatedClient);
 
   Future<List<LessonGroup>> fetchLessonGroups() async {
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await _authenticatedClient.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         // Parse the response body and extract the lesson groups

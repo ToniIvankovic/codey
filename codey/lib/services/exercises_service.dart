@@ -26,8 +26,9 @@ class ExercisesServiceV1 implements ExercisesService {
   // bool _isSessionActive = false;
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
+  final http.Client _authenticatedClient;
 
-  ExercisesServiceV1(this.exRepo);
+  ExercisesServiceV1(this.exRepo, this._authenticatedClient);
 
   @override
   Exercise? get currentExercise {
@@ -80,7 +81,7 @@ class ExercisesServiceV1 implements ExercisesService {
       return exercise.correctAnswer == answer;
     } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
       
-      final response = await http.post(
+      final response = await _authenticatedClient.post(
         Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
         body: json.encode({"answer": answer}),
         headers: {

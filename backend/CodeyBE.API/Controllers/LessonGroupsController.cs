@@ -1,6 +1,7 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,6 +10,7 @@ namespace CodeyBE.API.Controllers
 
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "STUDENT")]
     public class LessonGroupsController : ControllerBase
     {
         const string version = "v2";

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:codey/models/exercise_type.dart';
 
 import 'exercise.dart';
