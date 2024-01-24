@@ -41,9 +41,9 @@ namespace CodeyBe.Services
             return _exercisesRepository.GetExercisesByID(exerciseIDs);
         }
 
-        public async Task<AnswerValidationResult> ValidateAnswer(string exerciseId, string answer)
+        public async Task<AnswerValidationResult> ValidateAnswer(int exerciseId, string answer)
         {
-            Exercise? exercise = await _exercisesRepository.GetByIdAsync(int.Parse(exerciseId));
+            Exercise? exercise = await _exercisesRepository.GetByIdAsync(exerciseId);
             if (exercise == null)
             {
                 throw new ArgumentException($"Exercise with id {exerciseId} does not exist");
@@ -65,7 +65,17 @@ namespace CodeyBe.Services
             else if (exercise.Type == "LA")
             {
                 bool correct = ValidateAnswerLA(exercise, answer);
-                return new AnswerValidationResult(exercise, correct, answer, expectedAnswers: exercise.CorrectAnswers);
+                return new AnswerValidationResult(exercise,
+                    correct,
+                    answer,
+                    expectedAnswers: exercise.CorrectAnswers);
+            }
+            else if (exercise.Type == "MC")
+            {
+                return new AnswerValidationResult(exercise,
+                    exercise.CorrectAnswer == answer,
+                    answer,
+                    expectedAnswers: [exercise.CorrectAnswer!]);
             }
             else
             {

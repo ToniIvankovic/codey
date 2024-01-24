@@ -11,16 +11,12 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT")]
-    public class ExercisesController
+    public class ExercisesController(IExercisesService exercisesService, ILogsService loggingService) : ControllerBase
     {
 
         const string version = "v2";
-        private readonly IExercisesService exercisesService;
-
-        public ExercisesController(IExercisesService exercisesService)
-        {
-            this.exercisesService = exercisesService;
-        }
+        private readonly IExercisesService exercisesService = exercisesService;
+        private readonly ILogsService loggingService = loggingService;
 
         [HttpGet(Name = "getAllExercises")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
@@ -38,10 +34,13 @@ namespace CodeyBE.API.Controllers
             return await exercisesService.GetExerciseByIDAsync(id);
         }
 
+
         [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
         {
+            var user = User;
+            loggingService.RequestedLesson(user, lessonId);
             return (await exercisesService.GetExercisesForLessonAsync(lessonId))
                 .Select(exercise => exercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
@@ -49,10 +48,12 @@ namespace CodeyBE.API.Controllers
 
         [HttpPost("{exerciseId}", Name = "validateAnswer")]
         [ProducesResponseType(typeof(AnswerValidationResultDTO), (int)HttpStatusCode.OK)]
-        public async Task<AnswerValidationResultDTO> ValidateAnswer(string exerciseId, [FromBody] Dictionary<string, string> body)
+        public async Task<AnswerValidationResultDTO> ValidateAnswer(int exerciseId, [FromBody] Dictionary<string, string> body)
         {
             var answer = body["answer"];
             var result = await exercisesService.ValidateAnswer(exerciseId, answer);
+            var exercise = (await exercisesService.GetExerciseByIDAsync(exerciseId))!;
+            loggingService.AnsweredExercise(User, exerciseId, exercise.CorrectAnswer != null ? [exercise.CorrectAnswer] : exercise.CorrectAnswers!, answer, result.IsCorrect);
             return new AnswerValidationResultDTO(result);
         }
     }

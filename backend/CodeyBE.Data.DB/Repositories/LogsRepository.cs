@@ -1,0 +1,21 @@
+﻿using CodeyBE.Contracts.Entities.Logs;
+using CodeyBE.Contracts.Repositories;
+using MongoDB.Driver;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CodeyBE.Data.DB.Repositories
+{
+    public class LogsRepository(IMongoDbContext dbContext) : Repository<LogBasic>(dbContext, "logs"), ILogsRepository
+    {
+        public override Task<LogBasic?> GetByIdAsync(int id) => _collection.Find(log => log.Id.Increment == id).FirstOrDefaultAsync();
+
+        public void SaveLogAsync(LogBasic log)
+        {
+            _collection.InsertOneAsync(log);
+        }
+    }
+}

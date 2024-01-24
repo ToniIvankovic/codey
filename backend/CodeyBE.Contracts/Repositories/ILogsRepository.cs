@@ -1,4 +1,4 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.Entities.Logs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.Repositories
 {
-    public interface ILessonGroupsRepository : IRepository<LessonGroup>
+    public interface ILogsRepository : IRepository<LogBasic>
     {
+        public void SaveLogAsync(LogBasic log);
     }
 }

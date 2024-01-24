@@ -90,22 +90,20 @@ namespace CodeyBE.API
                 IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
                 return new ExercisesRepository(dbContext);
             });
+            services.AddScoped<ILogsRepository>(provider =>
+            {
+                IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
+                return new LogsRepository(dbContext);
+            });
+
 
             // Configure the services
-            services.AddScoped<ILessonGroupsService>(provider =>
-            {
-                return new LessonGroupsService(provider.GetRequiredService<ILessonGroupsRepository>());
-            });
-            services.AddScoped<ILessonsService>(provider =>
-            {
-                return new LessonsService(provider.GetRequiredService<ILessonsRepository>(), provider.GetRequiredService<ILessonGroupsService>());
-            });
-            services.AddScoped<IExercisesService>(provider =>
-            {
-                return new ExercisesService(provider.GetRequiredService<IExercisesRepository>(), provider.GetRequiredService<ILessonsService>());
-            });
+            services.AddScoped<ILessonGroupsService, LessonGroupsService>();
+            services.AddScoped<ILessonsService, LessonsService>();
+            services.AddScoped<IExercisesService, ExercisesService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
+            services.AddScoped<ILogsService, LogsService>();
         }
     }
 

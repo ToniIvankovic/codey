@@ -14,7 +14,7 @@ namespace CodeyBE.Contracts.Services
         public Task<Exercise?> GetExerciseByIDAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 
-        public Task<AnswerValidationResult> ValidateAnswer(string exerciseId, string answer);
+        public Task<AnswerValidationResult> ValidateAnswer(int exerciseId, string answer);
         public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise);
     }
 }
