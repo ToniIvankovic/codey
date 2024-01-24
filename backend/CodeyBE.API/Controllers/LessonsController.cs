@@ -10,17 +10,10 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT")]
-    public class LessonsController
+    public class LessonsController(ILessonsService lessonsService)
     {
         const string version = "v2";
-        private readonly ILogger<LessonsController> _logger;
-        private readonly ILessonsService lessonsService;
-
-        public LessonsController(ILogger<LessonsController> logger, ILessonsService lessonsService)
-        {
-            _logger = logger;
-            this.lessonsService = lessonsService;
-        }
+        private readonly ILessonsService lessonsService = lessonsService;
 
         [HttpGet(Name = "getAllLessons")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]

@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using System;
@@ -92,5 +93,15 @@ namespace CodeyBe.Services
             return correctAnswers.Contains(answer);
         }
 
+        public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise)
+        {
+            return exercise.Type switch
+            {
+                "MC" => new ExerciseMC_DTO(exercise),
+                "SA" => new ExerciseSA_DTO(exercise),
+                "LA" => new ExerciseLA_DTO(exercise),
+                _ => new ExerciseDTO(exercise),
+            };
+        }
     }
 }

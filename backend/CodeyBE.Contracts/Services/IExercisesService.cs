@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace CodeyBE.Contracts.Services
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 
         public Task<AnswerValidationResult> ValidateAnswer(string exerciseId, string answer);
+        public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise);
     }
 }
