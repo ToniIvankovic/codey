@@ -46,60 +46,66 @@ class _LessonGroupsListState extends State<LessonGroupsList> {
           username = email;
         });
       }).catchError((error) {
-        print('Error occurred: $error - Logging out');
+        print('Error occurred on getting email: $error - Logging out');
         authService.logout();
         widget.onLogout();
       });
     }
 
-    return FutureBuilder<List<LessonGroup>>(
-      future: lessonGroupsRepository.lessonGroups,
-      builder:
-          (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(
-            strokeWidth: 5,
-          );
-        } else if (snapshot.hasError) {
-          if(snapshot.error is UnauthenticatedException){
-            authService.logout();
-            widget.onLogout();
-          }
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.data == null) {
-          return const Text('No data');
-        } else {
-          var lg = snapshot.data!;
-          data = lg
-              .map<ListItem>(
-                (item) => ListItem(
-                  lessonGroup: item,
-                  isExpanded: false,
-                ),
-              )
-              .toList();
+    try {
+      return FutureBuilder<List<LessonGroup>>(
+        future: lessonGroupsRepository.lessonGroups,
+        builder:
+            (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(
+              strokeWidth: 5,
+            );
+          } else if (snapshot.hasError) {
+            if (snapshot.error is UnauthenticatedException) {
+              authService.logout();
+              widget.onLogout();
+            }
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.data == null) {
+            return const Text('No data');
+          } else {
+            var lg = snapshot.data!;
+            data = lg
+                .map<ListItem>(
+                  (item) => ListItem(
+                    lessonGroup: item,
+                    isExpanded: false,
+                  ),
+                )
+                .toList();
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(username!),
-              LGListView(data: data),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    authService
-                        .logout(); // Call the logout method from AuthService
-                    widget.onLogout();
-                  },
-                  child: const Text('Logout'),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(username!),
+                LGListView(data: data),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      authService
+                          .logout(); // Call the logout method from AuthService
+                      widget.onLogout();
+                    },
+                    child: const Text('Logout'),
+                  ),
                 ),
-              ),
-            ],
-          );
-        }
-      },
-    );
+              ],
+            );
+          }
+        },
+      );
+    } on UnauthenticatedException catch (e) {
+      authService.logout();
+      widget.onLogout();
+      return Text('Error: $e');
+    }
   }
 }
 
