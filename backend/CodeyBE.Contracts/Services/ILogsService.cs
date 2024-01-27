@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeyBE.Contracts.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -12,5 +13,7 @@ namespace CodeyBE.Contracts.Services
         void RequestedLesson(ClaimsPrincipal user, int lessonId);
         void RequestedExercise(int exerciseId);
         void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<string> correctAnswers, string givenAnswer, bool correct);
+        void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report);
+
     }
 }

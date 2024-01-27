@@ -2,6 +2,7 @@
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -10,7 +11,7 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT")]
-    public class LessonsController(ILessonsService lessonsService)
+    public class LessonsController(ILessonsService lessonsService) : ControllerBase
     {
         const string version = "v2";
         private readonly ILessonsService lessonsService = lessonsService;
@@ -34,6 +35,13 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<Lesson>> GetLessonsForLessonGroup(int lessonGroupId)
         {
             return await lessonsService.GetLessonsForLessonGroupAsync(lessonGroupId);
+        }
+
+        [HttpPost("end", Name = "lessonResults")]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+        public async Task EndLesson([FromBody] EndOfLessonReport lessonReport)
+        {
+            await lessonsService.EndLessonAsync(User,lessonReport);
         }
     }
 }

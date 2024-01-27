@@ -10,9 +10,11 @@ class SingleExerciseWidget extends StatefulWidget {
   const SingleExerciseWidget({
     Key? key,
     required this.exercisesService,
+    required this.onSessionFinished,
   }) : super(key: key);
 
   final ExercisesService exercisesService;
+  final VoidCallback onSessionFinished;
 
   @override
   State<SingleExerciseWidget> createState() => _SingleExerciseWidgetState();
@@ -22,48 +24,23 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   bool? isCorrectResponse;
   dynamic answer;
   bool enableCheck = false;
+  Exercise? exercise;
+
+  @override
+  void initState() {
+    super.initState();
+    exercise = widget.exercisesService.currentExercise;
+  }
 
   @override
   Widget build(BuildContext context) {
-    Exercise? exercise = widget.exercisesService.currentExercise;
 
-    ElevatedButton button;
-    if (isCorrectResponse == null) {
-      button = ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: null),
-        onPressed: enableCheck
-            ? () {
-                widget.exercisesService.checkAnswer(exercise!, answer).then(
-                  (value) {
-                    setState(() {
-                      isCorrectResponse = value;
-                    });
-                  },
-                );
-              }
-            : null,
-        child: const Text('CHECK'),
-      );
-    } else {
-      button = ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isCorrectResponse == true
-              ? const Color.fromARGB(255, 123, 224, 127)
-              : Colors.red,
-        ),
-        onPressed: () {
-          setState(() {
-            exercise = widget.exercisesService.getNextExercise();
-            isCorrectResponse = null;
-            enableCheck = false;
-          });
-        },
-        child: const Text('NEXT'),
-      );
-    }
+    ElevatedButton button = buildButton();
     if (exercise == null) {
-      return const Text('No exercises');
+      widget.onSessionFinished();
+      return const Text("No exercises");
     }
+
     // single exercise, button
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -138,6 +115,46 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
         button,
       ],
     );
+  }
+
+  ElevatedButton buildButton() {
+    ElevatedButton button;
+    //If the exercise isn't answered yet, show the check button (active if anything is enterd)
+    if (isCorrectResponse == null) {
+      button = ElevatedButton(
+        style: ElevatedButton.styleFrom(backgroundColor: null),
+        onPressed: enableCheck
+            ? () {
+                widget.exercisesService.checkAnswer(exercise!, answer).then(
+                  (value) {
+                    setState(() {
+                      isCorrectResponse = value;
+                    });
+                  },
+                );
+              }
+            : null,
+        child: const Text('CHECK'),
+      );
+    } else {
+      //If the exercise is answered, show the next button
+      button = ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isCorrectResponse == true
+              ? const Color.fromARGB(255, 123, 224, 127)
+              : Colors.red,
+        ),
+        onPressed: () {
+          setState(() {
+            exercise = widget.exercisesService.getNextExercise();
+            isCorrectResponse = null;
+            enableCheck = false;
+          });
+        },
+        child: const Text('NEXT'),
+      );
+    }
+    return button;
   }
 }
 

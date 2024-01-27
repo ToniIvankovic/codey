@@ -4,20 +4,23 @@ import 'package:codey/widgets/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class ExercisesScreen extends StatelessWidget {
   final Lesson lesson;
+  final VoidCallback onSessionCompleted;
 
-  const ExercisesScreen({super.key, required this.lesson});
+  const ExercisesScreen({super.key, required this.lesson, required this.onSessionCompleted});
 
   @override
   Widget build(BuildContext context) {
     var exercisesService = context.read<ExercisesService>();
-    Future<void> x = exercisesService.startSessionForLesson(lesson);
+    Future<void> startSessionFuture =
+        exercisesService.startSessionForLesson(lesson);
 
     return WillPopScope(
       onWillPop: () async {
-        exercisesService.endSession();
+        if (exercisesService.sessionActive) {
+          exercisesService.endSession(false);
+        }
         return true;
       },
       child: Scaffold(
@@ -28,7 +31,7 @@ class ExercisesScreen extends StatelessWidget {
         ),
         body: Center(
           child: FutureBuilder<void>(
-            future: x,
+            future: startSessionFuture,
             builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator(
@@ -45,7 +48,17 @@ class ExercisesScreen extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SingleExerciseWidget(key: ValueKey(exercise.id),exercisesService: exercisesService),
+                    SingleExerciseWidget(
+                      key: ValueKey(exercise.id),
+                      exercisesService: exercisesService,
+                      onSessionFinished: () => {
+                        exercisesService.endSession(true),
+                        onSessionCompleted(),
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          Navigator.pop(context);
+                        })
+                      },
+                    ),
                   ],
                 );
               }

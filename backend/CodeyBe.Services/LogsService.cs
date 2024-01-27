@@ -35,5 +35,15 @@ namespace CodeyBe.Services
                     lessonId
             ));
         }
+
+        public void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report)
+        {
+            _logsRepository.SaveLogAsync(
+                new LogEndLesson(
+                    userId: user.Claims.First(c => c.Type == ClaimTypes.Email).Value,
+                    report
+                    ));
+
+        }
     }
 }

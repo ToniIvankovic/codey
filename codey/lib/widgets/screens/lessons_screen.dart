@@ -1,7 +1,7 @@
 import 'package:codey/models/lesson.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lessons_repository.dart';
-import 'package:codey/widgets/screens/exercises_screen.dart';
+import 'package:codey/widgets/screens/pre_post_exercise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Replace with the actual path
 
@@ -23,8 +23,10 @@ class LessonsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       appBar: AppBar(
-        title: Text(lessonGroup.name), 
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,// Set the title of the lessonGroup
+        title: Text(lessonGroup.name),
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .inversePrimary, // Set the title of the lessonGroup
       ),
       body: FutureBuilder<List<Lesson>>(
         future: lessonsFuture,
@@ -43,25 +45,22 @@ class LessonsScreen extends StatelessWidget {
               itemCount: lessons.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                  title: Text('${lessons[index].id} ${lessons[index].name}'),
-                  subtitle: ButtonBar(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ExercisesScreen(
-                                lesson: lessons[index],
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text('Play'),
-                      ),
-                    ],
-                  )
-                );
+                    title: Text('${lessons[index].id} ${lessons[index].name}'),
+                    subtitle: ButtonBar(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PrePostExerciseScreen(
+                                      lesson: lessons[index])),
+                            );
+                          },
+                          child: const Text('Play'),
+                        ),
+                      ],
+                    ));
               },
             );
           }
@@ -70,3 +69,4 @@ class LessonsScreen extends StatelessWidget {
     );
   }
 }
+

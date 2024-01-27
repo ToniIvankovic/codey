@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codey/models/end_report.dart';
 import 'package:codey/models/exercise.dart';
 import 'package:codey/models/exercise_LA.dart';
 import 'package:codey/models/exercise_MC.dart';
@@ -15,18 +16,23 @@ abstract class ExercisesService {
   Future<void> startSessionForLesson(Lesson lesson);
   Exercise? getNextExercise();
   Exercise? get currentExercise;
-  void endSession();
+  bool get sessionActive;
+  void endSession(bool completed);
   Future<bool> checkAnswer(Exercise exercise, dynamic answer);
+  EndReport? getEndReport();
 }
 
 class ExercisesServiceV1 implements ExercisesService {
-  String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
+  static String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
       "http://localhost:5052/exercises/${exercise.id}";
+  static const String _endOfSessionEndpoint =
+      "http://localhost:5052/lessons/end";
   final ExercisesRepository exRepo;
-  // bool _isSessionActive = false;
+  final http.Client _authenticatedClient;
+
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
-  final http.Client _authenticatedClient;
+  EndReport? _endReport;
 
   ExercisesServiceV1(this.exRepo, this._authenticatedClient);
 
@@ -35,10 +41,14 @@ class ExercisesServiceV1 implements ExercisesService {
     return _currentExercise;
   }
 
-  //function to get all lessons
+  @override
+  bool get sessionActive {
+    return _sessionExercises != null;
+  }
+
   @override
   Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
-    return exRepo.fetchExercises(lesson.id.toString());
+    return getAllExercisesForLessonById(lesson.id.toString());
   }
 
   @override
@@ -48,12 +58,9 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<void> startSessionForLesson(Lesson lesson) async {
-    // if (_isSessionActive) {
-    //   throw Exception('Session already active');
-    // }
-    // _isSessionActive = true;
     var exercises = await getAllExercisesForLesson(lesson);
     _sessionExercises = exercises;
+    _endReport = EndReport(lesson.id, 0, 0, exercises.length, DateTime.now());
   }
 
   @override
@@ -62,7 +69,6 @@ class ExercisesServiceV1 implements ExercisesService {
       throw Exception('Session not active');
     }
     if (_sessionExercises!.isEmpty) {
-      endSession();
       return null;
     }
     _currentExercise = _sessionExercises!.removeAt(0);
@@ -70,17 +76,18 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  void endSession() {
-    // _isSessionActive = false;
-    _sessionExercises = null;
-  }
-
-  @override
   Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
+    bool correct;
     if (exercise is ExerciseMC) {
-      return exercise.correctAnswer == answer;
+      correct = exercise.correctAnswer == answer;
+      _authenticatedClient.post(
+        Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
+        body: json.encode({"answer": answer}),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
     } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
-      
       final response = await _authenticatedClient.post(
         Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
         body: json.encode({"answer": answer}),
@@ -91,12 +98,40 @@ class ExercisesServiceV1 implements ExercisesService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['isCorrect'];
+        correct = data['isCorrect'];
       } else {
         throw Exception('Failed to validate answer');
       }
     } else {
       throw Exception('Unknown exercise type');
     }
+    _endReport!.totalAnswers++;
+    if (correct) {
+      _endReport!.correctAnswers++;
+    }
+    return correct;
+  }
+
+  @override
+  void endSession(bool completed) {
+    _sessionExercises = null;
+    if (!completed) {
+      _endReport = null;
+    } else {
+      if (_endReport == null) throw Exception('End report is null');
+
+      _authenticatedClient.post(
+        Uri.parse(_endOfSessionEndpoint),
+        body: json.encode(_endReport!.toJson()),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+    }
+  }
+
+  @override
+  EndReport? getEndReport() {
+    return _endReport;
   }
 }
