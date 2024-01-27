@@ -34,7 +34,7 @@ void main() {
               context.read<AuthenticatedClient>()),
         ),
         Provider<AuthService>(
-          create: (context) => AuthService(context.read<AuthenticatedClient>()),
+          create: (context) => AuthService(),
         ),
       ],
       child: const MyApp(),
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(30.0),
         child: Center(
           child: FutureBuilder<String?>(
-            future: AuthenticatedClient.getToken(),
+            future: AuthService.getToken(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
@@ -94,11 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 return LessonGroupsList(
                     title: 'A',
                     onLogout: () => setState(() => loggedIn = false));
-              } else {
-                return LoginScreen(
-                  onLogin: () => setState(() => loggedIn = true),
-                );
               }
+              return LoginScreen(
+                onLogin: () => setState(() => loggedIn = true),
+              );
             },
           ),
         ),

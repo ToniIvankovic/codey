@@ -10,7 +10,6 @@ class ExerciseSA extends Exercise {
   ExerciseSA({
     required id,
     required difficulty,
-    type = ExerciseType.SA,
     String? statement,
     String? statementCode,
     String? question,
@@ -20,7 +19,7 @@ class ExerciseSA extends Exercise {
   }) : super(
           id: id,
           difficulty: difficulty,
-          type: type,
+          type: ExerciseType.SA,
           statement: statement,
           statementCode: statementCode,
           question: question,

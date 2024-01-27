@@ -1,4 +1,3 @@
-import 'package:codey/auth/authenticated_client.dart';
 import 'package:codey/models/claim_types.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,12 +7,21 @@ class AuthService {
   final String _loginEndpoint = 'http://localhost:5052/user/login';
   final String _registerEndpoint = 'http://localhost:5052/user/register';
 
-  final http.Client _authenticatedClient;
 
-  AuthService(this._authenticatedClient);
+  AuthService();
+
+  static Future<String?> getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
+  static Future<void> clearToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+  }
 
   Future<String> getUserEmail() async {
-    final token = await AuthenticatedClient.getToken();
+    final token = await getToken();
     //read claims from token
     final parts = token!.split('.');
     final payload = parts[1];
@@ -24,7 +32,7 @@ class AuthService {
   }
 
   Future<String> login(String username, String password) async {
-    final response = await _authenticatedClient.post(
+    final response = await http.post(
       Uri.parse(_loginEndpoint),
       body: json.encode({'email': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},
@@ -49,7 +57,7 @@ class AuthService {
   }
 
   Future<void> register(String username, String password) async {
-    final response = await _authenticatedClient.post(
+    final response = await http.post(
       Uri.parse(_registerEndpoint),
       body: json.encode({'username': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},

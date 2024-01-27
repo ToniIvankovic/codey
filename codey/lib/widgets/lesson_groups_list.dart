@@ -1,3 +1,4 @@
+import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/services/auth_service.dart';
@@ -60,6 +61,10 @@ class _LessonGroupsListState extends State<LessonGroupsList> {
             strokeWidth: 5,
           );
         } else if (snapshot.hasError) {
+          if(snapshot.error is UnauthenticatedException){
+            authService.logout();
+            widget.onLogout();
+          }
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.data == null) {
           return const Text('No data');

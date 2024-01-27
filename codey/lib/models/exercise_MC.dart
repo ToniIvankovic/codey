@@ -11,7 +11,6 @@ class ExerciseMC extends Exercise {
   ExerciseMC({
     required id,
     required difficulty,
-    type = ExerciseType.MC,
     String? statement,
     String? statementCode,
     String? question,
@@ -21,7 +20,7 @@ class ExerciseMC extends Exercise {
   }) : super(
           id: id,
           difficulty: difficulty,
-          type: type,
+          type: ExerciseType.MC,
           statement: statement,
           statementCode: statementCode,
           question: question,

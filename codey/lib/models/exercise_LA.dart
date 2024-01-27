@@ -9,7 +9,6 @@ class ExerciseLA extends Exercise {
   ExerciseLA({
     required id,
     required difficulty,
-    type = ExerciseType.LA,
     String? statement,
     String? statementCode,
     String? question,
@@ -18,7 +17,7 @@ class ExerciseLA extends Exercise {
   }) : super(
           id: id,
           difficulty: difficulty,
-          type: type,
+          type: ExerciseType.LA,
           statement: statement,
           statementCode: statementCode,
           question: question,
