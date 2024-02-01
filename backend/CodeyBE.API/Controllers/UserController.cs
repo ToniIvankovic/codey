@@ -12,13 +12,13 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class UserController(IUserService userService)
+    public class UserController(IUserService userService) : ControllerBase
     {
 
         [AllowAnonymous]
         [HttpPost("register", Name = "register")]
         [ProducesResponseType(typeof(UserRegistrationDTO), (int)HttpStatusCode.OK)]
-        public async Task<UserRegistrationDTO> RegisterUser([FromBody] Dictionary<string, string> body)
+        public async Task<IActionResult> RegisterUser([FromBody] Dictionary<string, string> body)
         {
             var email = body["email"];
             var password = body["password"];
@@ -27,17 +27,25 @@ namespace CodeyBE.API.Controllers
                 Email = email,
                 Password = password
             });
-            return new UserRegistrationDTO
+            if (result.Succeeded)
             {
-                success = result.Succeeded,
-                message = result?.Errors.Select(e => e.Description)
-            };
+                return Ok(new UserRegistrationDTO
+                {
+                    success = true,
+                    message = ["User created successfully"]
+                });
+            }
+            return StatusCode(400, new UserRegistrationDTO
+            {
+                success = false,
+                message = result.Errors.Select(error => error.Description)
+            });
         }
 
         [AllowAnonymous]
         [HttpPost("login", Name = "login")]
         [ProducesResponseType(typeof(UserLoginDTO), (int)HttpStatusCode.OK)]
-        public async Task<UserLoginDTO> LoginUser([FromBody] Dictionary<string, string> body)
+        public async Task<IActionResult> LoginUser([FromBody] Dictionary<string, string> body)
         {
             var email = body["email"];
             var password = body["password"];
@@ -48,25 +56,16 @@ namespace CodeyBE.API.Controllers
                     Email = email,
                     Password = password
                 });
-                return new UserLoginDTO
-                {
-                    token = token.Token,
-                    success = true,
-                };
-            } catch(UserAuthenticationException e)
+                return new OkObjectResult(
+                    new UserLoginDTO
+                    {
+                        token = token.Token,
+                        success = true,
+                    });
+            }
+            catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
             {
-                return new UserLoginDTO
-                {
-                    success = false,
-                    message = [e.Message]
-                };
-            } catch(EntityNotFoundException e)
-            {
-                return new UserLoginDTO
-                {
-                    success = false,
-                    message = [e.Message]
-                };
+                return StatusCode(401, e.Message);
             }
         }
     }

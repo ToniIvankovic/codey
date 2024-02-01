@@ -8,30 +8,44 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   final String _loginEndpoint = 'http://localhost:5052/user/login';
   final String _registerEndpoint = 'http://localhost:5052/user/register';
-  static String? token;
+  String? _token;
 
-  AuthService();
-
-  static Future<String?> getToken() async {
-    return token;
+  Future<String?> get token async {
+    _token ??= await _getToken();
+    try {
+      _checkTokenExpired();
+    } catch (e) {
+      await _clearToken();
+      return Future(() => null);
+    }
+    return Future.value(_token);
   }
 
-  static Future<void> clearToken() async {
-    token = null;
+  AuthService() {
+    _getToken();
+  }
+
+  Future<String?> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('token');
+    return _token;
+  }
+
+  Future<void> _clearToken() async {
+    _token = null;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
   }
 
-  static Future<void> setToken(token) async {
-    AuthService.token = token;
+  Future<void> _setToken(token) async {
+    _token = token;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
   }
 
-  Future<DateTime?> getTokenExpiration() async {
-    final token = await getToken();
-    if (token != null) {
-      final Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+  DateTime? _getTokenExpiration() {
+    if (_token != null) {
+      final Map<String, dynamic> decodedToken = Jwt.parseJwt(_token!);
       if (decodedToken.containsKey('exp')) {
         final int expirationTimestamp = decodedToken['exp'];
         return DateTime.fromMillisecondsSinceEpoch(expirationTimestamp * 1000);
@@ -40,17 +54,19 @@ class AuthService {
     return null;
   }
 
-  Future<String> getUserEmail() async {
-    final token = await getToken();
-    if (token == null) {
-      throw UnauthenticatedException('No token found');
-    }
-    var expiration = await getTokenExpiration();
+  void _checkTokenExpired() {
+    var expiration = _getTokenExpiration();
     if (expiration != null && expiration.isBefore(DateTime.now())) {
       throw UnauthenticatedException('Token expired');
     }
+  }
+
+  Future<String> getUserEmail() async {
+    if (await token == null) {
+      throw UnauthenticatedException('No token found');
+    }
     //read claims from token
-    final parts = token!.split('.');
+    final parts = _token!.split('.');
     final payload = parts[1];
     final decoded =
         json.decode(utf8.decode(base64.decode(base64.normalize(payload))));
@@ -69,27 +85,28 @@ class AuthService {
       final data = json.decode(response.body);
       final token = data['token'];
       // Store the token on the device
-      await setToken(token);
+      await _setToken(token);
 
       return token;
     } else {
-      throw Exception('Failed to log in.');
+      throw Exception('Incorrect');
     }
   }
 
-
   Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
+    _clearToken();
   }
 
   Future<void> register(String username, String password) async {
     final response = await http.post(
       Uri.parse(_registerEndpoint),
-      body: json.encode({'username': username, 'password': password}),
+      body: json.encode({'email': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
 
-    if (response.statusCode == 200) {}
+    if (response.statusCode != 200) {
+      var errorMessage = json.decode(response.body);
+      throw Exception('Failed to register. Reason: ${errorMessage["message"]}');
+    }
   }
 }

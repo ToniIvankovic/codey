@@ -13,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String username = '';
   String password = '';
+  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
           onChanged: (value) {
             setState(() {
               username = value;
+              errorMessage = null;
             });
           },
         ),
@@ -37,19 +39,33 @@ class _LoginScreenState extends State<LoginScreen> {
           onChanged: (value) {
             setState(() {
               password = value;
+              errorMessage = null;
             });
           },
         ),
-        ElevatedButton(
-          onPressed: () async {
-            try {
-              await context.read<AuthService>().login(username, password);
-              widget.onLogin();
-            } catch (e) {
-              print('Error occurred: $e');
-            }
-          },
-          child: const Text('Login'),
+        if (errorMessage != null)
+          Text(
+            errorMessage!,
+            style: const TextStyle(
+              color: Colors.red,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () async {
+              try {
+                await context.read<AuthService>().login(username, password);
+                widget.onLogin();
+              } catch (e) {
+                print('Error occurred: $e');
+                setState(() {
+                  errorMessage = e.toString().replaceFirst("Exception: ", "");
+                });
+              }
+            },
+            child: const Text('Login'),
+          ),
         ),
       ],
     );

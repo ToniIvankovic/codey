@@ -5,6 +5,7 @@ import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/widgets/lesson_groups_list.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/widgets/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:codey/widgets/screens/login_screen.dart';
@@ -13,8 +14,11 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        Provider<AuthService>(
+          create: (context) => AuthService(),
+        ),
         Provider<AuthenticatedClient>(
-          create: (_) => AuthenticatedClient(),
+          create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
         Provider<ExercisesRepository>(
           create: (context) =>
@@ -32,9 +36,6 @@ void main() {
           create: (context) => ExercisesServiceV1(
               context.read<ExercisesRepository>(),
               context.read<AuthenticatedClient>()),
-        ),
-        Provider<AuthService>(
-          create: (context) => AuthService(),
         ),
       ],
       child: const MyApp(),
@@ -84,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(30.0),
         child: Center(
           child: FutureBuilder<String?>(
-            future: AuthService.getToken(),
+            future: context.read<AuthService>().token,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
@@ -95,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     title: 'A',
                     onLogout: () => setState(() => loggedIn = false));
               }
-              return LoginScreen(
+              return AuthScreen(
                 onLogin: () => setState(() => loggedIn = true),
               );
             },
