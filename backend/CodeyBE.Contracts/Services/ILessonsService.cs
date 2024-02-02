@@ -10,9 +10,13 @@ namespace CodeyBE.Contracts.Services
 {
     public interface ILessonsService
     {
+        public int FirstLessonId { get; }
         public Task<IEnumerable<Lesson>> GetAllLessonsAsync();
         public Task<Lesson?> GetLessonByIDAsync(int id);
         public Task<IEnumerable<Lesson>> GetLessonsForLessonGroupAsync(int lessonGroupId);
-        public Task EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);
+        public Task<LessonGroup?> GetLessonGroupByLessonIdAsync(int id);
+        public Task<int?> LessonOrder(int lesson1Id, int lesson2Id);
+        public Task<bool> IsLastLessonInGroup(int lessonId);
+        public Task<int> GetNextLessonForLessonId(int lessonId);
     }
 }

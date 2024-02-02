@@ -3,12 +3,12 @@ import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/lesson_groups_list.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:codey/widgets/screens/login_screen.dart';
 
 void main() {
   runApp(
@@ -32,10 +32,15 @@ void main() {
           create: (context) =>
               LessonsRepository(context.read<AuthenticatedClient>()),
         ),
+        Provider<UserService>(
+            create: (context) => UserService(context.read<AuthService>(),
+                context.read<AuthenticatedClient>())),
         Provider<ExercisesService>(
           create: (context) => ExercisesServiceV1(
-              context.read<ExercisesRepository>(),
-              context.read<AuthenticatedClient>()),
+            context.read<ExercisesRepository>(),
+            context.read<AuthenticatedClient>(),
+            context.read<UserService>(),
+          ),
         ),
       ],
       child: const MyApp(),
@@ -50,13 +55,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Codey',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 37, 9, 198)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Codey - Python Course'),
     );
   }
 }

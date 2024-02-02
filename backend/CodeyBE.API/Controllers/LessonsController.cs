@@ -36,12 +36,5 @@ namespace CodeyBE.API.Controllers
         {
             return await lessonsService.GetLessonsForLessonGroupAsync(lessonGroupId);
         }
-
-        [HttpPost("end", Name = "lessonResults")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task EndLesson([FromBody] EndOfLessonReport lessonReport)
-        {
-            await lessonsService.EndLessonAsync(User,lessonReport);
-        }
     }
 }

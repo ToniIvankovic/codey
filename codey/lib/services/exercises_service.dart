@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:codey/models/app_user.dart';
 import 'package:codey/models/end_report.dart';
 import 'package:codey/models/exercise.dart';
 import 'package:codey/models/exercise_LA.dart';
@@ -7,6 +8,7 @@ import 'package:codey/models/exercise_MC.dart';
 import 'package:codey/models/exercise_SA.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ExercisesService {
@@ -26,15 +28,16 @@ class ExercisesServiceV1 implements ExercisesService {
   static String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
       "http://localhost:5052/exercises/${exercise.id}";
   static const String _endOfSessionEndpoint =
-      "http://localhost:5052/lessons/end";
+      "http://localhost:5052/user/endedLesson";
   final ExercisesRepository exRepo;
   final http.Client _authenticatedClient;
+  final UserService _userService;
 
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
   EndReport? _endReport;
 
-  ExercisesServiceV1(this.exRepo, this._authenticatedClient);
+  ExercisesServiceV1(this.exRepo, this._authenticatedClient, this._userService);
 
   @override
   Exercise? get currentExercise {
@@ -113,20 +116,25 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  void endSession(bool completed) {
+  void endSession(bool completed) async {
     _sessionExercises = null;
     if (!completed) {
       _endReport = null;
-    } else {
-      if (_endReport == null) throw Exception('End report is null');
+      return;
+    }
+    
+    if (_endReport == null) throw Exception('End report is null');
 
-      _authenticatedClient.post(
-        Uri.parse(_endOfSessionEndpoint),
-        body: json.encode(_endReport!.toJson()),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
+    var response = await _authenticatedClient.post(
+      Uri.parse(_endOfSessionEndpoint),
+      body: json.encode(_endReport!.toJson()),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      AppUser user = AppUser.fromJson(json.decode(response.body));
+      _userService.updateUser(user);
     }
   }
 

@@ -58,25 +58,29 @@ class _PrePostExerciseScreenState extends State<PrePostExerciseScreen> {
               ),
             )
           : Center(
-              child: PostLessonReport(endReport: exercisesService.getEndReport()!),
+              child:
+                  PostLessonReport(endReport: exercisesService.getEndReport()!),
             ),
     );
   }
 }
 
 class PostLessonReport extends StatelessWidget {
-  PostLessonReport({Key? key,
+  const PostLessonReport({
+    Key? key,
     required this.endReport,
   }) : super(key: key);
-  EndReport endReport;
+  
+  final EndReport endReport;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          Text("Lesson completed!"),
-          Text("You got ${endReport.correctAnswers} out of ${endReport.totalAnswers} correct!"),
+          const Text("Lesson completed!"),
+          Text(
+              "You got ${endReport.correctAnswers} out of ${endReport.totalAnswers} correct!"),
           TextButton(
             onPressed: () {
               Navigator.pop(context);

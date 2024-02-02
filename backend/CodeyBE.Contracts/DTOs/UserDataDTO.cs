@@ -1,14 +1,14 @@
-﻿using AspNetCore.Identity.Mongo.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeyBE.Contracts.Entities.Users
+namespace CodeyBE.Contracts.DTOs
 {
-    public class ApplicationUser : MongoUser
+    public class UserDataDTO
     {
+        public string? Email { get; set; }
         public int? HighestLessonId { get; set; }
         public int? HighestLessonGroupId { get; set; }
         public int? NextLessonId { get; set; }

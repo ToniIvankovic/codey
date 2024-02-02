@@ -1,7 +1,9 @@
+import 'package:codey/models/app_user.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/screens/lessons_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,14 +11,16 @@ import 'package:provider/provider.dart';
 class ListItem {
   ListItem({
     required this.lessonGroup,
+    required this.clickable,
     this.isExpanded = false,
   });
 
   final LessonGroup lessonGroup;
+  final bool clickable;
   bool isExpanded;
 }
 
-class LessonGroupsList extends StatefulWidget {
+class LessonGroupsList extends StatelessWidget {
   final String title;
   final VoidCallback onLogout;
 
@@ -27,36 +31,21 @@ class LessonGroupsList extends StatefulWidget {
   });
 
   @override
-  State<LessonGroupsList> createState() => _LessonGroupsListState();
-}
-
-class _LessonGroupsListState extends State<LessonGroupsList> {
-  String? username;
-
-  @override
   Widget build(BuildContext context) {
     LessonGroupsRepository lessonGroupsRepository =
         context.read<LessonGroupsRepository>();
     List<ListItem> data = [];
     final authService = context.read<AuthService>();
-    if (username == null) {
-      authService.getUserEmail().then((email) {
-        print(email);
-        setState(() {
-          username = email;
-        });
-      }).catchError((error) {
-        print('Error occurred on getting email: $error - Logging out');
-        authService.logout();
-        widget.onLogout();
-      });
-    }
+    final userService = context.read<UserService>();
+    AppUser user;
 
     try {
-      return FutureBuilder<List<LessonGroup>>(
-        future: lessonGroupsRepository.lessonGroups,
-        builder:
-            (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
+      return FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          lessonGroupsRepository.lessonGroups,
+          userService.user
+        ]), // Call the getUser method from AuthService to get the user
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator(
               strokeWidth: 5,
@@ -64,17 +53,20 @@ class _LessonGroupsListState extends State<LessonGroupsList> {
           } else if (snapshot.hasError) {
             if (snapshot.error is UnauthenticatedException) {
               authService.logout();
-              widget.onLogout();
+              onLogout();
             }
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.data == null) {
             return const Text('No data');
           } else {
-            var lg = snapshot.data!;
+            List<LessonGroup> lg = snapshot.data![0];
+            user = snapshot.data![1];
+
             data = lg
                 .map<ListItem>(
                   (item) => ListItem(
                     lessonGroup: item,
+                    clickable: item.id <= user.nextLessonGroupId,
                     isExpanded: false,
                   ),
                 )
@@ -83,15 +75,21 @@ class _LessonGroupsListState extends State<LessonGroupsList> {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(username!),
-                LGListView(data: data),
+                Text(user.email),
+                Text(
+                    "Last lesson: ${user.highestLessonId?.toString() ?? 'Just begun'}"),
+                Text(
+                    "Last lesson group: ${user.highestLessonGroupId?.toString() ?? 'Just begun'}"),
+                Text("Next lesson: ${user.nextLessonId.toString()}"),
+                Text("Next lesson group: ${user.nextLessonGroupId.toString()}"),
+                LessonGroupsListView(data: data),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () {
                       authService
                           .logout(); // Call the logout method from AuthService
-                      widget.onLogout();
+                      onLogout();
                     },
                     child: const Text('Logout'),
                   ),
@@ -103,25 +101,25 @@ class _LessonGroupsListState extends State<LessonGroupsList> {
       );
     } on UnauthenticatedException catch (e) {
       authService.logout();
-      widget.onLogout();
+      onLogout();
       return Text('Error: $e');
     }
   }
 }
 
-class LGListView extends StatefulWidget {
+class LessonGroupsListView extends StatefulWidget {
   final List<ListItem> data;
 
-  const LGListView({
+  const LessonGroupsListView({
     Key? key,
     required this.data,
   }) : super(key: key);
 
   @override
-  State<LGListView> createState() => _LGListViewState();
+  State<LessonGroupsListView> createState() => _LessonGroupsListViewState();
 }
 
-class _LGListViewState extends State<LGListView> {
+class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   late List<ListItem> data;
   @override
   void initState() {
@@ -149,26 +147,40 @@ class _LGListViewState extends State<LGListView> {
               return ListTile(
                 title: Text(
                   item.lessonGroup.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
+                    color: item.clickable ? null : Colors.grey,
                   ),
                 ),
               );
             },
             body: ListTile(
-              title: Text(item.lessonGroup.tips),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        LessonsScreen(lessonGroup: item.lessonGroup),
-                  ),
-                );
-              },
-            ),
+                title: Text(
+                  item.lessonGroup.tips,
+                  style: TextStyle(color: item.clickable ? null : Colors.grey),
+                ),
+                onTap: item.clickable
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LessonsScreen(lessonGroup: item.lessonGroup),
+                          ),
+                        );
+                      }
+                    : () {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'You need to complete the previous lesson group first'),
+                            ),
+                          );
+                      }),
             isExpanded: item.isExpanded,
-            canTapOnHeader: true,
+            canTapOnHeader: item.clickable,
           );
         }).toList(),
       ),

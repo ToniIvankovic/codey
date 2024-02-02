@@ -1,4 +1,5 @@
 ﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Services;
@@ -31,14 +32,12 @@ namespace CodeyBE.API.Controllers
             {
                 return Ok(new UserRegistrationDTO
                 {
-                    success = true,
-                    message = ["User created successfully"]
+                    Message = ["User created successfully"]
                 });
             }
             return StatusCode(400, new UserRegistrationDTO
             {
-                success = false,
-                message = result.Errors.Select(error => error.Description)
+                Message = result.Errors.Select(error => error.Description)
             });
         }
 
@@ -59,13 +58,57 @@ namespace CodeyBE.API.Controllers
                 return new OkObjectResult(
                     new UserLoginDTO
                     {
-                        token = token.Token,
-                        success = true,
+                        Token = token.Token,
                     });
             }
             catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
             {
                 return StatusCode(401, e.Message);
+            }
+        }
+
+        [HttpGet("", Name = "getUserData")]
+        [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetUserData()
+        {
+            try
+            {
+                ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
+                return new OkObjectResult(
+                    new UserDataDTO
+                    {
+                        Email = applicationUser.Email,
+                        HighestLessonId = applicationUser.HighestLessonId,
+                        HighestLessonGroupId = applicationUser.HighestLessonGroupId,
+                        NextLessonId = applicationUser.NextLessonId,
+                        NextLessonGroupId = applicationUser.NextLessonGroupId
+                    });
+            }
+            catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
+            {
+                return StatusCode(401, e.Message);
+            }
+        }
+
+        [HttpPost("endedLesson", Name = "lessonResults")]
+        [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> EndLesson([FromBody] EndOfLessonReport lessonReport)
+        {
+            try
+            {
+                ApplicationUser? applicationUser = await userService.EndLessonAsync(User, lessonReport);
+                var dto = new UserDataDTO
+                {
+                    Email = applicationUser.Email,
+                    HighestLessonId = applicationUser.HighestLessonId,
+                    HighestLessonGroupId = applicationUser.HighestLessonGroupId,
+                    NextLessonId = applicationUser.NextLessonId,
+                    NextLessonGroupId = applicationUser.NextLessonGroupId
+                };
+                return new OkObjectResult(dto);
+            } catch (EntityNotFoundException e)
+            {
+                return StatusCode(400, e.Message);
             }
         }
     }

@@ -8,7 +8,6 @@ namespace CodeyBE.Contracts.DTOs
 {
     public class UserRegistrationDTO
     {
-        public bool success { get; set; }
-        public IEnumerable<string>? message { get; set; }
+        public IEnumerable<string>? Message { get; set; }
     }
 }

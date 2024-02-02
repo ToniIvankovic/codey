@@ -1,6 +1,5 @@
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:codey/models/claim_types.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,19 +60,6 @@ class AuthService {
     }
   }
 
-  Future<String> getUserEmail() async {
-    if (await token == null) {
-      throw UnauthenticatedException('No token found');
-    }
-    //read claims from token
-    final parts = _token!.split('.');
-    final payload = parts[1];
-    final decoded =
-        json.decode(utf8.decode(base64.decode(base64.normalize(payload))));
-    final email = decoded[ClaimTypes.email];
-    return email;
-  }
-
   Future<String> login(String username, String password) async {
     final response = await http.post(
       Uri.parse(_loginEndpoint),
@@ -89,7 +75,7 @@ class AuthService {
 
       return token;
     } else {
-      throw Exception('Incorrect');
+      throw Exception('Incorrect username or password');
     }
   }
 
