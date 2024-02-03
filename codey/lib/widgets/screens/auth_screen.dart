@@ -19,7 +19,8 @@ class _AuthScreenState extends State<AuthScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Text(showLogin ? 'Login' : 'Register', style: Theme.of(context).textTheme.displaySmall),
+          child: Text(showLogin ? 'Login' : 'Register',
+              style: Theme.of(context).textTheme.displaySmall),
         ),
         if (showLogin)
           LoginScreen(

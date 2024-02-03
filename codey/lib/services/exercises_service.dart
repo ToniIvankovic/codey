@@ -134,7 +134,7 @@ class ExercisesServiceV1 implements ExercisesService {
     );
     if (response.statusCode == 200) {
       AppUser user = AppUser.fromJson(json.decode(response.body));
-      _userService.updateUser(user);
+      _userService.user = user;
     }
   }
 

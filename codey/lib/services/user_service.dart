@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:codey/models/app_user.dart';
-import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:rxdart/rxdart.dart';
 
 class UserService {
   final String _userEndpoint = 'http://localhost:5052/user';
@@ -11,12 +12,31 @@ class UserService {
   final http.Client _authenticatedClient;
   AppUser? _user;
   String? _token;
+  late BehaviorSubject<AppUser?> _userSubject;
 
   UserService(this._authService, this._authenticatedClient) {
     initializeUser();
   }
 
+  Stream<AppUser?> get userStream => _userSubject.stream;
+
+  set user(AppUser user) {
+    _user = user;
+    _userSubject.add(_user!);
+  }
+
+  void logout() {
+    _user = null;
+    // _userSubject.add(null);
+    _dispose();
+  }
+
+  void _dispose() {
+    _userSubject.close();
+  }
+
   Future<void> initializeUser() async {
+    _userSubject = BehaviorSubject<AppUser?>();
     var token = await _authService.token;
     if (token == null) {
       return;
@@ -27,32 +47,10 @@ class UserService {
     );
 
     if (response.statusCode == 200) {
-      _user = AppUser.fromJson(jsonDecode(response.body));
-    } else{
-      _authService.logout();
+      user = AppUser.fromJson(jsonDecode(response.body));
+    } else {
+      await _authService.logout();
+      logout();
     }
   }
-
-  void updateUser(AppUser user){
-    //TODO: no one is notified of this change - notify listeners or use a stream
-    _user = user;
-  }
-
-  Future<AppUser> get user async {
-    var token = await _authService.token;
-    if (token == null) {
-      throw UnauthenticatedException('No token found');
-    } else if (token != _token) {
-      _token = token;
-      _user = null;
-    }
-
-    if (_user == null) {
-      await initializeUser();
-    }
-
-    //TODO: if user is deleted, and token remained, null is returned here
-    return Future.value(_user);
-  }
-
 }

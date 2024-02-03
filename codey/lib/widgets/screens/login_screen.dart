@@ -1,4 +1,5 @@
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SessionService sessionService = context.read<SessionService>();
+
     return Column(
       children: [
         TextField(
@@ -55,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ElevatedButton(
             onPressed: () async {
               try {
-                await context.read<AuthService>().login(username, password);
+                await sessionService.login(username, password);
                 widget.onLogin();
               } catch (e) {
                 print('Error occurred: $e');

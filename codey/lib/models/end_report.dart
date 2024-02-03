@@ -1,5 +1,5 @@
 class EndReport {
-  String lessonId;
+  int lessonId;
   int correctAnswers;
   int totalAnswers;
   int totalExercises;

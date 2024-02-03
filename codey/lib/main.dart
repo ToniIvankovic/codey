@@ -3,6 +3,7 @@ import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/lesson_groups_list.dart';
 import 'package:codey/services/exercises_service.dart';
@@ -41,6 +42,10 @@ void main() {
             context.read<AuthenticatedClient>(),
             context.read<UserService>(),
           ),
+        ),
+        Provider<SessionService>(
+          create: (context) => SessionService(
+              context.read<AuthService>(), context.read<UserService>()),
         ),
       ],
       child: const MyApp(),

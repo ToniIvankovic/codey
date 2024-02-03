@@ -3,6 +3,7 @@ import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/screens/lessons_screen.dart';
 import 'package:flutter/material.dart';
@@ -35,72 +36,80 @@ class LessonGroupsList extends StatelessWidget {
     LessonGroupsRepository lessonGroupsRepository =
         context.read<LessonGroupsRepository>();
     List<ListItem> data = [];
-    final authService = context.read<AuthService>();
+    final sessionService = context.read<SessionService>();
     final userService = context.read<UserService>();
-    AppUser user;
+    Stream<AppUser?> user$ = userService.userStream;
 
     try {
-      return FutureBuilder<List<dynamic>>(
-        future: Future.wait([
-          lessonGroupsRepository.lessonGroups,
-          userService.user
-        ]), // Call the getUser method from AuthService to get the user
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+      return FutureBuilder<List<LessonGroup>>(
+        future: lessonGroupsRepository.lessonGroups,
+        // Call the getUser method from AuthService to get the user
+        builder:
+            (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator(
               strokeWidth: 5,
             );
           } else if (snapshot.hasError) {
             if (snapshot.error is UnauthenticatedException) {
-              authService.logout();
+              sessionService.logout();
               onLogout();
             }
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.data == null) {
             return const Text('No data');
           } else {
-            List<LessonGroup> lg = snapshot.data![0];
-            user = snapshot.data![1];
+            List<LessonGroup> lg = snapshot.data!;
 
-            data = lg
-                .map<ListItem>(
-                  (item) => ListItem(
-                    lessonGroup: item,
-                    clickable: item.id <= user.nextLessonGroupId,
-                    isExpanded: false,
-                  ),
-                )
-                .toList();
+            return StreamBuilder(
+                stream: user$,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const CircularProgressIndicator();
+                  }
+                  AppUser user = snapshot.data!;
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(user.email),
-                Text(
-                    "Last lesson: ${user.highestLessonId?.toString() ?? 'Just begun'}"),
-                Text(
-                    "Last lesson group: ${user.highestLessonGroupId?.toString() ?? 'Just begun'}"),
-                Text("Next lesson: ${user.nextLessonId.toString()}"),
-                Text("Next lesson group: ${user.nextLessonGroupId.toString()}"),
-                LessonGroupsListView(data: data),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      authService
-                          .logout(); // Call the logout method from AuthService
-                      onLogout();
-                    },
-                    child: const Text('Logout'),
-                  ),
-                ),
-              ],
-            );
+                  data = lg
+                      .map<ListItem>(
+                        (item) => ListItem(
+                          lessonGroup: item,
+                          clickable: item.id <= user.nextLessonGroupId,
+                          isExpanded: false,
+                        ),
+                      )
+                      .toList();
+
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(user.email),
+                      Text(
+                          "Last lesson: ${user.highestLessonId?.toString() ?? 'Just begun'}"),
+                      Text(
+                          "Last lesson group: ${user.highestLessonGroupId?.toString() ?? 'Just begun'}"),
+                      Text("Next lesson: ${user.nextLessonId.toString()}"),
+                      Text(
+                          "Next lesson group: ${user.nextLessonGroupId.toString()}"),
+                      LessonGroupsListView(data: data),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            sessionService
+                                .logout(); // Call the logout method from AuthService
+                            onLogout();
+                          },
+                          child: const Text('Logout'),
+                        ),
+                      ),
+                    ],
+                  );
+                });
           }
         },
       );
     } on UnauthenticatedException catch (e) {
-      authService.logout();
+      sessionService.logout();
       onLogout();
       return Text('Error: $e');
     }
@@ -125,6 +134,12 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   void initState() {
     super.initState();
     data = widget.data; // Initialize data from the parent widget
+  }
+
+  @override
+  void didUpdateWidget(LessonGroupsListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    data = widget.data; // Update data when the parent widget updates
   }
 
   @override

@@ -1,5 +1,5 @@
 class Lesson {
-  String id;
+  int id;
   String lessonGroupId;
   List<String> exerciseIds;
   String name;
@@ -15,7 +15,7 @@ class Lesson {
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
     return Lesson(
-      id: json['privateId'].toString(),
+      id: json['privateId'],
       lessonGroupId: json['lessonGroupId'].toString(),
       name: json['name'],
       exerciseIds: json['exercises'].cast<String>(),
