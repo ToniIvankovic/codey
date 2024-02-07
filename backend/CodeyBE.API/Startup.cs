@@ -16,9 +16,26 @@ using System.Text;
 namespace CodeyBE.API
 {
     // Startup.cs
-    public static class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        private IConfiguration Configuration { get; } = configuration;
+
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+
+        public void ConfigureServices(IServiceCollection services)
         {
             // Configure the MongoDB context
             services.AddScoped<IMongoDbContext>(provider =>
@@ -42,13 +59,12 @@ namespace CodeyBE.API
             },
             mongoIdentityOptions =>
             {
-
-                mongoIdentityOptions.ConnectionString = configuration["database:ConnectionString"] + "/" + configuration["database:DatabaseName"];
-                mongoIdentityOptions.UsersCollection = configuration["database:UsersCollectionName"];
-                mongoIdentityOptions.RolesCollection = configuration["database:UserRolesCollectionName"];
+                mongoIdentityOptions.ConnectionString = Configuration["database:ConnectionString"] + "/" + Configuration["database:DatabaseName"];
+                mongoIdentityOptions.UsersCollection = Configuration["database:UsersCollectionName"];
+                mongoIdentityOptions.RolesCollection = Configuration["database:UserRolesCollectionName"];
             });
 
-            services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
+            services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,10 +77,10 @@ namespace CodeyBE.API
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuer = configuration["JWTSettings:Issuer"],
-                    ValidAudience = configuration["JWTSettings:Audience"],
+                    ValidIssuer = Configuration["JWTSettings:Issuer"],
+                    ValidAudience = Configuration["JWTSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["JWTSettings:Key"]!)
+                        Encoding.UTF8.GetBytes(Configuration["JWTSettings:Key"]!)
                         ),
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,

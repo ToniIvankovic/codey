@@ -9,7 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 //IoC
-Startup.ConfigureServices(builder.Services, builder.Configuration);
+var startup = new Startup(builder.Configuration);
+startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
@@ -41,11 +42,6 @@ app.Use(async (context, next) =>
     await next(context);
 });
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-//app.UseMiddleware<ExceptionMiddleware>();
-
-app.MapControllers();
+Startup.Configure(app, app.Environment);
 
 app.Run();

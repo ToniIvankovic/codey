@@ -1,0 +1,65 @@
+name: Build and deploy .NET Core application to Web App CodeyBEAPI20240227131508 with API Management Service CodeyBEAPIapi-CodeyBEAPI
+on:
+  push:
+    branches:
+    - main
+env:
+  AZURE_WEBAPP_NAME: CodeyBEAPI20240227131508
+  AZURE_WEBAPP_PACKAGE_PATH: CodeyBE.API\publish
+  AZURE_APIM_RESOURCE_PATH: /codeyBE
+  AZURE_APIM_RESOURCEGROUP: CodeyBEAPI20240227131508ResourceGroup
+  AZURE_APIM_SERVICENAME: CodeyBEAPIapi
+  AZURE_APIM_API_ID: CodeyBEAPI
+  AZURE_APIM_APPSERVICEURL: https://codeybeapi20240227131508.azurewebsites.net
+  SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION: 5.6.3
+  SWASHBUCKLE_DOTNET_CORE_VERSION: 3.1.x
+  API_IMPORT_SPECIFICATION_PATH: backend\CodeyBE.API\publish\swagger.json
+  API_IMPORT_DLL: backend\CodeyBE.API\bin\Release\net8.0\CodeyBE.API.dll
+  API_IMPORT_VERSION: v1
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 8.0.x
+  WORKING_DIRECTORY: backend/CodeyBE.API
+  ENV_VAR: ${{ vars.VAR1 }}
+jobs:
+  build:
+    runs-on: windows-latest
+    environment:
+      name: 'production'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1.8.0
+      with:
+        include-prerelease: True
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Restore
+      run: dotnet restore ${{ env.WORKING_DIRECTORY }}
+    - name: Build
+      run: dotnet build ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-restore
+    - name: Test
+      run: dotnet test ${{ env.WORKING_DIRECTORY }} --no-build
+    - name: Publish
+      run: dotnet publish ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-build --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: webapp
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'production'
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: webapp
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.CodeyBEAPI20240227131508_E04E }}
+    

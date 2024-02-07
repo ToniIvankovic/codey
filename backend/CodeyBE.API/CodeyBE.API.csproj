@@ -1,15 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+    <UserSecretsId>fda92957-1f6a-4a0f-80d8-a84a2b5d11d1</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="secrets.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.Identity.Mongo" Version="8.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="7.1.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
