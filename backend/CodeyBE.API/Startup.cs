@@ -44,8 +44,8 @@ namespace CodeyBE.API
             {
 
                 mongoIdentityOptions.ConnectionString = configuration["database:ConnectionString"] + "/" + configuration["database:DatabaseName"];
-                mongoIdentityOptions.UsersCollection = "Users";
-                mongoIdentityOptions.RolesCollection = "Roles";
+                mongoIdentityOptions.UsersCollection = configuration["database:UsersCollectionName"];
+                mongoIdentityOptions.RolesCollection = configuration["database:UserRolesCollectionName"];
             });
 
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
