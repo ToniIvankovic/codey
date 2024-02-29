@@ -1,7 +1,7 @@
-import 'package:codey/models/exercise.dart';
-import 'package:codey/models/exercise_LA.dart';
-import 'package:codey/models/exercise_MC.dart';
-import 'package:codey/models/exercise_SA.dart';
+import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_LA.dart';
+import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';

@@ -1,54 +1,56 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:codey/models/app_user.dart';
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
-class UserService {
-  final String _userEndpoint = '${dotenv.env["API_BASE"]}/user';
+abstract class UserService {
+  Stream<AppUser> get userStream;
+  Future<void> initializeUser();
+  void logout();
+  void updateUser(AppUser user);
+}
+
+class UserService1 implements UserService {
+  final Uri _userEndpoint = Uri.parse('${dotenv.env["API_BASE"]}/user');
   final AuthService _authService;
   final http.Client _authenticatedClient;
-  AppUser? _user;
-  String? _token;
-  late BehaviorSubject<AppUser?> _userSubject;
+  late BehaviorSubject<AppUser> _userSubject;
 
-  UserService(this._authService, this._authenticatedClient) {
+  UserService1(this._authService, this._authenticatedClient) {
     initializeUser();
   }
 
-  Stream<AppUser?> get userStream => _userSubject.stream;
+  @override
+  Stream<AppUser> get userStream => _userSubject.stream;
 
-  set user(AppUser user) {
-    _user = user;
-    _userSubject.add(_user!);
+  @override
+  void updateUser(AppUser user) {
+    _userSubject.add(user);
   }
 
+  @override
   void logout() {
-    _user = null;
-    // _userSubject.add(null);
-    _dispose();
-  }
-
-  void _dispose() {
     _userSubject.close();
   }
 
+  @override
   Future<void> initializeUser() async {
-    _userSubject = BehaviorSubject<AppUser?>();
+    _userSubject = BehaviorSubject<AppUser>();
     var token = await _authService.token;
     if (token == null) {
       return;
     }
 
-    var response = await _authenticatedClient.get(
-      Uri.parse(_userEndpoint),
-    );
+    // Token exists, but might be invalid
+    var response = await _authenticatedClient.get(_userEndpoint);
 
     if (response.statusCode == 200) {
-      user = AppUser.fromJson(jsonDecode(response.body));
+      var user = AppUser.fromJson(jsonDecode(response.body));
+      updateUser(user);
     } else {
       await _authService.logout();
       logout();

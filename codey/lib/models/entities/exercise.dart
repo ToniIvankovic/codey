@@ -1,7 +1,7 @@
-import 'package:codey/models/exercise_LA.dart';
-import 'package:codey/models/exercise_MC.dart';
-import 'package:codey/models/exercise_SA.dart';
-import 'package:codey/models/exercise_type.dart';
+import 'package:codey/models/entities/exercise_LA.dart';
+import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/exercise_type.dart';
 
 abstract class Exercise {
   final int id;
@@ -23,7 +23,6 @@ abstract class Exercise {
   });
   
   factory Exercise.fromJson(Map<String, dynamic> json) {
-    //return specific exercise based on type
     switch (json['type']) {
       case 'MC':
         return ExerciseMC.fromJson(json);
@@ -36,13 +35,13 @@ abstract class Exercise {
     }
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'difficulty': difficulty,
-        'type': type.toString().split('.').last,
-        'statement': statement,
-        'statementCode': statementCode,
-        'question': question,
-        'specificTip': specificTip,
-      };
+  // Map<String, dynamic> toJson() => {
+  //       'id': id,
+  //       'difficulty': difficulty,
+  //       'type': type.toString().split('.').last,
+  //       'statement': statement,
+  //       'statementCode': statementCode,
+  //       'question': question,
+  //       'specificTip': specificTip,
+  //     };
 }

@@ -1,6 +1,6 @@
-import 'package:codey/models/app_user.dart';
-import 'package:codey/models/lesson.dart';
-import 'package:codey/models/lesson_group.dart';
+import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/screens/pre_post_exercise_screen.dart';

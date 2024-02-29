@@ -1,6 +1,6 @@
-import 'package:codey/models/app_user.dart';
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
-import 'package:codey/models/lesson_group.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/session_service.dart';
@@ -42,7 +42,7 @@ class LessonGroupsList extends StatelessWidget {
 
     try {
       return FutureBuilder<List<LessonGroup>>(
-        future: lessonGroupsRepository.lessonGroups,
+        future: lessonGroupsRepository.getAllLessonGroups(),
         // Call the getUser method from AuthService to get the user
         builder:
             (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {

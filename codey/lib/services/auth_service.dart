@@ -5,27 +5,78 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthService {
-  final String _loginEndpoint = '${dotenv.env["API_BASE"]}/user/login';
-  final String _registerEndpoint = '${dotenv.env["API_BASE"]}/user/register';
+abstract class AuthService {
+  Future<String?> get token;
+  Future<void> login(String username, String password);
+  Future<void> logout();
+  Future<void> register(String username, String password);
+}
+
+class AuthService1 implements AuthService {
+  final Uri _loginEndpoint = Uri.parse('${dotenv.env["API_BASE"]}/user/login');
+  final Uri _registerEndpoint =
+      Uri.parse('${dotenv.env["API_BASE"]}/user/register');
   String? _token;
 
+  AuthService1() {
+    _getTokenFromStorage();
+  }
+
+  @override
+  Future<void> login(String username, String password) async {
+    final response = await http.post(
+      _loginEndpoint,
+      body: json.encode({'email': username, 'password': password}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final token = data['token'];
+      await _setToken(token);
+    } else {
+      throw Exception('Incorrect username or password');
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    _clearToken();
+  }
+
+  @override
+  Future<void> register(String username, String password) async {
+    final response = await http.post(
+      _registerEndpoint,
+      body: json.encode({'email': username, 'password': password}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      var errorMessage = json.decode(response.body);
+      throw Exception('Failed to register. Reason: ${errorMessage["message"]}');
+    }
+  }
+
+  @override
   Future<String?> get token async {
-    _token ??= await _getToken();
+    _token ??= await _getTokenFromStorage();
+    if (_token == null) {
+      return Future(() => null);
+    }
+
+    // Token exists, but might be expired
     try {
       _checkTokenExpired();
     } catch (e) {
       await _clearToken();
       return Future(() => null);
     }
+
     return Future.value(_token);
   }
 
-  AuthService() {
-    _getToken();
-  }
-
-  Future<String?> _getToken() async {
+  Future<String?> _getTokenFromStorage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
     return _token;
@@ -43,17 +94,6 @@ class AuthService {
     await prefs.setString('token', token);
   }
 
-  DateTime? _getTokenExpiration() {
-    if (_token != null) {
-      final Map<String, dynamic> decodedToken = Jwt.parseJwt(_token!);
-      if (decodedToken.containsKey('exp')) {
-        final int expirationTimestamp = decodedToken['exp'];
-        return DateTime.fromMillisecondsSinceEpoch(expirationTimestamp * 1000);
-      }
-    }
-    return null;
-  }
-
   void _checkTokenExpired() {
     var expiration = _getTokenExpiration();
     if (expiration != null && expiration.isBefore(DateTime.now())) {
@@ -61,39 +101,17 @@ class AuthService {
     }
   }
 
-  Future<String> login(String username, String password) async {
-    final response = await http.post(
-      Uri.parse(_loginEndpoint),
-      body: json.encode({'email': username, 'password': password}),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final token = data['token'];
-      // Store the token on the device
-      await _setToken(token);
-
-      return token;
-    } else {
-      throw Exception('Incorrect username or password');
+  DateTime? _getTokenExpiration() {
+    if (_token == null) {
+      return null;
     }
-  }
 
-  Future<void> logout() async {
-    _clearToken();
-  }
-
-  Future<void> register(String username, String password) async {
-    final response = await http.post(
-      Uri.parse(_registerEndpoint),
-      body: json.encode({'email': username, 'password': password}),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode != 200) {
-      var errorMessage = json.decode(response.body);
-      throw Exception('Failed to register. Reason: ${errorMessage["message"]}');
+    final Map<String, dynamic> decodedToken = Jwt.parseJwt(_token!);
+    if (!decodedToken.containsKey('exp')) {
+      return null;
     }
+
+    final int expirationTimestamp = decodedToken['exp'];
+    return DateTime.fromMillisecondsSinceEpoch(expirationTimestamp * 1000);
   }
 }

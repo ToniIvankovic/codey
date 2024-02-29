@@ -1,5 +1,5 @@
-import 'package:codey/models/end_report.dart';
-import 'package:codey/models/lesson.dart';
+import 'package:codey/models/entities/end_report.dart';
+import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/screens/exercises_screen.dart';
 import 'package:flutter/material.dart';

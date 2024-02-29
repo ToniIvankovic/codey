@@ -1,40 +1,47 @@
 import 'dart:convert';
 
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
-import 'package:codey/models/lesson_group.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
 
-class LessonGroupsRepository {
-  final String apiUrl = '${dotenv.env["API_BASE"]}/lessonGroups';
+abstract class LessonGroupsRepository {
+  Future<List<LessonGroup>> getAllLessonGroups();
+}
+
+class LessonGroupsRepository1 implements LessonGroupsRepository {
+  final String _apiUrl = '${dotenv.env["API_BASE"]}/lessonGroups';
   List<LessonGroup>? _lessonGroupsCache;
   final http.Client _authenticatedClient;
 
-  LessonGroupsRepository(this._authenticatedClient);
+  LessonGroupsRepository1(this._authenticatedClient);
 
-  Future<List<LessonGroup>> fetchLessonGroups() async {
-    final response = await _authenticatedClient.get(Uri.parse(apiUrl));
-    
-    if (response.statusCode == 200) {
-      // Parse the response body and extract the lesson groups
-      final List<dynamic> data = json.decode(response.body);
-      final List<LessonGroup> lessonGroups =
-          data.map((dynamic item) => LessonGroup.fromJson(item)).toList();
-      _lessonGroupsCache = lessonGroups; // Update the cache
-      return lessonGroups;
-    } else if (response.statusCode == 401) {
-      throw UnauthenticatedException('Unauthorized');
-    } else {
-      throw Exception('Failed to fetch lesson groups');
+  @override
+  Future<List<LessonGroup>> getAllLessonGroups() {
+    if (_lessonGroupsCache == null) {
+      return _fetchLessonGroups();
     }
+    return Future.value(_lessonGroupsCache!);
   }
 
-  Future<List<LessonGroup>> get lessonGroups async {
-    if (_lessonGroupsCache == null) {
-      // Cache not initialized, fetch the lesson groups
-      return await fetchLessonGroups();
+  Future<List<LessonGroup>> _fetchLessonGroups() async {
+    final response = await _authenticatedClient.get(Uri.parse(_apiUrl));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      final List<LessonGroup> lessonGroups =
+          data.map((item) => LessonGroup.fromJson(item)).toList();
+      _lessonGroupsCache = lessonGroups;
+      return lessonGroups;
+    } else {
+      switch (response.statusCode) {
+        case 401:
+          throw UnauthenticatedException(
+              'Unauthorized retrieval of lesson groups');
+        default:
+          throw Exception('Failed to fetch lesson groups, '
+              'Error ${response.statusCode}');
+      }
     }
-    return Future.value(_lessonGroupsCache);
   }
 }

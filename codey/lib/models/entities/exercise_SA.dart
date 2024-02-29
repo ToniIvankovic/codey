@@ -1,42 +1,35 @@
 // ignore_for_file: file_names
 
-import 'package:codey/models/exercise_type.dart';
+import 'package:codey/models/entities/exercise_type.dart';
 
 import 'exercise.dart';
 
-class ExerciseMC extends Exercise {
-  Map<String, dynamic> answerOptions;
-  String correctAnswer;
-
-  ExerciseMC({
+class ExerciseSA extends Exercise {
+  ExerciseSA({
     required id,
     required difficulty,
     String? statement,
     String? statementCode,
     String? question,
     String? specificTip,
-    required this.answerOptions,
-    required this.correctAnswer,
   }) : super(
+          type: ExerciseType.SA,
           id: id,
           difficulty: difficulty,
-          type: ExerciseType.MC,
           statement: statement,
           statementCode: statementCode,
           question: question,
           specificTip: specificTip,
         );
 
-  factory ExerciseMC.fromJson(Map<String, dynamic> json) {
-    return ExerciseMC(
+  factory ExerciseSA.fromJson(Map<String, dynamic> json) {
+    return ExerciseSA(
       id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementCode: json['statementCode'],
       question: json['question'],
       specificTip: json['specificTip'],
-      answerOptions: json['answerOptions'],
-      correctAnswer: json['correctAnswer'],
     );
   }
 }

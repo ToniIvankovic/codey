@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:codey/models/app_user.dart';
-import 'package:codey/models/end_report.dart';
-import 'package:codey/models/exercise.dart';
-import 'package:codey/models/exercise_LA.dart';
-import 'package:codey/models/exercise_MC.dart';
-import 'package:codey/models/exercise_SA.dart';
-import 'package:codey/models/lesson.dart';
+import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/models/entities/end_report.dart';
+import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_LA.dart';
+import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,10 +26,10 @@ abstract class ExercisesService {
 }
 
 class ExercisesServiceV1 implements ExercisesService {
-  static String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
-      "${dotenv.env["API_BASE"]}/exercises/${exercise.id}";
-  static final String _endOfSessionEndpoint =
-      "${dotenv.env["API_BASE"]}/user/endedLesson";
+  static Uri _exerciseAnswerValidationEndpoint(Exercise exercise) =>
+      Uri.parse("${dotenv.env["API_BASE"]}/exercises/${exercise.id}");
+  static final Uri _endOfSessionEndpoint =
+      Uri.parse("${dotenv.env["API_BASE"]}/user/endedLesson");
   final ExercisesRepository exRepo;
   final http.Client _authenticatedClient;
   final UserService _userService;
@@ -57,14 +57,14 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<List<Exercise>> getAllExercisesForLessonById(String lessonId) {
-    return exRepo.fetchExercises(lessonId);
+    return exRepo.getExercisesForLesson(lessonId);
   }
 
   @override
   Future<void> startSessionForLesson(Lesson lesson) async {
     var exercises = await getAllExercisesForLesson(lesson);
     _sessionExercises = exercises;
-    _endReport = EndReport(lesson.id, 0, 0, exercises.length, DateTime.now());
+    _endReport = EndReport(lesson.id, 0, 0, exercises.length);
   }
 
   @override
@@ -85,7 +85,7 @@ class ExercisesServiceV1 implements ExercisesService {
     if (exercise is ExerciseMC) {
       correct = exercise.correctAnswer == answer;
       _authenticatedClient.post(
-        Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
+        _exerciseAnswerValidationEndpoint(exercise),
         body: json.encode({"answer": answer}),
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ class ExercisesServiceV1 implements ExercisesService {
       );
     } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
       final response = await _authenticatedClient.post(
-        Uri.parse(_exerciseAnswerValidationEndpoint(exercise)),
+        _exerciseAnswerValidationEndpoint(exercise),
         body: json.encode({"answer": answer}),
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ class ExercisesServiceV1 implements ExercisesService {
     if (_endReport == null) throw Exception('End report is null');
 
     var response = await _authenticatedClient.post(
-      Uri.parse(_endOfSessionEndpoint),
+      _endOfSessionEndpoint,
       body: json.encode(_endReport!.toJson()),
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ class ExercisesServiceV1 implements ExercisesService {
     );
     if (response.statusCode == 200) {
       AppUser user = AppUser.fromJson(json.decode(response.body));
-      _userService.user = user;
+      _userService.updateUser(user);
     }
   }
 

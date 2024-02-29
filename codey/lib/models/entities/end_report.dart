@@ -3,10 +3,10 @@ class EndReport {
   int correctAnswers;
   int totalAnswers;
   int totalExercises;
-  final DateTime _startTime;
+  final DateTime _startTime = DateTime.now();
 
   EndReport(this.lessonId, this.correctAnswers, this.totalAnswers,
-      this.totalExercises, this._startTime);
+      this.totalExercises);
 
   double get accuracy => correctAnswers / totalAnswers;
   Duration get duration => DateTime.now().difference(_startTime);

@@ -18,25 +18,25 @@ Future main() async{
     MultiProvider(
       providers: [
         Provider<AuthService>(
-          create: (context) => AuthService(),
+          create: (context) => AuthService1(),
         ),
         Provider<AuthenticatedClient>(
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
         Provider<ExercisesRepository>(
           create: (context) =>
-              ExercisesRepository(context.read<AuthenticatedClient>()),
+              ExercisesRepository1(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonGroupsRepository>(
           create: (context) =>
-              LessonGroupsRepository(context.read<AuthenticatedClient>()),
+              LessonGroupsRepository1(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonsRepository>(
           create: (context) =>
-              LessonsRepository(context.read<AuthenticatedClient>()),
+              LessonsRepository1(context.read<AuthenticatedClient>()),
         ),
         Provider<UserService>(
-            create: (context) => UserService(context.read<AuthService>(),
+            create: (context) => UserService1(context.read<AuthService>(),
                 context.read<AuthenticatedClient>())),
         Provider<ExercisesService>(
           create: (context) => ExercisesServiceV1(
@@ -46,7 +46,7 @@ Future main() async{
           ),
         ),
         Provider<SessionService>(
-          create: (context) => SessionService(
+          create: (context) => SessionService1(
               context.read<AuthService>(), context.read<UserService>()),
         ),
       ],
