@@ -3,11 +3,12 @@ import 'dart:convert';
 
 import 'package:codey/models/app_user.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
 
 class UserService {
-  final String _userEndpoint = 'http://localhost:5052/user';
+  final String _userEndpoint = '${dotenv.env["API_BASE"]}/user';
   final AuthService _authService;
   final http.Client _authenticatedClient;
   AppUser? _user;

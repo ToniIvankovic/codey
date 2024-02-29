@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/lesson_group.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class LessonGroupsRepository {
-  final String apiUrl = 'http://localhost:5052/lessonGroups';
+  final String apiUrl = '${dotenv.env["API_BASE"]}/lessonGroups';
   List<LessonGroup>? _lessonGroupsCache;
   final http.Client _authenticatedClient;
 

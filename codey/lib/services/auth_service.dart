@@ -1,12 +1,13 @@
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String _loginEndpoint = 'http://localhost:5052/user/login';
-  final String _registerEndpoint = 'http://localhost:5052/user/register';
+  final String _loginEndpoint = '${dotenv.env["API_BASE"]}/user/login';
+  final String _registerEndpoint = '${dotenv.env["API_BASE"]}/user/register';
   String? _token;
 
   Future<String?> get token async {

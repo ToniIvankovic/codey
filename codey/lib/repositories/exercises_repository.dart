@@ -1,9 +1,10 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '/models/exercise.dart';
 
 class ExercisesRepository {
-  final String apiUrl = 'http://localhost:5052/exercises';
+  final String apiUrl = '${dotenv.env["API_BASE"]}/exercises';
   final Map<String, List<Exercise>> cache = {};
   final http.Client _authenticatedClient;
 

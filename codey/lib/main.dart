@@ -10,8 +10,10 @@ import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
-void main() {
+Future main() async{
+  await dotenv.dotenv.load();
   runApp(
     MultiProvider(
       providers: [

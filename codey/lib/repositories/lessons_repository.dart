@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:codey/models/lesson.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class LessonsRepository {
-  final String apiUrl = 'http://localhost:5052/Lessons';
+  final String apiUrl = '${dotenv.env["API_BASE"]}/Lessons';
   final Map<String, List<Lesson>> _cache = {};
   final http.Client _authenticatedClient;
 

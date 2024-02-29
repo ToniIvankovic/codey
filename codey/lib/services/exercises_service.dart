@@ -9,6 +9,7 @@ import 'package:codey/models/exercise_SA.dart';
 import 'package:codey/models/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/user_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ExercisesService {
@@ -26,9 +27,9 @@ abstract class ExercisesService {
 
 class ExercisesServiceV1 implements ExercisesService {
   static String _exerciseAnswerValidationEndpoint(Exercise exercise) =>
-      "http://localhost:5052/exercises/${exercise.id}";
-  static const String _endOfSessionEndpoint =
-      "http://localhost:5052/user/endedLesson";
+      "${dotenv.env["API_BASE"]}/exercises/${exercise.id}";
+  static final String _endOfSessionEndpoint =
+      "${dotenv.env["API_BASE"]}/user/endedLesson";
   final ExercisesRepository exRepo;
   final http.Client _authenticatedClient;
   final UserService _userService;
