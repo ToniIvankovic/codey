@@ -28,13 +28,7 @@ class ExercisesRepository1 implements ExercisesRepository {
     final uri = _apiUrl(lessonId);
     final response = await _authenticatedClient.get(uri);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      final exercises =
-          data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
-      cache[lessonId] = exercises;
-      return List.of(exercises);
-    } else {
+    if (response.statusCode != 200) {
       switch (response.statusCode) {
         case 401:
           throw UnauthenticatedException(
@@ -44,5 +38,11 @@ class ExercisesRepository1 implements ExercisesRepository {
               'Error ${response.statusCode}');
       }
     }
+
+    final List<dynamic> data = json.decode(response.body);
+    final exercises =
+        data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
+    cache[lessonId] = exercises;
+    return List.of(exercises);
   }
 }

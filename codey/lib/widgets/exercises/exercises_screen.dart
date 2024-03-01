@@ -1,6 +1,6 @@
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/exercises_service.dart';
-import 'package:codey/widgets/single_exercise_widget.dart';
+import 'package:codey/widgets/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,12 +8,13 @@ class ExercisesScreen extends StatelessWidget {
   final Lesson lesson;
   final VoidCallback onSessionCompleted;
 
-  const ExercisesScreen({super.key, required this.lesson, required this.onSessionCompleted});
+  const ExercisesScreen(
+      {super.key, required this.lesson, required this.onSessionCompleted});
 
   @override
   Widget build(BuildContext context) {
-    var exercisesService = context.read<ExercisesService>();
-    Future<void> startSessionFuture =
+    final exercisesService = context.read<ExercisesService>();
+    final Future<void> startSessionFuture =
         exercisesService.startSessionForLesson(lesson);
 
     return WillPopScope(
@@ -39,29 +40,29 @@ class ExercisesScreen extends StatelessWidget {
                 );
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
-              } else {
-                var exercise = exercisesService.getNextExercise();
-                if (exercise == null) {
-                  return const Text('No exercises');
-                }
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SingleExerciseWidget(
-                      key: ValueKey(exercise.id),
-                      exercisesService: exercisesService,
-                      onSessionFinished: () => {
-                        exercisesService.endSession(true),
-                        onSessionCompleted(),
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          Navigator.pop(context);
-                        })
-                      },
-                    ),
-                  ],
-                );
               }
+
+              var exercise = exercisesService.getNextExercise();
+              if (exercise == null) {
+                return const Text('No exercises');
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SingleExerciseWidget(
+                    key: ValueKey(exercise.id),
+                    exercisesService: exercisesService,
+                    onSessionFinished: () => {
+                      exercisesService.endSession(true),
+                      onSessionCompleted(),
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.pop(context);
+                      })
+                    },
+                  ),
+                ],
+              );
             },
           ),
         ),

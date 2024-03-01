@@ -47,13 +47,13 @@ class UserService1 implements UserService {
 
     // Token exists, but might be invalid
     var response = await _authenticatedClient.get(_userEndpoint);
-
-    if (response.statusCode == 200) {
-      var user = AppUser.fromJson(jsonDecode(response.body));
-      updateUser(user);
-    } else {
+    if (response.statusCode != 200) {
       await _authService.logout();
       logout();
+      return;
     }
+
+    var user = AppUser.fromJson(jsonDecode(response.body));
+    updateUser(user);
   }
 }

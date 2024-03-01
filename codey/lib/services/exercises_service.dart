@@ -13,9 +13,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ExercisesService {
-  const ExercisesService();
-  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson);
-  Future<List<Exercise>> getAllExercisesForLessonById(String lessonId);
   Future<void> startSessionForLesson(Lesson lesson);
   Exercise? getNextExercise();
   Exercise? get currentExercise;
@@ -30,7 +27,8 @@ class ExercisesServiceV1 implements ExercisesService {
       Uri.parse("${dotenv.env["API_BASE"]}/exercises/${exercise.id}");
   static final Uri _endOfSessionEndpoint =
       Uri.parse("${dotenv.env["API_BASE"]}/user/endedLesson");
-  final ExercisesRepository exRepo;
+
+  final ExercisesRepository _exRepo;
   final http.Client _authenticatedClient;
   final UserService _userService;
 
@@ -38,7 +36,8 @@ class ExercisesServiceV1 implements ExercisesService {
   Exercise? _currentExercise;
   EndReport? _endReport;
 
-  ExercisesServiceV1(this.exRepo, this._authenticatedClient, this._userService);
+  ExercisesServiceV1(
+      this._exRepo, this._authenticatedClient, this._userService);
 
   @override
   Exercise? get currentExercise {
@@ -51,20 +50,9 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
-    return getAllExercisesForLessonById(lesson.id.toString());
-  }
-
-  @override
-  Future<List<Exercise>> getAllExercisesForLessonById(String lessonId) {
-    return exRepo.getExercisesForLesson(lessonId);
-  }
-
-  @override
   Future<void> startSessionForLesson(Lesson lesson) async {
-    var exercises = await getAllExercisesForLesson(lesson);
-    _sessionExercises = exercises;
-    _endReport = EndReport(lesson.id, 0, 0, exercises.length);
+    _sessionExercises = await _getAllExercisesForLesson(lesson);
+    _endReport = EndReport(lesson.id, 0, 0, _sessionExercises!.length);
   }
 
   @override
@@ -100,18 +88,22 @@ class ExercisesServiceV1 implements ExercisesService {
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        correct = data['isCorrect'];
-      } else {
+      if (response.statusCode != 200) {
         throw Exception('Failed to validate answer');
       }
+
+      final data = json.decode(response.body);
+      correct = data['isCorrect'];
     } else {
       throw Exception('Unknown exercise type');
     }
+
     _endReport!.totalAnswers++;
     if (correct) {
       _endReport!.correctAnswers++;
+    } else {
+      // TODO: indicate that the exercise is repeated
+      _sessionExercises!.add(exercise);
     }
     return correct;
   }
@@ -123,7 +115,7 @@ class ExercisesServiceV1 implements ExercisesService {
       _endReport = null;
       return;
     }
-    
+
     if (_endReport == null) throw Exception('End report is null');
 
     var response = await _authenticatedClient.post(
@@ -133,14 +125,24 @@ class ExercisesServiceV1 implements ExercisesService {
         'Content-Type': 'application/json',
       },
     );
-    if (response.statusCode == 200) {
-      AppUser user = AppUser.fromJson(json.decode(response.body));
-      _userService.updateUser(user);
+    if (response.statusCode != 200) {
+      return;
     }
+
+    AppUser user = AppUser.fromJson(json.decode(response.body));
+    _userService.updateUser(user);
   }
 
   @override
   EndReport? getEndReport() {
     return _endReport;
+  }
+
+  Future<List<Exercise>> _getAllExercisesForLesson(Lesson lesson) {
+    return _getAllExercisesForLessonById(lesson.id.toString());
+  }
+
+  Future<List<Exercise>> _getAllExercisesForLessonById(String lessonId) {
+    return _exRepo.getExercisesForLesson(lessonId);
   }
 }

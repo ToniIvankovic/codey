@@ -1,3 +1,4 @@
+import 'package:codey/models/exceptions/authentication_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decode/jwt_decode.dart';
@@ -29,14 +30,13 @@ class AuthService1 implements AuthService {
       body: json.encode({'email': username, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final token = data['token'];
-      await _setToken(token);
-    } else {
-      throw Exception('Incorrect username or password');
+    if (response.statusCode != 200) {
+      throw AuthenticationException('Incorrect username or password');
     }
+
+    final data = json.decode(response.body);
+    final token = data['token'];
+    await _setToken(token);
   }
 
   @override
@@ -54,7 +54,8 @@ class AuthService1 implements AuthService {
 
     if (response.statusCode != 200) {
       var errorMessage = json.decode(response.body);
-      throw Exception('Failed to register. Reason: ${errorMessage["message"]}');
+      errorMessage = errorMessage['message'].toString().substring(1, errorMessage['message'].toString().length - 1).split(", ").join("\n");
+      throw AuthenticationException(errorMessage);
     }
   }
 
@@ -70,10 +71,9 @@ class AuthService1 implements AuthService {
       _checkTokenExpired();
     } catch (e) {
       await _clearToken();
-      return Future(() => null);
     }
 
-    return Future.value(_token);
+    return _token;
   }
 
   Future<String?> _getTokenFromStorage() async {

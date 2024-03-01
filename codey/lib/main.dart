@@ -3,16 +3,18 @@ import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/lesson_groups_service.dart';
+import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/lesson_groups_list.dart';
+import 'package:codey/widgets/lesson_groups/lesson_groups_screen.dart';
 import 'package:codey/services/exercises_service.dart';
-import 'package:codey/widgets/screens/auth_screen.dart';
+import 'package:codey/widgets/auth/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
-Future main() async{
+Future main() async {
   await dotenv.dotenv.load();
   runApp(
     MultiProvider(
@@ -31,9 +33,17 @@ Future main() async{
           create: (context) =>
               LessonGroupsRepository1(context.read<AuthenticatedClient>()),
         ),
+        Provider<LessonGroupsService>(
+          create: (context) =>
+              LessonGroupsServiceV1(context.read<LessonGroupsRepository>()),
+        ),
         Provider<LessonsRepository>(
           create: (context) =>
               LessonsRepository1(context.read<AuthenticatedClient>()),
+        ),
+        Provider<LessonsService>(
+          create: (context) =>
+              LessonsServiceV1(context.read<LessonsRepository>()),
         ),
         Provider<UserService>(
             create: (context) => UserService1(context.read<AuthService>(),
@@ -87,40 +97,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Center(
-          child: FutureBuilder<String?>(
-            future: context.read<AuthService>().token,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData && snapshot.data != null) {
-                return LessonGroupsList(
-                    title: 'A',
-                    onLogout: () => setState(() => loggedIn = false));
-              }
-              return AuthScreen(
-                onLogin: () => setState(() => loggedIn = true),
-              );
-            },
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => print("back"),
-        tooltip: 'Back',
-        child: const Icon(Icons.arrow_back),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    return FutureBuilder<String?>(
+      future: context.read<AuthService>().token,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          return AuthScreen(
+            onLogin: () => setState(() => loggedIn = true),
+          );
+        }
+
+        return LessonGroupsScreen(
+            onLogoutSuper: () => setState(() => loggedIn = false));
+      },
     );
   }
 }

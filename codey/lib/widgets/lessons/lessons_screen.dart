@@ -1,9 +1,9 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
-import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/screens/pre_post_exercise_screen.dart';
+import 'package:codey/widgets/exercises/pre_post_exercise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Replace with the actual path
 
@@ -17,10 +17,10 @@ class LessonsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LessonsRepository lessonsRepository =
-        Provider.of<LessonsRepository>(context);
+    LessonsService lessonsService =
+        Provider.of<LessonsService>(context);
     Future<List<Lesson>> lessonsFuture =
-        lessonsRepository.getLessonsForGroup(lessonGroup.id.toString());
+        lessonsService.getLessonsForGroup(lessonGroup);
     Stream<AppUser?> user$ = context.read<UserService>().userStream;
 
     return Scaffold(

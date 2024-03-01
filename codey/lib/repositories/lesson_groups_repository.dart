@@ -27,13 +27,7 @@ class LessonGroupsRepository1 implements LessonGroupsRepository {
   Future<List<LessonGroup>> _fetchLessonGroups() async {
     final response = await _authenticatedClient.get(Uri.parse(_apiUrl));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      final List<LessonGroup> lessonGroups =
-          data.map((item) => LessonGroup.fromJson(item)).toList();
-      _lessonGroupsCache = lessonGroups;
-      return lessonGroups;
-    } else {
+    if (response.statusCode != 200) {
       switch (response.statusCode) {
         case 401:
           throw UnauthenticatedException(
@@ -43,5 +37,11 @@ class LessonGroupsRepository1 implements LessonGroupsRepository {
               'Error ${response.statusCode}');
       }
     }
+
+    final List<dynamic> data = json.decode(response.body);
+    final List<LessonGroup> lessonGroups =
+        data.map((item) => LessonGroup.fromJson(item)).toList();
+    _lessonGroupsCache = lessonGroups;
+    return lessonGroups;
   }
 }
