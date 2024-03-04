@@ -10,7 +10,7 @@ namespace CodeyBe.Services
     {
         private readonly ILogsRepository _logsRepository = logsRepository;
 
-        public void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<string> correctAnswer, string givenAnswer, bool correct)
+        public void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<dynamic> correctAnswer, dynamic givenAnswer, bool correct)
         {
             _logsRepository.SaveLogAsync(
                 new LogExerciseAnswer(

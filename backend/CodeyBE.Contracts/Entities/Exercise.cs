@@ -29,6 +29,15 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("statementCode")]
         public string? StatementCode { get; set; }
 
+        [BsonElement("defaultGapLengths")]
+        public List<int>? DefaultGapLengths { get; set; }
+
+        [BsonElement("defaultGapLines")]
+        public List<int>? DefaultGapLines { get; set; }
+
+        [BsonElement("statementOutput")]
+        public string? StatementOutput { get; set; }
+
         [BsonElement("question")]
         public string? Question { get; set; }
         
@@ -39,7 +48,7 @@ namespace CodeyBE.Contracts.Entities
         public string? CorrectAnswer { get; set; }
 
         [BsonElement("correctAnswers")]
-        public List<string>? CorrectAnswers { get; set; }
+        public List<dynamic>? CorrectAnswers { get; set; }
 
         [BsonElement("raisesError")]
         public bool? RaisesError { get; set; }

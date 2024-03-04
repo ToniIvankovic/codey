@@ -12,7 +12,7 @@ namespace CodeyBE.Contracts.Services
     {
         void RequestedLesson(ClaimsPrincipal user, int lessonId);
         void RequestedExercise(int exerciseId);
-        void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<string> correctAnswers, string givenAnswer, bool correct);
+        void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<dynamic> correctAnswers, dynamic givenAnswer, bool correct);
         void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report);
 
     }

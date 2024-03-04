@@ -2,9 +2,15 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+
+import 'exercise_LA_widget.dart';
+import 'exercise_MC_widget.dart';
+import 'exercise_SA_widget.dart';
+import 'exercise_SCW_widget.dart';
 
 class SingleExerciseWidget extends StatefulWidget {
   const SingleExerciseWidget({
@@ -25,6 +31,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   dynamic answer;
   bool enableCheck = false;
   Exercise? exercise;
+  int repeatCount = 0;
 
   @override
   void initState() {
@@ -39,98 +46,78 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       return const Text("No exercises");
     }
 
-    ElevatedButton checkNextButton = buildCheckNextButton();
-    var codeArea;
-    if (exercise!.statementCode?.isEmpty == false) {
-      codeArea = Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: DottedBorder(
-          borderType: BorderType.RRect,
-          dashPattern: const [6, 3],
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(
-              exercise!.statementCode!,
-              style: const TextStyle(
-                fontFamily: 'courier new',
-                fontSize: 20.0,
-              ),
-            ),
-          ),
-        ),
-      );
-    } else {
-      codeArea = SizedBox.shrink();
-    }
-
-    var questionArea;
-    if (exercise!.question?.isEmpty == false) {
-      questionArea =
-          Text(exercise!.question!, style: const TextStyle(fontSize: 20.0));
-    } else {
-      questionArea = SizedBox.shrink();
-    }
-
-    final statementArea = Text(
-        '${exercise!.statement} '
-        '(${exercise!.id}, difficulty: ${exercise!.difficulty})',
-        style: const TextStyle(fontSize: 20.0));
-
+    ElevatedButton checkNextButton = _buildCheckNextButton();
     // single exercise, button
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              statementArea,
-              codeArea,
-              questionArea,
-              if (exercise is ExerciseMC)
-                ExerciseMCWidget(
-                  key: ValueKey(exercise!.id),
-                  exercise: exercise!,
-                  onAnswerSelected: (answer) {
-                    setState(() {
-                      this.answer = answer;
-                      enableCheck = true;
-                    });
-                  },
-                ),
-              if (exercise is ExerciseSA)
-                ExerciseSAWidget(
-                    key: ValueKey(exercise!.id),
-                    exercise: exercise!,
-                    onAnswerSelected: (answer) {
-                      setState(() {
-                        this.answer = answer;
-                        enableCheck = true;
-                      });
-                    }),
-              if (exercise is ExerciseLA)
-                ExerciseLAWidget(
-                    key: ValueKey(exercise!.id),
-                    exercise: exercise!,
-                    onAnswerSelected: (answer) {
-                      setState(() {
-                        this.answer = answer;
-                        //TODO make this work
-                        if (answer.isNotEmpty) {
-                          enableCheck = true;
-                        }
-                      });
-                    }),
-            ],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (exercise is ExerciseMC)
+            ExerciseMCWidget(
+              key: ValueKey(exercise!.id),
+              exercise: exercise!,
+              onAnswerSelected: (answer) {
+                setState(() {
+                  this.answer = answer;
+                  enableCheck = true;
+                });
+              },
+              statementArea: _buildStaticStatementArea(),
+              codeArea: _buildStaticCodeArea(),
+              questionArea: _buildStaticQuestionArea(),
+            ),
+          if (exercise is ExerciseSA)
+            ExerciseSAWidget(
+              key: ValueKey(exercise!.id),
+              exercise: exercise!,
+              onAnswerSelected: (answer) {
+                setState(() {
+                  this.answer = answer;
+                  enableCheck = true;
+                });
+              },
+              statementArea: _buildStaticStatementArea(),
+              codeArea: _buildStaticCodeArea(),
+              questionArea: _buildStaticQuestionArea(),
+            ),
+          if (exercise is ExerciseLA)
+            ExerciseLAWidget(
+              key: ValueKey(exercise!.id),
+              exercise: exercise!,
+              onAnswerSelected: (answer) {
+                setState(() {
+                  this.answer = answer;
+                  enableCheck = answer.isNotEmpty;
+                });
+              },
+              statementArea: _buildStaticStatementArea(),
+              codeArea: _buildStaticCodeArea(),
+              questionArea: _buildStaticQuestionArea(),
+            ),
+          if (exercise is ExerciseSCW)
+            ExerciseSCWWidget(
+              key: ValueKey(exercise!.id + 100 * repeatCount),
+              exercise: exercise!,
+              onAnswerSelected: (answer) {
+                setState(() {
+                  this.answer = answer;
+                  enableCheck = answer.isNotEmpty &&
+                      answer.every((element) => element.isNotEmpty);
+                });
+              },
+              statementArea: _buildStaticStatementArea(),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: checkNextButton,
           ),
-        ),
-        checkNextButton,
-      ],
+        ],
+      ),
     );
   }
 
-  ElevatedButton buildCheckNextButton() {
+  ElevatedButton _buildCheckNextButton() {
     ElevatedButton button;
     //If the exercise isn't answered yet, show the check button (active if anything is enterd)
     if (isCorrectResponse == null) {
@@ -150,7 +137,10 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                 );
               }
             : null,
-        child: const Text('CHECK'),
+        child: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text('CHECK'),
+        ),
       );
     } else {
       //If the exercise is answered, show the next button
@@ -165,126 +155,64 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             exercise = widget.exercisesService.getNextExercise();
             isCorrectResponse = null;
             enableCheck = false;
+            repeatCount++;
           });
         },
-        child: const Text('NEXT'),
+        child: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text('NEXT'),
+        ),
       );
     }
     return button;
   }
-}
 
-class ExerciseMCWidget extends StatefulWidget {
-  const ExerciseMCWidget({
-    Key? key,
-    required this.exercise,
-    required this.onAnswerSelected,
-  }) : super(key: key);
+  Widget _buildStaticStatementArea() {
+    Widget statementArea = Text(
+        '${exercise!.statement} '
+        '(${exercise!.id}, difficulty: ${exercise!.difficulty})',
+        style: const TextStyle(fontSize: 20.0));
+    return statementArea;
+  }
 
-  final Exercise exercise;
-  final ValueChanged<String> onAnswerSelected;
+  Widget _buildStaticQuestionArea() {
+    Widget questionArea;
+    if (exercise!.question?.isEmpty == false) {
+      questionArea =
+          Text(exercise!.question!, style: const TextStyle(fontSize: 20.0));
+    } else {
+      questionArea = const SizedBox.shrink();
+    }
+    return questionArea;
+  }
 
-  @override
-  State<ExerciseMCWidget> createState() => _ExerciseMCWidgetState();
-}
-
-class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
-  String? selectedAnswer;
-  @override
-  Widget build(BuildContext context) {
-    var exercise = widget.exercise as ExerciseMC;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 3,
-          childAspectRatio: 2, // For square tiles
-          children: exercise.answerOptions.entries.map((option) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedAnswer = option.key;
-                });
-                widget.onAnswerSelected(selectedAnswer!);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: selectedAnswer == option.key
-                          ? Colors.black
-                          : Colors.grey,
-                      width: 2,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(option.value),
+  Widget _buildStaticCodeArea() {
+    Widget codeArea;
+    if (exercise!.statementCode?.isEmpty == false) {
+      codeArea = Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: DottedBorder(
+          borderType: BorderType.RRect,
+          dashPattern: const [6, 3],
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: [
+                Text(
+                  exercise!.statementCode!,
+                  style: const TextStyle(
+                    fontFamily: 'courier new',
+                    fontSize: 20.0,
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-        Text(exercise.correctAnswer,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-}
-
-class ExerciseSAWidget extends StatelessWidget {
-  const ExerciseSAWidget({
-    super.key,
-    required this.exercise,
-    required this.onAnswerSelected,
-  });
-
-  final Exercise exercise;
-  final ValueChanged<String> onAnswerSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          decoration: const InputDecoration(
-            labelText: 'Answer',
+              ],
+            ),
           ),
-          maxLines: 1,
-          onChanged: (value) => onAnswerSelected(value),
         ),
-      ],
-    );
-  }
-}
-
-class ExerciseLAWidget extends StatelessWidget {
-  final Exercise exercise;
-  const ExerciseLAWidget({
-    super.key,
-    required this.exercise,
-    required this.onAnswerSelected,
-  });
-
-  final ValueChanged<String> onAnswerSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          decoration: const InputDecoration(
-            labelText: 'Answer',
-          ),
-          maxLines: null,
-          minLines: 5,
-          onChanged: (value) => onAnswerSelected(value),
-        ),
-      ],
-    );
+      );
+    } else {
+      codeArea = const SizedBox.shrink();
+    }
+    return codeArea;
   }
 }

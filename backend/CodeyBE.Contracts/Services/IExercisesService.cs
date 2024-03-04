@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.Services
@@ -14,7 +15,7 @@ namespace CodeyBE.Contracts.Services
         public Task<Exercise?> GetExerciseByIDAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 
-        public Task<AnswerValidationResult> ValidateAnswer(int exerciseId, string answer);
+        public Task<AnswerValidationResult> ValidateAnswer(int exerciseId, JsonElement answer);
         public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise);
     }
 }

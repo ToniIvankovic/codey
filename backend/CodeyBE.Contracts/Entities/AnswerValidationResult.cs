@@ -6,19 +6,11 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.Entities
 {
-    public class AnswerValidationResult
+    public class AnswerValidationResult(Exercise exercise, bool isCorrect, dynamic gottenAnswer, IEnumerable<dynamic>? expectedAnswers)
     {
-        public Exercise exercise { get; set; }
-        public bool IsCorrect { get; set; }
-        public String GottenAnswer { get; set; }
-        public IEnumerable<String>? CorrectAnswers { get; set; }
-
-        public AnswerValidationResult(Exercise exercise, bool isCorrect, String gottenAnswer, IEnumerable<String>? expectedAnswers)
-        {
-            this.exercise = exercise;
-            IsCorrect = isCorrect;
-            GottenAnswer = gottenAnswer;
-            CorrectAnswers = expectedAnswers;
-        }
+        public Exercise exercise { get; set; } = exercise;
+        public bool IsCorrect { get; set; } = isCorrect;
+        public dynamic GottenAnswer { get; set; } = gottenAnswer;
+        public IEnumerable<dynamic>? CorrectAnswers { get; set; } = expectedAnswers;
     }
 }

@@ -2,10 +2,12 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CodeyBe.Services
@@ -41,7 +43,7 @@ namespace CodeyBe.Services
             return _exercisesRepository.GetExercisesByID(exerciseIDs);
         }
 
-        public async Task<AnswerValidationResult> ValidateAnswer(int exerciseId, string answer)
+        public async Task<AnswerValidationResult> ValidateAnswer(int exerciseId, JsonElement answer)
         {
             Exercise? exercise = await _exercisesRepository.GetByIdAsync(exerciseId);
             if (exercise == null)
@@ -51,31 +53,52 @@ namespace CodeyBe.Services
             return ValidateAnswer(exercise, answer);
         }
 
-        private AnswerValidationResult ValidateAnswer(Exercise exercise, string answer)
+        private AnswerValidationResult ValidateAnswer(Exercise exercise, JsonElement answer)
         {
+            //convert System.Text.Json.JsonElement answer to string
+
             if (exercise.Type == "SA")
             {
-
-                bool correct = ValidateAnswerSA(exercise, answer);
+                string castAnswer = answer.ToString();
+                IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(answer => ((string)answer));
+                bool correct = ValidateAnswerSA(exercise, castAnswer);
                 return new AnswerValidationResult(exercise,
                                                   correct,
-                                                  answer,
-                                                  expectedAnswers: exercise.CorrectAnswers);
+                                                  castAnswer,
+                                                  expectedAnswers: correctAnswers);
             }
             else if (exercise.Type == "LA")
             {
-                bool correct = ValidateAnswerLA(exercise, answer);
+                string castAnswer = answer.ToString();
+                bool correct = ValidateAnswerLA(exercise, castAnswer);
+                IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(answer => ((string)answer));
                 return new AnswerValidationResult(exercise,
                     correct,
-                    answer,
-                    expectedAnswers: exercise.CorrectAnswers);
+                    castAnswer,
+                    expectedAnswers: correctAnswers);
             }
             else if (exercise.Type == "MC")
             {
+                string castAnswer = answer.ToString();
+                IEnumerable<string> correctAnswers = new List<string>([exercise.CorrectAnswer!]);
                 return new AnswerValidationResult(exercise,
-                    exercise.CorrectAnswer == answer,
-                    answer,
-                    expectedAnswers: [exercise.CorrectAnswer!]);
+                    exercise.CorrectAnswer == castAnswer,
+                    castAnswer,
+                    expectedAnswers: correctAnswers);
+            }
+            else if (exercise.Type == "SCW")
+            {
+                List<string> castAnswer = [];
+                foreach (JsonElement element in answer.EnumerateArray())
+                {
+                    castAnswer.Add(element.GetString()!);
+                }
+                IEnumerable<IEnumerable<string>> correctAnswers = exercise.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
+                bool correct = ValidateAnswerSCW(correctAnswers, castAnswer);
+                return new AnswerValidationResult(exercise,
+                                        correct,
+                                        castAnswer,
+                                        expectedAnswers: correctAnswers);
             }
             else
             {
@@ -91,6 +114,33 @@ namespace CodeyBe.Services
                 return false;
             }
             return correctAnswers.Contains(answer);
+        }
+
+        private bool ValidateAnswerSCW(IEnumerable<IEnumerable<string>> correctAnswers, IEnumerable<string> givenAnswers)
+        {
+            if (givenAnswers.IsNullOrEmpty() || correctAnswers.IsNullOrEmpty())
+            {
+                return false;
+            }
+            if (correctAnswers.Count() != givenAnswers.Count())
+            {
+                return false;
+            }
+            for (int i = 0; i < givenAnswers.Count(); i++)
+            {
+                for (int j = 0; j < correctAnswers.ElementAt(i).Count(); j++)
+                {
+                    if (correctAnswers.ElementAt(i).ElementAt(j) == givenAnswers.ElementAt(i))
+                    {
+                        break;
+                    }
+                    if(j == correctAnswers.ElementAt(i).Count() - 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         private bool ValidateAnswerLA(Exercise exercise, string answer)
@@ -110,6 +160,7 @@ namespace CodeyBe.Services
                 "MC" => new ExerciseMC_DTO(exercise),
                 "SA" => new ExerciseSA_DTO(exercise),
                 "LA" => new ExerciseLA_DTO(exercise),
+                "SCW" => new ExerciseSCW_DTO(exercise),
                 _ => new ExerciseDTO(exercise),
             };
         }

@@ -9,6 +9,7 @@ namespace CodeyBE.Contracts.DTOs
 {
     public class ExerciseMC_DTO(Exercise ex) : ExerciseDTO(ex)
     {
+        public string? Question { get; set; } = ex.Question;
         public Dictionary<string, string>? AnswerOptions { get; set; } = ex.AnswerOptions;
         public string? CorrectAnswer { get; set; } = ex.CorrectAnswer;
     }

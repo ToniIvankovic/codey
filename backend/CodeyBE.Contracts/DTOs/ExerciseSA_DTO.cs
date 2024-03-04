@@ -10,5 +10,6 @@ namespace CodeyBE.Contracts.DTOs
     public class ExerciseSA_DTO(Exercise ex) : ExerciseDTO(ex)
     {
         //public List<string>? CorrectAnswers { get; set; } = ex.CorrectAnswers;
+        public string? Question { get; set; } = ex.Question;
     }
 }

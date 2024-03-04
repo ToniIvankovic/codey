@@ -6,6 +6,7 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/user_service.dart';
@@ -70,24 +71,17 @@ class ExercisesServiceV1 implements ExercisesService {
   @override
   Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
     bool correct;
+    final request = _authenticatedClient.post(
+      _exerciseAnswerValidationEndpoint(exercise),
+      body: json.encode({"answer": answer}),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
     if (exercise is ExerciseMC) {
       correct = exercise.correctAnswer == answer;
-      _authenticatedClient.post(
-        _exerciseAnswerValidationEndpoint(exercise),
-        body: json.encode({"answer": answer}),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-    } else if (exercise is ExerciseSA || exercise is ExerciseLA) {
-      final response = await _authenticatedClient.post(
-        _exerciseAnswerValidationEndpoint(exercise),
-        body: json.encode({"answer": answer}),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
+    } else if (exercise is ExerciseSA || exercise is ExerciseLA || exercise is ExerciseSCW) {
+      final response = await request;
       if (response.statusCode != 200) {
         throw Exception('Failed to validate answer');
       }

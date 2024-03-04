@@ -15,7 +15,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
 Future main() async {
-  await dotenv.dotenv.load();
+  String mode = 'prod';
+  // String mode = 'dev';
+  String env = '$mode.env';
+  await dotenv.dotenv.load(fileName: env);
   runApp(
     MultiProvider(
       providers: [

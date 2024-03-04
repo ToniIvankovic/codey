@@ -5,6 +5,7 @@ using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.Json;
 
 namespace CodeyBE.API.Controllers
 {
@@ -48,12 +49,13 @@ namespace CodeyBE.API.Controllers
 
         [HttpPost("{exerciseId}", Name = "validateAnswer")]
         [ProducesResponseType(typeof(AnswerValidationResultDTO), (int)HttpStatusCode.OK)]
-        public async Task<AnswerValidationResultDTO> ValidateAnswer(int exerciseId, [FromBody] Dictionary<string, string> body)
+        public async Task<AnswerValidationResultDTO> ValidateAnswer(int exerciseId, [FromBody] Dictionary<string, dynamic> body)
         {
             var answer = body["answer"];
-            var result = await exercisesService.ValidateAnswer(exerciseId, answer);
+            AnswerValidationResult result = await exercisesService.ValidateAnswer(exerciseId, answer);
             var exercise = (await exercisesService.GetExerciseByIDAsync(exerciseId))!;
-            loggingService.AnsweredExercise(User, exerciseId, exercise.CorrectAnswer != null ? [exercise.CorrectAnswer] : exercise.CorrectAnswers!, answer, result.IsCorrect);
+            //TODO: log the whole exercise
+            loggingService.AnsweredExercise(User, exerciseId, result.CorrectAnswers, result.GottenAnswer, result.IsCorrect);
             return new AnswerValidationResultDTO(result);
         }
     }

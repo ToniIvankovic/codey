@@ -1,6 +1,7 @@
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 
 abstract class Exercise {
@@ -10,6 +11,9 @@ abstract class Exercise {
   final String? statement;
   final String? statementCode;
   final String? question;
+  final List<int>? defaultGapLengths;
+  final List<int>? defaultGapLines;
+  final String? statementOutput;
   final String? specificTip;
 
   Exercise({
@@ -20,6 +24,9 @@ abstract class Exercise {
     this.statementCode,
     this.question,
     this.specificTip,
+    this.defaultGapLengths,
+    this.defaultGapLines,
+    this.statementOutput,
   });
   
   factory Exercise.fromJson(Map<String, dynamic> json) {
@@ -30,6 +37,8 @@ abstract class Exercise {
         return ExerciseSA.fromJson(json);
       case 'LA':
         return ExerciseLA.fromJson(json);
+      case 'SCW':
+        return ExerciseSCW.fromJson(json);
       default:
         throw Exception('Invalid exercise type');
     }
