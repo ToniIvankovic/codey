@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CodeyBe.Services
 {
-    public class ExercisesService : IExercisesService
+    public partial class ExercisesService : IExercisesService
     {
         private readonly IExercisesRepository _exercisesRepository;
         private readonly ILessonsService _lessonsService;
@@ -40,8 +41,34 @@ namespace CodeyBe.Services
                 return new List<Exercise>();
             }
             IEnumerable<int> exerciseIDs = lesson.Exercises;
-            return _exercisesRepository.GetExercisesByID(exerciseIDs);
+            IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs).Select(exercise =>
+            {
+                if (exercise.Type == "LA")
+                {
+                    GenerateAnswerOptionsForExerciseLA(exercise);
+                }
+                return exercise;
+            });
+            exercises = exercises.OrderBy(exercise => exercise.PrivateId);
+            return exercises;
         }
+
+        private static void GenerateAnswerOptionsForExerciseLA(Exercise exercise)
+        {
+            var correctAnswer = (string)exercise.CorrectAnswers![0];
+            var parts = AnswerSplitterLARegex().Split(correctAnswer);
+            exercise.AnswerOptions = [];
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (parts[i].IsNullOrEmpty())
+                    continue;
+
+                exercise.AnswerOptions.Add(i.ToString(), parts[i]);
+            }
+        }
+
+        [GeneratedRegex("(?<=[\\s\\n])|([\\(\\)])")]
+        private static partial Regex AnswerSplitterLARegex();
 
         public async Task<AnswerValidationResult> ValidateAnswer(int exerciseId, JsonElement answer)
         {
@@ -134,7 +161,7 @@ namespace CodeyBe.Services
                     {
                         break;
                     }
-                    if(j == correctAnswers.ElementAt(i).Count() - 1)
+                    if (j == correctAnswers.ElementAt(i).Count() - 1)
                     {
                         return false;
                     }
@@ -164,5 +191,6 @@ namespace CodeyBe.Services
                 _ => new ExerciseDTO(exercise),
             };
         }
+
     }
 }

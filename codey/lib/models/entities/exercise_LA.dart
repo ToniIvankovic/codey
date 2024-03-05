@@ -4,6 +4,8 @@ import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
 class ExerciseLA extends Exercise {
+  Map<String, dynamic> answerOptions;
+
   ExerciseLA({
     required id,
     required difficulty,
@@ -11,6 +13,7 @@ class ExerciseLA extends Exercise {
     String? statementCode,
     String? question,
     String? specificTip,
+    required this.answerOptions,
   }) : super(
           type: ExerciseType.LA,
           id: id,
@@ -29,6 +32,7 @@ class ExerciseLA extends Exercise {
       statementCode: json['statementCode'],
       question: json['question'],
       specificTip: json['specificTip'],
+      answerOptions: json['answerOptions'],
     );
   }
 }

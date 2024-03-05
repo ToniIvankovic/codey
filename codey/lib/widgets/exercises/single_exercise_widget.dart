@@ -55,7 +55,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
         children: [
           if (exercise is ExerciseMC)
             ExerciseMCWidget(
-              key: ValueKey(exercise!.id),
+              key: ValueKey(exercise!.id + 100 * repeatCount),
               exercise: exercise!,
               onAnswerSelected: (answer) {
                 setState(() {
@@ -69,7 +69,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             ),
           if (exercise is ExerciseSA)
             ExerciseSAWidget(
-              key: ValueKey(exercise!.id),
+              key: ValueKey(exercise!.id + 100 * repeatCount),
               exercise: exercise!,
               onAnswerSelected: (answer) {
                 setState(() {
@@ -83,8 +83,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             ),
           if (exercise is ExerciseLA)
             ExerciseLAWidget(
-              key: ValueKey(exercise!.id),
-              exercise: exercise!,
+              key: ValueKey(exercise!.id + 100 * repeatCount),
+              exercise: exercise! as ExerciseLA,
               onAnswerSelected: (answer) {
                 setState(() {
                   this.answer = answer;
