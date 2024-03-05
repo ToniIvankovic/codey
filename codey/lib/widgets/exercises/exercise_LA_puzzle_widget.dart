@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:math';
+
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,14 @@ class ExerciseLAPuzzleWidget extends StatefulWidget {
 class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
   static const pieceBorderRadius = 8.0;
   List<GestureDetector> answerParts = [];
+  List<MapEntry<String, dynamic>> answerOptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    answerOptions = widget.exercise.answerOptions.entries.toList();
+    answerOptions.shuffle();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +62,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             constraints: const BoxConstraints(minHeight: 150, maxHeight: 300),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(pieceBorderRadius),
-              color: Color.fromARGB(50, 200, 200, 200), // Set opacity value here
+              color: const Color.fromARGB(50, 200, 200, 200),
             ),
             child: DottedBorder(
               color: Colors.grey,
@@ -79,7 +89,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
           child: Wrap(
             spacing: 8.0, // gap between adjacent chips
             runSpacing: 4.0, // gap between lines
-            children: widget.exercise.answerOptions.entries.map((entry) {
+            children: answerOptions.map((entry) {
               final entryTextToDisplay = entry.value
                   .toString()
                   .replaceAll('\n', '↵')

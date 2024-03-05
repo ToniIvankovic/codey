@@ -11,7 +11,10 @@ namespace CodeyBE.Data.DB.Repositories
 {
     public class LogsRepository(IMongoDbContext dbContext) : Repository<LogBasic>(dbContext, "logs"), ILogsRepository
     {
-        public override Task<LogBasic?> GetByIdAsync(int id) => _collection.Find(log => log.Id.Increment == id).FirstOrDefaultAsync();
+        public async override Task<LogBasic?> GetByIdAsync(int id)
+        {
+            return await _collection.Find(log => log.Id.ToString().Equals(id.ToString())).FirstOrDefaultAsync();
+        }
 
         public void SaveLogAsync(LogBasic log)
         {
