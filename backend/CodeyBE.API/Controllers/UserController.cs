@@ -23,7 +23,7 @@ namespace CodeyBE.API.Controllers
         {
             var email = body["email"];
             var password = body["password"];
-            var result = await userService.RegisterUser(new UserRegistrationInternalDTO
+            var result = await userService.RegisterStudent(new UserRegistrationInternalDTO
             {
                 Email = email,
                 Password = password
@@ -110,6 +110,31 @@ namespace CodeyBE.API.Controllers
             {
                 return StatusCode(400, e.Message);
             }
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("register/creator", Name = "registerCreator")]
+        [ProducesResponseType(typeof(UserRegistrationDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RegisterCreator([FromBody] Dictionary<string, string> body)
+        {
+            var email = body["email"];
+            var password = body["password"];
+            var result = await userService.RegisterCreator(new UserRegistrationInternalDTO
+            {
+                Email = email,
+                Password = password
+            });
+            if (result.Succeeded)
+            {
+                return Ok(new UserRegistrationDTO
+                {
+                    Message = ["User created successfully"]
+                });
+            }
+            return StatusCode(400, new UserRegistrationDTO
+            {
+                Message = result.Errors.Select(error => error.Description)
+            });
         }
     }
 }

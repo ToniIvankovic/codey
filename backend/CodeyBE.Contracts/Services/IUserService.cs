@@ -13,7 +13,8 @@ namespace CodeyBE.Contracts.Services
 {
     public interface IUserService
     {
-        public Task<IdentityResult> RegisterUser(UserRegistrationInternalDTO user);
+        public Task<IdentityResult> RegisterStudent(UserRegistrationInternalDTO user);
+        public Task<IdentityResult> RegisterCreator(UserRegistrationInternalDTO user);
         public Task<JWTTokenDTO> LoginUser(UserRegistrationInternalDTO user);
         public Task<ApplicationUser?> GetUser(ClaimsPrincipal user);
         public Task<ApplicationUser> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);

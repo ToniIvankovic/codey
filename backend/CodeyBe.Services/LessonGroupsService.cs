@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeyBE.Contracts.DTOs;
 
 namespace CodeyBe.Services
 {
@@ -16,6 +17,7 @@ namespace CodeyBe.Services
         public LessonGroupsService(ILessonGroupsRepository lessonGroupsRepository) { 
             this._lessonGroupsRepository = lessonGroupsRepository;
         }
+        public int FirstLessonGroupId => 10001;
 
         public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync()
         {
@@ -33,6 +35,22 @@ namespace CodeyBe.Services
             return group.PrivateId + 1;
         }
 
-        public int FirstLessonGroupId => 10001;
+        public async Task<LessonGroup> CreateLessonGroupAsync(LessonGroupCreationDTO lessonGroup)
+        {
+            LessonGroup newGroup = await _lessonGroupsRepository.CreateAsync(lessonGroup);
+            return newGroup;
+        }
+
+        public async Task DeleteLessonGroupAsync(int id)
+        {
+            await _lessonGroupsRepository.DeleteAsync(id);
+        }
+
+        public async Task<LessonGroup> UpdateLessonGroupAsync(int id, LessonGroupCreationDTO lessonGroup)
+        {
+            LessonGroup updatedGroup = await _lessonGroupsRepository.UpdateAsync(id, lessonGroup);
+            return updatedGroup;
+        }
+
     }
 }

@@ -41,7 +41,7 @@ namespace CodeyBe.Services
             return tokenGenerator.GenerateToken(claims);
         }
 
-        public async Task<IdentityResult> RegisterUser(UserRegistrationInternalDTO user)
+        public async Task<IdentityResult> RegisterStudent(UserRegistrationInternalDTO user)
         {
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
@@ -59,6 +59,24 @@ namespace CodeyBe.Services
                 HighestLessonId = null,
                 NextLessonGroupId = lessonGroupsService.FirstLessonGroupId,
                 NextLessonId = lessonsService.FirstLessonId,
+            }, user.Password);
+            return result;
+        }
+
+        public async Task<IdentityResult> RegisterCreator(UserRegistrationInternalDTO user)
+        {
+            IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
+            {
+                UserName = user.Email,
+                Email = user.Email,
+                Roles = ["CREATOR"],
+                Claims = [
+                    new()
+                    {
+                        ClaimType = ClaimTypes.Email,
+                        ClaimValue = user.Email
+                    },
+                ],
             }, user.Password);
             return result;
         }
@@ -114,5 +132,6 @@ namespace CodeyBe.Services
             applicationUser.NextLessonGroupId = lessonGroupId;
             await _userManager.UpdateAsync(applicationUser);
         }
+
     }
 }
