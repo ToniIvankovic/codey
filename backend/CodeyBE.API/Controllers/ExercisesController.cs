@@ -24,7 +24,7 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<object>> GetAllExercises()
         {
             return (await exercisesService.GetAllExercisesAsync())
-                .Select(exercise => exercisesService.MapToSpecificExerciseDTOType(exercise))
+                .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }
 
@@ -43,7 +43,7 @@ namespace CodeyBE.API.Controllers
             var user = User;
             loggingService.RequestedLesson(user, lessonId);
             return (await exercisesService.GetExercisesForLessonAsync(lessonId))
-                .Select(exercise => exercisesService.MapToSpecificExerciseDTOType(exercise))
+                .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }
 

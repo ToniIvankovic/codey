@@ -13,12 +13,23 @@ namespace CodeyBE.Data.DB.Repositories
     {
         public override async Task<Exercise?> GetByIdAsync(int id)
         {
-            return await _collection.Find(exercise => exercise.PrivateId == id).FirstOrDefaultAsync();
+            Exercise? ex = await _collection
+                .Find(exercise => exercise.PrivateId == id)
+                .FirstOrDefaultAsync();
+            if (ex == null)
+            {
+                return null;
+            }
+
+            return IExercisesRepository.MapToSpecificExerciseType(ex);
         }
 
         public IEnumerable<Exercise> GetExercisesByID(IEnumerable<int> ids)
         {
-            return _collection.Find(exercise => ids.Contains(exercise.PrivateId)).ToList();
+            return _collection
+                .Find(exercise => ids.Contains(exercise.PrivateId))
+                .ToList()
+                .Select(ex => IExercisesRepository.MapToSpecificExerciseType(ex));
         }
     }
 }

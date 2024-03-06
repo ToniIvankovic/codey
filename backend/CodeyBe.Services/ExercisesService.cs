@@ -43,9 +43,9 @@ namespace CodeyBe.Services
             IEnumerable<int> exerciseIDs = lesson.Exercises;
             IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs).Select(exercise =>
             {
-                if (exercise.Type == "LA")
+                if (exercise is ExerciseLA)
                 {
-                    GenerateAnswerOptionsForExerciseLA(exercise);
+                    GenerateAnswerOptionsForExerciseLA((ExerciseLA)exercise);
                 }
                 return exercise;
             });
@@ -53,7 +53,7 @@ namespace CodeyBe.Services
             return exercises;
         }
 
-        private static void GenerateAnswerOptionsForExerciseLA(Exercise exercise)
+        private static void GenerateAnswerOptionsForExerciseLA(ExerciseLA exercise)
         {
             var correctAnswer = (string)exercise.CorrectAnswers![0];
             var parts = AnswerSplitterLARegex().Split(correctAnswer);
@@ -83,46 +83,49 @@ namespace CodeyBe.Services
         private AnswerValidationResult ValidateAnswer(Exercise exercise, JsonElement answer)
         {
             //convert System.Text.Json.JsonElement answer to string
-
             if (exercise.Type == "SA")
             {
+                ExerciseSA exerciseSA = (ExerciseSA)exercise;
                 string castAnswer = answer.ToString();
-                IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(answer => ((string)answer));
-                bool correct = ValidateAnswerSA(exercise, castAnswer);
-                return new AnswerValidationResult(exercise,
+                IEnumerable<string> correctAnswers = exerciseSA.CorrectAnswers!.Select(answer => ((string)answer));
+                bool correct = ValidateAnswerSA(exerciseSA, castAnswer);
+                return new AnswerValidationResult(exerciseSA,
                                                   correct,
                                                   castAnswer,
                                                   expectedAnswers: correctAnswers);
             }
             else if (exercise.Type == "LA")
             {
+                ExerciseLA exerciseLA = (ExerciseLA)exercise;
                 string castAnswer = answer.ToString();
-                bool correct = ValidateAnswerLA(exercise, castAnswer);
-                IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(answer => ((string)answer));
-                return new AnswerValidationResult(exercise,
+                bool correct = ValidateAnswerLA(exerciseLA, castAnswer);
+                IEnumerable<string> correctAnswers = exerciseLA.CorrectAnswers!.Select(answer => ((string)answer));
+                return new AnswerValidationResult(exerciseLA,
                     correct,
                     castAnswer,
                     expectedAnswers: correctAnswers);
             }
             else if (exercise.Type == "MC")
             {
+                ExerciseMC exerciseMC = (ExerciseMC)exercise;
                 string castAnswer = answer.ToString();
-                IEnumerable<string> correctAnswers = new List<string>([exercise.CorrectAnswer!]);
-                return new AnswerValidationResult(exercise,
-                    exercise.CorrectAnswer == castAnswer,
+                IEnumerable<string> correctAnswers = new List<string>([exerciseMC.CorrectAnswer!]);
+                return new AnswerValidationResult(exerciseMC,
+                    exerciseMC.CorrectAnswer == castAnswer,
                     castAnswer,
                     expectedAnswers: correctAnswers);
             }
             else if (exercise.Type == "SCW")
             {
+                ExerciseSCW exerciseSCW = (ExerciseSCW)exercise;
                 List<string> castAnswer = [];
                 foreach (JsonElement element in answer.EnumerateArray())
                 {
                     castAnswer.Add(element.GetString()!);
                 }
-                IEnumerable<IEnumerable<string>> correctAnswers = exercise.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
+                IEnumerable<IEnumerable<string>> correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
                 bool correct = ValidateAnswerSCW(correctAnswers, castAnswer);
-                return new AnswerValidationResult(exercise,
+                return new AnswerValidationResult(exerciseSCW,
                                         correct,
                                         castAnswer,
                                         expectedAnswers: correctAnswers);
@@ -133,10 +136,10 @@ namespace CodeyBe.Services
             }
         }
 
-        private bool ValidateAnswerSA(Exercise exercise, string answer)
+        private bool ValidateAnswerSA(ExerciseSA exercise, string answer)
         {
-            var correctAnswers = exercise.CorrectAnswers;
-            if (answer == null || correctAnswers == null)
+            List<dynamic> correctAnswers = exercise.CorrectAnswers!;
+            if (answer == null)
             {
                 return false;
             }
@@ -170,26 +173,14 @@ namespace CodeyBe.Services
             return true;
         }
 
-        private bool ValidateAnswerLA(Exercise exercise, string answer)
+        private bool ValidateAnswerLA(ExerciseLA exercise, string answer)
         {
-            var correctAnswers = exercise.CorrectAnswers;
-            if (answer == null || correctAnswers == null)
+            List<dynamic> correctAnswers = exercise.CorrectAnswers!;
+            if (answer == null)
             {
                 return false;
             }
             return correctAnswers.Contains(answer);
-        }
-
-        public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise)
-        {
-            return exercise.Type switch
-            {
-                "MC" => new ExerciseMC_DTO(exercise),
-                "SA" => new ExerciseSA_DTO(exercise),
-                "LA" => new ExerciseLA_DTO(exercise),
-                "SCW" => new ExerciseSCW_DTO(exercise),
-                _ => new ExerciseDTO(exercise),
-            };
         }
 
     }

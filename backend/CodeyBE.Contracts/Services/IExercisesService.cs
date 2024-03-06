@@ -16,6 +16,16 @@ namespace CodeyBE.Contracts.Services
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 
         public Task<AnswerValidationResult> ValidateAnswer(int exerciseId, JsonElement answer);
-        public ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise);
+        public static ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise)
+        {
+            return exercise.Type switch
+            {
+                "MC" => new ExerciseMC_DTO((ExerciseMC) exercise),
+                "SA" => new ExerciseSA_DTO((ExerciseSA) exercise),
+                "LA" => new ExerciseLA_DTO((ExerciseLA) exercise),
+                "SCW" => new ExerciseSCW_DTO((ExerciseSCW) exercise),
+                _ => new ExerciseDTO(exercise),
+            };
+        }
     }
 }

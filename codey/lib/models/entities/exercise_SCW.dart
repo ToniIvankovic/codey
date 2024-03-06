@@ -9,7 +9,7 @@ class ExerciseSCW extends Exercise {
     required id,
     required difficulty,
     String? statement,
-    String? statementCode,
+    required String statementCode,
     required List<int> defaultGapLengths,
     required List<int> defaultGapLines,
     String? statementOutput,
