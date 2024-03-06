@@ -82,92 +82,75 @@ namespace CodeyBe.Services
 
         private AnswerValidationResult ValidateAnswer(Exercise exercise, JsonElement answer)
         {
+            bool correct;
+            dynamic castAnswer;
+            IEnumerable<dynamic> correctAnswers;
             //convert System.Text.Json.JsonElement answer to string
-            if (exercise.Type == "SA")
+            if (exercise is ExerciseSA exerciseSA)
             {
-                ExerciseSA exerciseSA = (ExerciseSA)exercise;
-                string castAnswer = answer.ToString();
-                IEnumerable<string> correctAnswers = exerciseSA.CorrectAnswers!.Select(answer => ((string)answer));
-                bool correct = ValidateAnswerSA(exerciseSA, castAnswer);
-                return new AnswerValidationResult(exerciseSA,
-                                                  correct,
-                                                  castAnswer,
-                                                  expectedAnswers: correctAnswers);
+                castAnswer = answer.ToString();
+                correctAnswers = exerciseSA.CorrectAnswers!.Select(answer => ((string)answer));
+                correct = ValidateAnswerSA(exerciseSA, castAnswer);
+
             }
-            else if (exercise.Type == "LA")
+            else if (exercise is ExerciseLA exerciseLA)
             {
-                ExerciseLA exerciseLA = (ExerciseLA)exercise;
-                string castAnswer = answer.ToString();
-                bool correct = ValidateAnswerLA(exerciseLA, castAnswer);
-                IEnumerable<string> correctAnswers = exerciseLA.CorrectAnswers!.Select(answer => ((string)answer));
-                return new AnswerValidationResult(exerciseLA,
-                    correct,
-                    castAnswer,
-                    expectedAnswers: correctAnswers);
+                castAnswer = answer.ToString();
+                correct = ValidateAnswerLA(exerciseLA, castAnswer);
+                correctAnswers = exerciseLA.CorrectAnswers!.Select(answer => ((string)answer));
             }
-            else if (exercise.Type == "MC")
+            else if (exercise is ExerciseMC exerciseMC)
             {
-                ExerciseMC exerciseMC = (ExerciseMC)exercise;
-                string castAnswer = answer.ToString();
-                IEnumerable<string> correctAnswers = new List<string>([exerciseMC.CorrectAnswer!]);
-                return new AnswerValidationResult(exerciseMC,
-                    exerciseMC.CorrectAnswer == castAnswer,
-                    castAnswer,
-                    expectedAnswers: correctAnswers);
+                castAnswer = answer.ToString();
+                correctAnswers = new List<string>([exerciseMC.CorrectAnswer!]);
+                correct = exerciseMC.CorrectAnswer == castAnswer;
             }
-            else if (exercise.Type == "SCW")
+            else if (exercise is ExerciseSCW exerciseSCW)
             {
-                ExerciseSCW exerciseSCW = (ExerciseSCW)exercise;
-                List<string> castAnswer = [];
+                castAnswer = new List<string>();
                 foreach (JsonElement element in answer.EnumerateArray())
                 {
                     castAnswer.Add(element.GetString()!);
                 }
-                IEnumerable<IEnumerable<string>> correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
-                bool correct = ValidateAnswerSCW(correctAnswers, castAnswer);
-                return new AnswerValidationResult(exerciseSCW,
-                                        correct,
-                                        castAnswer,
-                                        expectedAnswers: correctAnswers);
+                correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
+                correct = ValidateAnswerSCW((IEnumerable<IEnumerable<string>>)correctAnswers, castAnswer);
             }
             else
             {
                 throw new NotImplementedException($"Unknown exercise type {exercise.Type}");
             }
+
+            return new AnswerValidationResult(exercise,
+                                                  correct,
+                                                  castAnswer,
+                                                  expectedAnswers: correctAnswers);
         }
 
         private bool ValidateAnswerSA(ExerciseSA exercise, string answer)
         {
-            List<dynamic> correctAnswers = exercise.CorrectAnswers!;
-            if (answer == null)
-            {
-                return false;
-            }
-            return correctAnswers.Contains(answer);
+            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => ((string)d));
+            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: true);
         }
 
         private bool ValidateAnswerSCW(IEnumerable<IEnumerable<string>> correctAnswers, IEnumerable<string> givenAnswers)
         {
-            if (givenAnswers.IsNullOrEmpty() || correctAnswers.IsNullOrEmpty())
-            {
-                return false;
-            }
             if (correctAnswers.Count() != givenAnswers.Count())
             {
                 return false;
             }
             for (int i = 0; i < givenAnswers.Count(); i++)
             {
-                for (int j = 0; j < correctAnswers.ElementAt(i).Count(); j++)
+                string answer = givenAnswers.ElementAt(i);
+                IEnumerable<string> correctAnswersFori = correctAnswers.ElementAt(i);
+                bool currentMatch = CompareAnswers(
+                    answer,
+                    correctAnswers: correctAnswersFori,
+                    allowTrim: true,
+                    allowCaseInsensitive: true);
+
+                if (!currentMatch)
                 {
-                    if (correctAnswers.ElementAt(i).ElementAt(j) == givenAnswers.ElementAt(i))
-                    {
-                        break;
-                    }
-                    if (j == correctAnswers.ElementAt(i).Count() - 1)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
             return true;
@@ -175,12 +158,47 @@ namespace CodeyBe.Services
 
         private bool ValidateAnswerLA(ExerciseLA exercise, string answer)
         {
-            List<dynamic> correctAnswers = exercise.CorrectAnswers!;
+            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => ((string)d));
             if (answer == null)
             {
                 return false;
             }
-            return correctAnswers.Contains(answer);
+            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: true);
+        }
+
+        private bool CompareAnswers(string answer, IEnumerable<string> correctAnswers, bool allowTrim, bool allowCaseInsensitive)
+        {
+            bool allowCaseInsensitiveTrim = allowTrim && allowCaseInsensitive;
+
+            if (answer == null)
+            {
+                return false;
+            }
+            bool exactMatch = correctAnswers.Contains(answer);
+            if (exactMatch)
+            {
+                return true;
+            }
+
+            bool trimMatch = correctAnswers.Contains(answer.Trim());
+            if (allowTrim && trimMatch)
+            {
+                return true;
+            }
+
+            bool caseInsensitiveMatch = correctAnswers.Select(answer => answer.ToLower()).Contains(answer.ToLower());
+            if (allowCaseInsensitive && caseInsensitiveMatch)
+            {
+                return true;
+            }
+
+            bool caseInsensitiveTrimMatch = correctAnswers.Select(answer => answer.ToLower().Trim()).Contains(answer.ToLower().Trim());
+            if (allowCaseInsensitiveTrim && caseInsensitiveTrimMatch)
+            {
+                return true;
+            }
+
+            return false;
         }
 
     }
