@@ -11,12 +11,10 @@ using CodeyBE.Contracts.DTOs;
 
 namespace CodeyBe.Services
 {
-    public class LessonGroupsService : ILessonGroupsService
+    public class LessonGroupsService(ILessonGroupsRepository lessonGroupsRepository) : ILessonGroupsService
     {
-        private readonly ILessonGroupsRepository _lessonGroupsRepository;
-        public LessonGroupsService(ILessonGroupsRepository lessonGroupsRepository) { 
-            this._lessonGroupsRepository = lessonGroupsRepository;
-        }
+        private readonly ILessonGroupsRepository _lessonGroupsRepository = lessonGroupsRepository;
+
         public int FirstLessonGroupId => 10001;
 
         public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync()

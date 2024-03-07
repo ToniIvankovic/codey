@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,8 @@ namespace CodeyBE.Contracts.Services
         public Task<int?> LessonOrder(int lesson1Id, int lesson2Id);
         public Task<bool> IsLastLessonInGroup(int lessonId);
         public Task<int> GetNextLessonForLessonId(int lessonId);
+        Task<Lesson> CreateLessonAsync(LessonCreationDTO lesson);
+        Task<Lesson> UpdateLessonAsync(int id, LessonCreationDTO lesson);
+        Task DeleteLessonAsync(int id);
     }
 }

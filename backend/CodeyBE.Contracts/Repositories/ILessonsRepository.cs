@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,8 @@ namespace CodeyBE.Contracts.Repositories
 {
     public interface ILessonsRepository : IRepository<Lesson>
     {
+        Task<Lesson> CreateAsync(LessonCreationDTO lesson);
+        Task DeleteAsync(int id);
+        Task<Lesson> UpdateAsync(int id, LessonCreationDTO lesson);
     }
 }

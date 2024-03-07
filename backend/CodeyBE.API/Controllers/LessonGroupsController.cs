@@ -12,23 +12,16 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT,CREATOR")]
-    public class LessonGroupsController : ControllerBase
+    public class LessonGroupsController(ILessonGroupsService lessonGroupsService) : ControllerBase
     {
         const string version = "v2";
-        private readonly ILogger<LessonGroupsController> _logger;
-        private readonly ILessonGroupsService lessonGroupsService;
-
-        public LessonGroupsController(ILogger<LessonGroupsController> logger, ILessonGroupsService lessonGroupsService)
-        {
-            this.lessonGroupsService = lessonGroupsService;
-            _logger = logger;
-        }
+        private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
 
         [HttpGet(Name = "getAllLessonGroups")]
         [ProducesResponseType(typeof(IEnumerable<LessonGroup>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<LessonGroup>> GetAllLessonGroups()
         {
-            return await lessonGroupsService.GetAllLessonGroupsAsync();
+            return await _lessonGroupsService.GetAllLessonGroupsAsync();
         }
 
         [Authorize(Roles = "CREATOR")]
@@ -36,7 +29,7 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(LessonGroup), (int)HttpStatusCode.OK)]
         public async Task<LessonGroup?> GetLessonGroupByID(int id)
         {
-            return await lessonGroupsService.GetLessonGroupByIDAsync(id);
+            return await _lessonGroupsService.GetLessonGroupByIDAsync(id);
         }
 
         [Authorize(Roles = "CREATOR")]
@@ -44,8 +37,7 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(LessonGroup), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CreateLessonGroup([FromBody] LessonGroupCreationDTO lessonGroup)
         {
-            var result = await lessonGroupsService.CreateLessonGroupAsync(lessonGroup);
-            return Ok(result);
+            return Ok(await _lessonGroupsService.CreateLessonGroupAsync(lessonGroup));
         }
 
         [Authorize(Roles = "CREATOR")]
@@ -55,8 +47,7 @@ namespace CodeyBE.API.Controllers
         {
             try
             {
-                var result = await lessonGroupsService.UpdateLessonGroupAsync(id, lessonGroup);
-                return Ok(result);
+                return Ok(await _lessonGroupsService.UpdateLessonGroupAsync(id, lessonGroup));
             }
             catch (Exception e)
             {
@@ -72,7 +63,7 @@ namespace CodeyBE.API.Controllers
 
             try
             {
-                await lessonGroupsService.DeleteLessonGroupAsync(id);
+                await _lessonGroupsService.DeleteLessonGroupAsync(id);
                 return Ok();
             }
             catch (Exception e)
