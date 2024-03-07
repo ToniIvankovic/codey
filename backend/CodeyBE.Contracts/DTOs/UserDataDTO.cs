@@ -13,5 +13,6 @@ namespace CodeyBE.Contracts.DTOs
         public int? HighestLessonGroupId { get; set; }
         public int? NextLessonId { get; set; }
         public int? NextLessonGroupId { get; set; }
+        public List<string>? Roles { get; set; }
     }
 }

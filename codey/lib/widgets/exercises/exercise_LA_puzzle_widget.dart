@@ -1,7 +1,5 @@
 // ignore_for_file: file_names
 
-import 'dart:math';
-
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';

@@ -81,7 +81,8 @@ namespace CodeyBE.API.Controllers
                         HighestLessonId = applicationUser.HighestLessonId,
                         HighestLessonGroupId = applicationUser.HighestLessonGroupId,
                         NextLessonId = applicationUser.NextLessonId,
-                        NextLessonGroupId = applicationUser.NextLessonGroupId
+                        NextLessonGroupId = applicationUser.NextLessonGroupId,
+                        Roles = applicationUser.Roles
                     });
             }
             catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
@@ -103,7 +104,8 @@ namespace CodeyBE.API.Controllers
                     HighestLessonId = applicationUser.HighestLessonId,
                     HighestLessonGroupId = applicationUser.HighestLessonGroupId,
                     NextLessonId = applicationUser.NextLessonId,
-                    NextLessonGroupId = applicationUser.NextLessonGroupId
+                    NextLessonGroupId = applicationUser.NextLessonGroupId,
+                    Roles = applicationUser.Roles
                 };
                 return new OkObjectResult(dto);
             } catch (EntityNotFoundException e)
