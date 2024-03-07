@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,5 +28,9 @@ namespace CodeyBE.Contracts.Services
                 _ => new ExerciseDTO(exercise),
             };
         }
+
+        Task<Exercise> CreateExerciseAsync(ExerciseCreationDTO exercise);
+        Task<Exercise> UpdateExerciseAsync(int id, ExerciseCreationDTO exercise);
+        Task DeleteExerciseAsync(int id);
     }
 }

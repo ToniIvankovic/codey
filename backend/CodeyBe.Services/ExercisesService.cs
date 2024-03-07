@@ -3,34 +3,93 @@ using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace CodeyBe.Services
 {
-    public partial class ExercisesService : IExercisesService
+    public partial class ExercisesService(IExercisesRepository exercisesRepository, ILessonsService lessonsService) : IExercisesService
     {
-        private readonly IExercisesRepository _exercisesRepository;
-        private readonly ILessonsService _lessonsService;
+        private readonly IExercisesRepository _exercisesRepository = exercisesRepository;
+        private readonly ILessonsService _lessonsService = lessonsService;
 
-        public ExercisesService(IExercisesRepository exercisesRepository, ILessonsService lessonsService)
+        public async Task<IEnumerable<Exercise>> GetAllExercisesAsync()
         {
-            _exercisesRepository = exercisesRepository;
-            _lessonsService = lessonsService;
-        }
-        public Task<IEnumerable<Exercise>> GetAllExercisesAsync()
-        {
-            return _exercisesRepository.GetAllAsync();
+            return EnrichExercisesList(await _exercisesRepository.GetAllAsync());
         }
 
-        public Task<Exercise?> GetExerciseByIDAsync(int id)
+        public async Task<Exercise?> GetExerciseByIDAsync(int id)
         {
-            return _exercisesRepository.GetByIdAsync(id);
+            Exercise? exercise = await _exercisesRepository.GetByIdAsync(id);
+            if (exercise != null)
+            {
+                exercise = EnrichExercisesList(new List<Exercise> { exercise }).ElementAt(0);
+            }
+            return exercise;
+        }
+
+        public async Task<Exercise> CreateExerciseAsync(ExerciseCreationDTO exercise)
+        {
+            // Checking requirements
+            ValidateExerciseCreationDTO(exercise);
+            DeserializeCorrectAnswers(exercise);
+
+            // Creating the exercise in DB
+            Exercise newExercise = await _exercisesRepository.CreateAsync(exercise);
+            return newExercise;
+        }
+
+        public async Task<Exercise> UpdateExerciseAsync(int id, ExerciseCreationDTO exercise)
+        {
+            // Checking requirements
+            ValidateExerciseCreationDTO(exercise);
+            DeserializeCorrectAnswers(exercise);
+
+            // Updating the exercise in DB
+            Exercise updatedExercise = await _exercisesRepository.UpdateAsync(id, exercise);
+            return updatedExercise;
+        }
+        private static void DeserializeCorrectAnswers(ExerciseCreationDTO exercise)
+        {
+            if (exercise.Type == "SCW")
+            {
+                exercise.CorrectAnswers = DeserializeJsonListListString(exercise.CorrectAnswers!);
+            }
+            else if (exercise.Type == "SA" || exercise.Type == "LA")
+            {
+                exercise.CorrectAnswers = DeserializeJsonListString(exercise.CorrectAnswers!);
+            }
+        }
+
+        private static List<dynamic> DeserializeJsonListListString(List<dynamic> answers)
+        {
+            IEnumerable<dynamic> castAnswers = answers
+                .Select(answer => ((JsonElement)answer)
+                                    .EnumerateArray()
+                                    .Select(d => d.GetString())
+                                    .ToList());
+            return castAnswers.ToList();
+        }
+        private static List<dynamic> DeserializeJsonListString(List<dynamic> answers)
+        {
+            IEnumerable<dynamic> castAnswers = answers.Select(answer => ((JsonElement)answer).GetString()!);
+            return castAnswers.ToList();
+        }
+
+
+        private void ValidateExerciseCreationDTO(ExerciseCreationDTO dto)
+        {
+            Exercise generalExercise = new Exercise(0, dto);
+            IExercisesRepository.MapToSpecificExerciseType(generalExercise);
+        }
+
+        public async Task DeleteExerciseAsync(int id)
+        {
+            //TODO: check if the exercise is used in any lesson
+            await _exercisesRepository.DeleteAsync(id);
         }
 
         public async Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId)
@@ -41,14 +100,21 @@ namespace CodeyBe.Services
                 return new List<Exercise>();
             }
             IEnumerable<int> exerciseIDs = lesson.Exercises;
-            IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs).Select(exercise =>
-            {
-                if (exercise is ExerciseLA)
-                {
-                    GenerateAnswerOptionsForExerciseLA((ExerciseLA)exercise);
-                }
-                return exercise;
-            });
+            IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs);
+            exercises = EnrichExercisesList(exercises);
+            return exercises;
+        }
+
+        private IEnumerable<Exercise> EnrichExercisesList(IEnumerable<Exercise> exercises)
+        {
+            exercises = exercises.Select(exercise =>
+             {
+                 if (exercise is ExerciseLA exerciseLA)
+                 {
+                     GenerateAnswerOptionsForExerciseLA(exerciseLA);
+                 }
+                 return exercise;
+             });
             exercises = exercises.OrderBy(exercise => exercise.PrivateId);
             return exercises;
         }
@@ -107,11 +173,9 @@ namespace CodeyBe.Services
             }
             else if (exercise is ExerciseSCW exerciseSCW)
             {
-                castAnswer = new List<string>();
-                foreach (JsonElement element in answer.EnumerateArray())
-                {
-                    castAnswer.Add(element.GetString()!);
-                }
+                castAnswer = answer.EnumerateArray()
+                    .Select(element => element.GetString())
+                    .ToList();
                 correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
                 correct = ValidateAnswerSCW((IEnumerable<IEnumerable<string>>)correctAnswers, castAnswer);
             }
@@ -128,7 +192,7 @@ namespace CodeyBe.Services
 
         private bool ValidateAnswerSA(ExerciseSA exercise, string answer)
         {
-            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => ((string)d));
+            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => (string)d);
             return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: true);
         }
 
@@ -158,7 +222,7 @@ namespace CodeyBe.Services
 
         private bool ValidateAnswerLA(ExerciseLA exercise, string answer)
         {
-            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => ((string)d));
+            IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => (string)d);
             if (answer == null)
             {
                 return false;
@@ -200,6 +264,5 @@ namespace CodeyBe.Services
 
             return false;
         }
-
     }
 }

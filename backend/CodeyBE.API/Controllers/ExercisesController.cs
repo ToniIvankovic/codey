@@ -11,14 +11,14 @@ namespace CodeyBE.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "STUDENT")]
+    [Authorize(Roles = "STUDENT,CREATOR")]
     public class ExercisesController(IExercisesService exercisesService, ILogsService loggingService) : ControllerBase
     {
 
         const string version = "v2";
         private readonly IExercisesService exercisesService = exercisesService;
-        private readonly ILogsService loggingService = loggingService;
 
+        [Authorize(Roles = "CREATOR")]
         [HttpGet(Name = "getAllExercises")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetAllExercises()
@@ -28,6 +28,7 @@ namespace CodeyBE.API.Controllers
                 .ToList<object>();
         }
 
+        [Authorize(Roles = "CREATOR")]
         [HttpGet("{id}", Name = "getExerciseByID")]
         [ProducesResponseType(typeof(Exercise), (int)HttpStatusCode.OK)]
         public async Task<Exercise?> GetExerciseByID(int id)
@@ -36,6 +37,7 @@ namespace CodeyBE.API.Controllers
         }
 
 
+        [Authorize(Roles = "STUDENT")]
         [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
@@ -47,6 +49,7 @@ namespace CodeyBE.API.Controllers
                 .ToList<object>();
         }
 
+        [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpPost("{exerciseId}", Name = "validateAnswer")]
         [ProducesResponseType(typeof(AnswerValidationResultDTO), (int)HttpStatusCode.OK)]
         public async Task<AnswerValidationResultDTO> ValidateAnswer(int exerciseId, [FromBody] Dictionary<string, dynamic> body)
@@ -58,5 +61,53 @@ namespace CodeyBE.API.Controllers
             loggingService.AnsweredExercise(User, exerciseId, result.CorrectAnswers, result.GottenAnswer, result.IsCorrect);
             return new AnswerValidationResultDTO(result);
         }
+
+        [Authorize(Roles = "CREATOR")]
+        [HttpPost(Name = "createExercise")]
+        [ProducesResponseType(typeof(Exercise), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> CreateExercise([FromBody] ExerciseCreationDTO exercise)
+        {
+            try
+            {
+                return Ok(await exercisesService.CreateExerciseAsync(exercise));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "CREATOR")]
+        [HttpPut("{id}", Name = "updateExercise")]
+        [ProducesResponseType(typeof(Exercise), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateExercise(int id, [FromBody] ExerciseCreationDTO exercise)
+        {
+            try
+            {
+                return Ok(await exercisesService.UpdateExerciseAsync(id, exercise));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "CREATOR")]
+        [HttpDelete("{id}", Name = "deleteExercise")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> DeleteExercise(int id)
+        {
+            try
+            {
+
+                await exercisesService.DeleteExerciseAsync(id);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
     }
 }

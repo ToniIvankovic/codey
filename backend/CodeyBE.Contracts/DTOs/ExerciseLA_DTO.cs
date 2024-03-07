@@ -10,6 +10,6 @@ namespace CodeyBE.Contracts.DTOs
     public class ExerciseLA_DTO(Exercise ex) : ExerciseDTO(ex)
     {
 
-        public Dictionary<string, string> AnswerOptions { get; set; } = ex.AnswerOptions;
+        public Dictionary<string, string> AnswerOptions { get; set; } = ex.AnswerOptions!;
     }
 }

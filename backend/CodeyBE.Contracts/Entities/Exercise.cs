@@ -1,10 +1,6 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using CodeyBE.Contracts.DTOs;
 using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace CodeyBE.Contracts.Entities
 {
@@ -73,6 +69,25 @@ namespace CodeyBE.Contracts.Entities
             RaisesError = ex.RaisesError;
             SpecificTip = ex.SpecificTip;
         }
+
+        public Exercise(int id, ExerciseCreationDTO exerciseCreationDTO)
+        {
+            PrivateId = id;
+            Type = exerciseCreationDTO.Type;
+            Difficulty = exerciseCreationDTO.Difficulty;
+            Statement = exerciseCreationDTO.Statement;
+            StatementCode = exerciseCreationDTO.StatementCode;
+            DefaultGapLengths = exerciseCreationDTO.DefaultGapLengths;
+            DefaultGapLines = exerciseCreationDTO.DefaultGapLines;
+            StatementOutput = exerciseCreationDTO.StatementOutput;
+            Question = exerciseCreationDTO.Question;
+            AnswerOptions = exerciseCreationDTO.AnswerOptions;
+            CorrectAnswer = exerciseCreationDTO.CorrectAnswer;
+            CorrectAnswers = exerciseCreationDTO.CorrectAnswers;
+            RaisesError = exerciseCreationDTO.RaisesError;
+            SpecificTip = exerciseCreationDTO.SpecificTip;
+        }
+
     }
 
     public class ExerciseLA : Exercise
@@ -140,19 +155,19 @@ namespace CodeyBE.Contracts.Entities
             {
                 throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
             }
-            if(ex.StatementCode == null)
+            if (ex.StatementCode == null)
             {
                 throw new Exception($"Missing field StatementCode in exercise {ex.PrivateId} {ex.Type}");
             }
-            if(ex.DefaultGapLengths == null)
+            if (ex.DefaultGapLengths == null)
             {
                 throw new Exception($"Missing field DefaultGapLengths in exercise {ex.PrivateId} {ex.Type}");
             }
-            if(ex.DefaultGapLines == null)
+            if (ex.DefaultGapLines == null)
             {
                 throw new Exception($"Missing field DefaultGapLines in exercise {ex.PrivateId} {ex.Type}");
             }
-            if(ex.CorrectAnswers == null)
+            if (ex.CorrectAnswers == null)
             {
                 throw new Exception($"Missing field CorrectAnswers in exercise {ex.PrivateId} {ex.Type}");
             }
