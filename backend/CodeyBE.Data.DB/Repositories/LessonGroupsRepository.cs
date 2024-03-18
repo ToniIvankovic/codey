@@ -21,13 +21,16 @@ namespace CodeyBE.Data.DB.Repositories
                 .AsQueryable()
                 .OrderByDescending(lessonGroup => lessonGroup.PrivateId)
                 .FirstOrDefault()!.PrivateId;
+            int newId = lastId + 1;
             await _collection.InsertOneAsync(new LessonGroup
             {
-                PrivateId = lastId + 1,
+                PrivateId = newId,
                 Name = lessonGroup.Name,
                 Tips = lessonGroup.Tips,
+                LessonIds = lessonGroup.Lessons.ToList(),
+                Order = lessonGroup.Order
             });
-            return (await GetByIdAsync(lastId + 1))!;
+            return (await GetByIdAsync(newId))!;
         }
 
         public async Task<LessonGroup> UpdateAsync(int id, LessonGroupCreationDTO lessonGroup)
@@ -37,6 +40,8 @@ namespace CodeyBE.Data.DB.Repositories
                                 Builders<LessonGroup>.Update
                                 .Set(lessonGroup => lessonGroup.Name, lessonGroup.Name)
                                 .Set(lessonGroup => lessonGroup.Tips, lessonGroup.Tips)
+                                .Set(lessonGroup => lessonGroup.LessonIds, lessonGroup.Lessons.ToList())
+                                .Set(lessonGroup => lessonGroup.Order, lessonGroup.Order)
                                 );
             if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)
             {
@@ -55,6 +60,9 @@ namespace CodeyBE.Data.DB.Repositories
             }
         }
 
-
+        public async Task<LessonGroup?> GetLessonGroupByOrderAsync(int order)
+        {
+            return await _collection.Find(lessonGroup => lessonGroup.Order == order).FirstOrDefaultAsync();
+        }
     }
 }

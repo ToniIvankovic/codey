@@ -92,20 +92,32 @@ namespace CodeyBe.Services
             ApplicationUser? applicationUser = await GetUser(user) ??
                 throw new EntityNotFoundException($"User not found {user.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault()?.Value}");
 
-            bool solvedNewLesson = applicationUser.HighestLessonId == null
-                || await lessonsService.LessonOrder((int)applicationUser.HighestLessonId, lessonReport.LessonId) < 0;
+            bool solvedNewLesson;
+            if (applicationUser.HighestLessonId == null)
+            {
+                solvedNewLesson = true;
+                return applicationUser;
+            }
+
+            LessonGroup? lessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync(lessonReport.LessonGroupId)
+                ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
+            int lessonIndex = lessonGroup.LessonIds.IndexOf(lessonReport.LessonId);
+            int highestSolvedLessonIndex = lessonGroup.LessonIds.IndexOf((int)applicationUser.HighestLessonId);
+            solvedNewLesson = highestSolvedLessonIndex < lessonIndex;
+
+
             if (solvedNewLesson)
             {
                 await SetHighestSolvedLesson(applicationUser, lessonReport.LessonId);
                 int nextLessonId = await lessonsService.GetNextLessonForLessonId(lessonReport.LessonId);
                 await SetNextLesson(applicationUser, nextLessonId);
 
-                if (await lessonsService.IsLastLessonInGroup(lessonReport.LessonId))
+                if (lessonGroup.LessonIds.IndexOf(lessonReport.LessonId) == lessonGroup.LessonIds.Count - 1)
                 {
                     Lesson lesson = await lessonsService.GetLessonByIDAsync(lessonReport.LessonId) ?? throw new EntityNotFoundException();
-                    await SetHighestSolvedLessonGroup(applicationUser, lesson.LessonGroupId);
+                    await SetHighestSolvedLessonGroup(applicationUser, lessonGroup.PrivateId);
 
-                    int nextLessonGroupId = await lessonGroupsService.GetNextLessonGroupForLessonGroupId(lesson.LessonGroupId);
+                    int? nextLessonGroupId = await lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId);
                     await SetNextLessonGroup(applicationUser, nextLessonGroupId);
                 }
             }
@@ -127,8 +139,12 @@ namespace CodeyBe.Services
             applicationUser.HighestLessonGroupId = lessonGroupId;
             await _userManager.UpdateAsync(applicationUser);
         }
-        protected async Task SetNextLessonGroup(ApplicationUser applicationUser, int lessonGroupId)
+        protected async Task SetNextLessonGroup(ApplicationUser applicationUser, int? lessonGroupId)
         {
+            if (lessonGroupId == null)
+            {
+                return;
+            }
             applicationUser.NextLessonGroupId = lessonGroupId;
             await _userManager.UpdateAsync(applicationUser);
         }

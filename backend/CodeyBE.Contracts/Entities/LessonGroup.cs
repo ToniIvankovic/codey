@@ -18,6 +18,10 @@ namespace CodeyBE.Contracts.Entities
         public string? Tips { get; set; }
         [BsonElement("id")]
         public int PrivateId { get; set; }
+        [BsonElement("order")]
+        public int Order { get; set; }
+        [BsonElement("lessons")]
+        public List<int> LessonIds { get; set; } = [];
 
     }
 }

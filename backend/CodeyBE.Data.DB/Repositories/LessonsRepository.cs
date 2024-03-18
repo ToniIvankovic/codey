@@ -29,7 +29,6 @@ namespace CodeyBE.Data.DB.Repositories
                 PrivateId = nextId,
                 Name = lesson.Name,
                 Exercises = lesson.Exercises,
-                LessonGroupId = lesson.LessonGroupId
             });
             return (await GetByIdAsync(nextId))!;
         }
@@ -41,7 +40,6 @@ namespace CodeyBE.Data.DB.Repositories
                                 Builders<Lesson>.Update
                                 .Set(lesson => lesson.Name, lesson.Name)
                                 .Set(lesson => lesson.Exercises, lesson.Exercises)
-                                .Set(lesson => lesson.LessonGroupId, lesson.LessonGroupId)
                                 );
             if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)
             {

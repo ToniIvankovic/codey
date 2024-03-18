@@ -12,7 +12,7 @@ abstract class LessonsRepository {
 
 class LessonsRepository1 implements LessonsRepository {
   static Uri _apiUri(lessonGroup) =>
-      Uri.parse('${dotenv.env["API_BASE"]}/Lessons/lessonGroup/$lessonGroup');
+      Uri.parse('${dotenv.env["API_BASE"]}/lessons/lessonGroup/$lessonGroup');
   final Map<String, List<Lesson>> _cache = {};
   final http.Client _authenticatedClient;
 
@@ -41,8 +41,8 @@ class LessonsRepository1 implements LessonsRepository {
 
     final List<dynamic> data = json.decode(response.body);
     final lessons = data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
-    //TODO: sort on backend
-    lessons.sort((a, b) => a.id.compareTo(b.id));
+    // //TODO: sort on backend
+    // lessons.sort((a, b) => a.id.compareTo(b.id));
     _cache[lessonGroup.id.toString()] = lessons;
     return lessons;
   }

@@ -71,6 +71,7 @@ class AuthService1 implements AuthService {
       _checkTokenExpired();
     } catch (e) {
       await _clearToken();
+      return null;
     }
 
     return _token;

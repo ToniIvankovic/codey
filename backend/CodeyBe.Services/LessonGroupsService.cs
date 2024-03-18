@@ -27,10 +27,12 @@ namespace CodeyBe.Services
             return _lessonGroupsRepository.GetByIdAsync(id);
         }
 
-        public async Task<int> GetNextLessonGroupForLessonGroupId(int lessonGroupId)
+        public async Task<int?> GetNextLessonGroupForLessonGroupId(int lessonGroupId)
         {
             LessonGroup group = await GetLessonGroupByIDAsync(lessonGroupId) ?? throw new EntityNotFoundException();
-            return group.PrivateId + 1;
+            int order = group.Order;
+            LessonGroup? nextGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(order);
+            return nextGroup?.PrivateId;
         }
 
         public async Task<LessonGroup> CreateLessonGroupAsync(LessonGroupCreationDTO lessonGroup)
