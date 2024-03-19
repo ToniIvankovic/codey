@@ -2,6 +2,7 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,15 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 throw new EntityNotFoundException("Delete failed");
             }
+        }
+
+        public async Task<List<Lesson>> GetLessonsByIDsAsync(List<int> ids)
+        {
+            return (await _collection
+                .Find(lesson => ids.Contains(lesson.PrivateId))
+                .ToListAsync())
+                .OrderBy(lesson => ids.IndexOf(lesson.PrivateId))
+                .ToList();
         }
     }
 }

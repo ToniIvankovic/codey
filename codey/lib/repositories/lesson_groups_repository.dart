@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 abstract class LessonGroupsRepository {
   Future<List<LessonGroup>> getAllLessonGroups();
+  void invalidateCache() {}
 }
 
 class LessonGroupsRepository1 implements LessonGroupsRepository {
@@ -43,5 +44,10 @@ class LessonGroupsRepository1 implements LessonGroupsRepository {
         data.map((item) => LessonGroup.fromJson(item)).toList();
     _lessonGroupsCache = lessonGroups;
     return lessonGroups;
+  }
+  
+  @override
+  void invalidateCache() {
+    _lessonGroupsCache = null;
   }
 }

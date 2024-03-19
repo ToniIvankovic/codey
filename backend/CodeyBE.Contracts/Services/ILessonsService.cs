@@ -19,5 +19,6 @@ namespace CodeyBE.Contracts.Services
         Task<Lesson> CreateLessonAsync(LessonCreationDTO lesson);
         Task<Lesson> UpdateLessonAsync(int id, LessonCreationDTO lesson);
         Task DeleteLessonAsync(int id);
+        Task<List<Lesson>> GetLessonsByIDsAsync(List<int> id);
     }
 }

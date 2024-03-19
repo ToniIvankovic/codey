@@ -56,6 +56,11 @@ namespace CodeyBe.Services
             await _lessonsRepository.DeleteAsync(id);
         }
 
+        public async Task<List<Lesson>> GetLessonsByIDsAsync(List<int> ids)
+        {
+            return await _lessonsRepository.GetLessonsByIDsAsync(ids);
+        }
+
         public int FirstLessonId => 10001;
     }
 }

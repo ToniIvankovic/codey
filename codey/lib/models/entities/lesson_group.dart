@@ -1,14 +1,16 @@
 class LessonGroup {
   final int id;
-  final String name;
-  final String tips;
-  final List<int> lessons;
+  String name;
+  String tips;
+  List<int> lessons;
+  int order;
 
   LessonGroup({
     required this.id,
     required this.name,
     required this.tips,
     required this.lessons,
+    required this.order,
   });
 
   factory LessonGroup.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,17 @@ class LessonGroup {
       name: json['name'],
       tips: json['tips'],
       lessons: json['lessonIds'].cast<int>(),
+      order: json['order'],
     );
+  }
+
+  toJson() {
+    return {
+      'privateId': id,
+      'name': name,
+      'tips': tips,
+      'lessonIds': lessons,
+      'order': order,
+    };
   }
 }

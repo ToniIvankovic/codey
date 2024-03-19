@@ -21,6 +21,7 @@ abstract class ExercisesService {
   void endSession(bool completed);
   Future<bool> checkAnswer(Exercise exercise, dynamic answer);
   EndReport? getEndReport();
+  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -52,7 +53,7 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<void> startSessionForLesson(Lesson lesson) async {
-    _sessionExercises = await _getAllExercisesForLesson(lesson);
+    _sessionExercises = await getAllExercisesForLesson(lesson);
     _endReport = EndReport(lesson.id, 0, 0, _sessionExercises!.length);
   }
 
@@ -132,7 +133,8 @@ class ExercisesServiceV1 implements ExercisesService {
     return _endReport;
   }
 
-  Future<List<Exercise>> _getAllExercisesForLesson(Lesson lesson) {
+  @override
+  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
     return _getAllExercisesForLessonById(lesson.id.toString());
   }
 

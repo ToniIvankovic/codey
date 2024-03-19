@@ -1,4 +1,5 @@
 import 'package:codey/auth/authenticated_client.dart';
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
@@ -14,9 +15,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
+import 'widgets/creator/creator_home_page.dart';
+
 Future main() async {
-  String mode = 'prod';
-  // String mode = 'dev';
+  // String mode = 'prod';
+  String mode = 'dev';
   String env = '$mode.env';
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -37,8 +40,9 @@ Future main() async {
               LessonGroupsRepository1(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonGroupsService>(
-          create: (context) =>
-              LessonGroupsServiceV1(context.read<LessonGroupsRepository>()),
+          create: (context) => LessonGroupsServiceV1(
+              context.read<LessonGroupsRepository>(),
+              context.read<AuthenticatedClient>()),
         ),
         Provider<LessonsRepository>(
           create: (context) =>
@@ -113,8 +117,30 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }
 
-        return LessonGroupsScreen(
-            onLogoutSuper: () => setState(() => loggedIn = false));
+        return StreamBuilder<AppUser>(
+          stream: context.read<UserService>().userStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError || snapshot.data == null) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final user = snapshot.data!;
+
+              if (user.roles.contains("CREATOR")) {
+                return CreatorHomePage(
+                    title: widget.title,
+                    onLogoutSuper: () => setState(() => loggedIn = false));
+              } else if (user.roles.contains("STUDENT")) {
+                return LessonGroupsScreen(
+                  onLogoutSuper: () => setState(() => loggedIn = false),
+                );
+              } else {
+                return const Text('Error: User has no roles');
+              }
+            }
+          },
+        );
       },
     );
   }

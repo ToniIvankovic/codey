@@ -16,22 +16,33 @@ namespace CodeyBE.API.Controllers
         private readonly ILessonsService lessonsService = lessonsService;
 
         [Authorize(Roles = "CREATOR")]
-        [HttpGet(Name = "getAllLessons")]
+        [HttpGet("all", Name = "getAllLessons")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Lesson>> GetAllLessons()
         {
             return await lessonsService.GetAllLessonsAsync();
         }
 
+        //[Authorize(Roles = "CREATOR")]
+        //[HttpGet("{id}", Name = "getLessonByID")]
+        //[ProducesResponseType(typeof(Lesson), (int)HttpStatusCode.OK)]
+        //public async Task<Lesson?> GetLessonByID(int id)
+        //{
+        //    return await lessonsService.GetLessonByIDAsync(id);
+        //}
+
         [Authorize(Roles = "CREATOR")]
-        [HttpGet("{id}", Name = "getLessonByID")]
-        [ProducesResponseType(typeof(Lesson), (int)HttpStatusCode.OK)]
-        public async Task<Lesson?> GetLessonByID(int id)
+        [HttpGet(Name = "getLessonsByID")]
+        [ProducesResponseType(typeof(List<Lesson>), (int)HttpStatusCode.OK)]
+        public async Task<List<Lesson>> GetLessonsByIDs([FromQuery] List<int> ids)
         {
-            return await lessonsService.GetLessonByIDAsync(id);
+            ids.ForEach(id => Console.WriteLine(id));
+            return await lessonsService.GetLessonsByIDsAsync(ids);
         }
 
-        [Authorize(Roles = "STUDENT")]
+
+
+        [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpGet("lessonGroup/{lessonGroupId}", Name = "getLessonsForLessonGroup")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Lesson>> GetLessonsForLessonGroup(int lessonGroupId)

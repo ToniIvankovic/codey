@@ -37,7 +37,7 @@ namespace CodeyBE.API.Controllers
         }
 
 
-        [Authorize(Roles = "STUDENT")]
+        [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
