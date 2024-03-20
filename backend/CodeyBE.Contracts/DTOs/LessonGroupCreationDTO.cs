@@ -11,6 +11,6 @@ namespace CodeyBE.Contracts.DTOs
         public required string Name { get; set; }
         public required string Tips { get; set; }
         public required IEnumerable<int> Lessons { get; set; }
-        public int Order { get; set; }
+        public int? Order { get; set; }
     }
 }

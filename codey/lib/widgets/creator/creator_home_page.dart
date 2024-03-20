@@ -16,7 +16,7 @@ class CreatorHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const padd = const EdgeInsets.fromLTRB(18.0, 8.0, 18.0, 8.0);
+    const padd = EdgeInsets.fromLTRB(18.0, 8.0, 18.0, 8.0);
     var lessonGroupsButton = Expanded(
       child: Padding(
         padding: padd,
@@ -25,7 +25,7 @@ class CreatorHomePage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditLessonGroupsScreen(),
+                builder: (context) => const EditLessonGroupsScreen(),
               ),
             );
           },
@@ -41,7 +41,7 @@ class CreatorHomePage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditLessonsScreen(),
+                builder: (context) => const EditLessonsScreen(),
               ),
             );
           },
@@ -57,27 +57,11 @@ class CreatorHomePage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditExercisesScreen(),
+                builder: (context) => const EditExercisesScreen(),
               ),
             );
           },
           child: const Text('Exercises'),
-        ),
-      ),
-    );
-    var editAllButton = Expanded(
-      child: Padding(
-        padding: padd,
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditLessonGroupsScreen(),
-              ),
-            );
-          },
-          child: const Text('Edit all'),
         ),
       ),
     );
@@ -92,12 +76,6 @@ class CreatorHomePage extends StatelessWidget {
           children: <Widget>[
             const Text(
               'You are logged in as a creator.',
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                editAllButton,
-              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

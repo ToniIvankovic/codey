@@ -14,8 +14,6 @@ abstract class LessonsRepository {
 }
 
 class LessonsRepository1 implements LessonsRepository {
-  static Uri _apiUri(lessonGroup) =>
-      Uri.parse('${dotenv.env["API_BASE"]}/lessons/lessonGroup/$lessonGroup');
   static final Uri _apiUriAll = Uri.parse('${dotenv.env["API_BASE"]}/lessons/all');
 
   final Map<int, Lesson> _cache = {};
@@ -28,29 +26,6 @@ class LessonsRepository1 implements LessonsRepository {
     List<int> lessonIds = lessonGroup.lessons;
     return getLessonsByIds(lessonIds);
   }
-
-  // Future<List<Lesson>> _fetchLessonsForGroup(LessonGroup lessonGroup) async {
-  //   var response = await _authenticatedClient.get(_apiUri(lessonGroup.id));
-
-  //   if (response.statusCode != 200) {
-  //     switch (response.statusCode) {
-  //       case 401:
-  //         throw UnauthenticatedException('Unauthorized retrieval of lessons');
-  //       default:
-  //         throw Exception(
-  //             'Failed to fetch lessons for group: ${lessonGroup.id}, '
-  //             'Error ${response.statusCode}');
-  //     }
-  //   }
-
-  //   final List<dynamic> data = json.decode(response.body);
-  //   final lessons =
-  //       data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
-  //   // //TODO: sort on backend
-  //   // lessons.sort((a, b) => a.id.compareTo(b.id));
-  //   _cache[lessonGroup.id.toString()] = lessons;
-  //   return lessons;
-  // }
 
   @override
   Future<List<Lesson>> getAllLessons() async {

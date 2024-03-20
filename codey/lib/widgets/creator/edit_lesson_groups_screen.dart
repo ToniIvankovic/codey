@@ -1,8 +1,10 @@
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'create_lesson_group_screen.dart';
 import 'edit_single_lesson_group_screen.dart';
 
 class EditLessonGroupsScreen extends StatefulWidget {
@@ -15,35 +17,42 @@ class EditLessonGroupsScreen extends StatefulWidget {
 }
 
 class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
-  List<LessonGroup>? lessonGroups;
+  List<LessonGroup>? lessonGroupsInitial;
+  List<LessonGroup>? lessonGroupsLocal;
+  List<LessonGroup> lessonGroupsToDelete = [];
   int? expandedId;
 
   @override
   Widget build(BuildContext context) {
-    if (lessonGroups == null) {
+    if (lessonGroupsLocal == null) {
       final lessonGroupsService = context.read<LessonGroupsService>();
-      lessonGroupsService
-          .getAllLessonGroups()
-          .then((value) => setState(() => lessonGroups = value));
+      lessonGroupsService.getAllLessonGroups().then((value) => setState(
+            () => {
+              lessonGroupsInitial = List.of(value),
+              lessonGroupsLocal = List.of(value),
+            },
+          ));
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
+    final bool isChanged = !listEquals(lessonGroupsLocal, lessonGroupsInitial);
+
     var reorderableListView = ReorderableListView(
+      shrinkWrap: true,
       onReorder: (int oldIndex, int newIndex) {
         if (newIndex > oldIndex) {
           newIndex -= 1;
         }
-        print("$oldIndex, $newIndex");
         setState(() {
-          lessonGroups!.insert(
+          lessonGroupsLocal!.insert(
             newIndex,
-            lessonGroups!.removeAt(oldIndex),
+            lessonGroupsLocal!.removeAt(oldIndex),
           );
         });
       },
       children: <Widget>[
-        for (var lessonGroup in lessonGroups!) ...[
+        for (var lessonGroup in lessonGroupsLocal!) ...[
           ListTile(
             key: ValueKey(lessonGroup.id),
             title: Text("${lessonGroup.name} (${lessonGroup.id})"),
@@ -59,22 +68,36 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
             },
             leading: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    print("Edit lesson group ${lessonGroup.id}");
-                    Navigator.of(context)
-                        .push(
-                          MaterialPageRoute(
-                            builder: (context) => EditSingleLessonGroupScreen(
-                              lessonGroup: lessonGroup,
-                            ),
-                          ),
-                        )
-                        .then(
-                          (value) => setState(() {}),
-                        );
-                  }),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditSingleLessonGroupScreen(
+                                  lessonGroup: lessonGroup,
+                                ),
+                              ),
+                            )
+                            .then(
+                              (value) => setState(() {}),
+                            );
+                      }),
+                  IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        lessonGroupsLocal!.remove(lessonGroup);
+                        lessonGroupsToDelete.add(lessonGroup);
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
             isThreeLine: expandedId == lessonGroup.id,
             subtitle: expandedId == lessonGroup.id
@@ -100,18 +123,59 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
     );
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit all'),
+        title: const Text('Edit lesson groups'),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(child: reorderableListView),
+          reorderableListView,
+          //add lesson group
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 30.0, vertical: 10.0),
+                child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) => const CreateLessonGroup(),
+                            ),
+                          )
+                          .then(
+                            (value) => setState(() {
+                              if (value != null) {
+                                lessonGroupsLocal!.add(value as LessonGroup);
+                                lessonGroupsInitial!.add(value);
+                              }
+                            }),
+                          );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add lesson group")),
+              ),
+            ],
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: ElevatedButton(
-              onPressed: () {
-                final lessonGroupsService = context.read<LessonGroupsService>();
-                lessonGroupsService.reorderLessonGroups(lessonGroups!);
-              },
+              onPressed: isChanged
+                  ? () {
+                      final lessonGroupsService =
+                          context.read<LessonGroupsService>();
+                      lessonGroupsService
+                          .reorderLessonGroups(lessonGroupsLocal!);
+                      for (var lessonGroup in lessonGroupsToDelete) {
+                        lessonGroupsService
+                            .deleteLessonGroup(lessonGroup.id)
+                            .then((value) => setState(() {
+                                  lessonGroupsLocal!.remove(lessonGroup);
+                                }));
+                      }
+                      Navigator.pop(context);
+                    }
+                  : null,
               child: const Text("Save"),
             ),
           ),

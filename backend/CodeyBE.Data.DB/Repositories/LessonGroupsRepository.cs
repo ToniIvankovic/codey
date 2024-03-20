@@ -25,6 +25,10 @@ namespace CodeyBE.Data.DB.Repositories
                 .AsQueryable()
                 .OrderByDescending(lessonGroup => lessonGroup.PrivateId)
                 .FirstOrDefault()!.PrivateId;
+            int newOrder = lessonGroup.Order ?? _collection
+                .AsQueryable()
+                .OrderByDescending(lessonGroup => lessonGroup.Order)
+                .FirstOrDefault()!.Order + 1;
             int newId = lastId + 1;
             await _collection.InsertOneAsync(new LessonGroup
             {
@@ -32,7 +36,7 @@ namespace CodeyBE.Data.DB.Repositories
                 Name = lessonGroup.Name,
                 Tips = lessonGroup.Tips,
                 LessonIds = lessonGroup.Lessons.ToList(),
-                Order = lessonGroup.Order
+                Order = newOrder,
             });
             return (await GetByIdAsync(newId))!;
         }
