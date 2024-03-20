@@ -10,6 +10,10 @@ namespace CodeyBE.Data.DB.Repositories
 {
     public class LessonGroupsRepository(IMongoDbContext dbContext) : Repository<LessonGroup>(dbContext, "lesson_groups"), ILessonGroupsRepository
     {
+        public override async Task<IEnumerable<LessonGroup>> GetAllAsync()
+        {
+            return (await base.GetAllAsync()).OrderBy(lgr => lgr.Order).ToList();
+        }
         public override async Task<LessonGroup?> GetByIdAsync(int id)
         {
             return await _collection.Find(lessonGroup => lessonGroup.PrivateId == id).FirstOrDefaultAsync();
@@ -63,6 +67,22 @@ namespace CodeyBE.Data.DB.Repositories
         public async Task<LessonGroup?> GetLessonGroupByOrderAsync(int order)
         {
             return await _collection.Find(lessonGroup => lessonGroup.Order == order).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<LessonGroup>> UpdateOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList)
+        {
+            var updates = new List<WriteModel<LessonGroup>>();
+
+            foreach (var lessonGroupOrder in lessonGroupOrderList)
+            {
+                var filter = Builders<LessonGroup>.Filter.Eq(lessonGroup => lessonGroup.PrivateId, lessonGroupOrder.Id);
+                var update = Builders<LessonGroup>.Update.Set(lessonGroup => lessonGroup.Order, lessonGroupOrder.Order);
+                updates.Add(new UpdateOneModel<LessonGroup>(filter, update));
+            }
+
+            await _collection.BulkWriteAsync(updates);
+            return (await GetAllAsync()).ToList();
+
         }
     }
 }

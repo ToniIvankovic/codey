@@ -18,5 +18,6 @@ namespace CodeyBE.Contracts.Services
         public Task<LessonGroup> CreateLessonGroupAsync(LessonGroupCreationDTO lessonGroup);
         public Task DeleteLessonGroupAsync(int id);
         public Task<LessonGroup> UpdateLessonGroupAsync(int id, LessonGroupCreationDTO lessonGroup);
+        Task<List<LessonGroup>> UpdateLessonGroupOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList);
     }
 }

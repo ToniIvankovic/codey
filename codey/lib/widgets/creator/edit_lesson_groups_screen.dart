@@ -63,13 +63,17 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                   icon: Icon(Icons.edit),
                   onPressed: () {
                     print("Edit lesson group ${lessonGroup.id}");
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EditSingleLessonGroupScreen(
-                          lessonGroup: lessonGroup,
-                        ),
-                      ),
-                    );
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) => EditSingleLessonGroupScreen(
+                              lessonGroup: lessonGroup,
+                            ),
+                          ),
+                        )
+                        .then(
+                          (value) => setState(() {}),
+                        );
                   }),
             ),
             isThreeLine: expandedId == lessonGroup.id,
@@ -98,7 +102,21 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
       appBar: AppBar(
         title: const Text('Edit all'),
       ),
-      body: reorderableListView,
+      body: Column(
+        children: [
+          Expanded(child: reorderableListView),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: ElevatedButton(
+              onPressed: () {
+                final lessonGroupsService = context.read<LessonGroupsService>();
+                lessonGroupsService.reorderLessonGroups(lessonGroups!);
+              },
+              child: const Text("Save"),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,21 +22,27 @@ class EditSingleLessonGroupScreen extends StatefulWidget {
 
 class _EditSingleLessonGroupScreenState
     extends State<EditSingleLessonGroupScreen> {
-  List<Lesson> lessons = [];
+  List<Lesson> localLessons = [];
+  String localName = '';
+  String localTips = '';
   bool nameEditable = false;
-  String? nameEdited;
   bool tipsEditable = false;
-  String? tipsEdited;
   bool lessonsEditable = false;
+  String? nameEdited;
+  String? tipsEdited;
   List<Lesson>? lessonsEdited;
+  String? nameEditedCommit;
+  String? tipsEditedCommit;
+  List<Lesson>? lessonsEditedCommit;
 
   @override
   void initState() {
     super.initState();
     final lessonsService = context.read<LessonsService>();
-    lessonsService
-        .getLessonsByIds(widget.lessonGroup.lessons)
-        .then((lessonsInGroup) => {lessons = lessonsInGroup});
+    lessonsService.getLessonsByIds(widget.lessonGroup.lessons).then(
+        (lessonsInGroup) => setState(() => localLessons = lessonsInGroup));
+    localName = widget.lessonGroup.name;
+    localTips = widget.lessonGroup.tips;
   }
 
   @override
@@ -43,6 +50,9 @@ class _EditSingleLessonGroupScreenState
     final nameRow = _generateNameRow();
     final tipsRow = _generateTipsRow();
     final lessonsRow = _generateLessonsRow();
+    final bool madeEdits = nameEditedCommit == null &&
+        tipsEditedCommit == null &&
+        lessonsEditedCommit == null;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,21 +76,36 @@ class _EditSingleLessonGroupScreenState
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                 child: lessonsRow,
               ),
+              // COMMIT CHANGES TO BE
               ElevatedButton(
-                  onPressed: () {
-                    final lessonGroup = LessonGroup(
-                        id: widget.lessonGroup.id,
-                        name: nameEdited ?? widget.lessonGroup.name,
-                        tips: tipsEdited ?? widget.lessonGroup.tips,
-                        lessons: lessonsEdited == null
-                            ? widget.lessonGroup.lessons
-                            : lessonsEdited!.map((e) => e.id).toList(),
-                        order: widget.lessonGroup.order);
-                    context
-                        .read<LessonGroupsService>()
-                        .updateLessonGroup(lessonGroup);
-                    Navigator.pop(context);
-                  },
+                  onPressed: madeEdits
+                      ? null
+                      : () {
+                          final lessonGroup = LessonGroup(
+                              id: widget.lessonGroup.id,
+                              name: nameEdited ?? widget.lessonGroup.name,
+                              tips: tipsEdited ?? widget.lessonGroup.tips,
+                              lessons: lessonsEdited == null
+                                  ? widget.lessonGroup.lessons
+                                  : lessonsEdited!.map((e) => e.id).toList(),
+                              order: widget.lessonGroup.order);
+
+                          // Save changes on BE
+                          context
+                              .read<LessonGroupsService>()
+                              .updateLessonGroup(lessonGroup);
+
+                          //Save changes on FE
+                          widget.lessonGroup.name =
+                              nameEditedCommit ?? widget.lessonGroup.name;
+                          widget.lessonGroup.tips =
+                              tipsEditedCommit ?? widget.lessonGroup.tips;
+                          widget.lessonGroup.lessons = lessonsEditedCommit ==
+                                  null
+                              ? widget.lessonGroup.lessons
+                              : lessonsEditedCommit!.map((e) => e.id).toList();
+                          Navigator.pop(context);
+                        },
                   child: const Text('Save'))
             ],
           ),
@@ -89,18 +114,126 @@ class _EditSingleLessonGroupScreenState
     );
   }
 
-  Row _generateLessonsRow() {
-    final lessonsRow = Row(
+  Row _generateNameRow() {
+    final nameRow = Row(
       children: [
+        // EDIT/UNDO BUTTON
         IconButton(
             onPressed: () {
               setState(() {
-                lessonsEdited = List.of(lessons);
+                nameEditable = !nameEditable;
+                nameEdited = localName;
+              });
+            },
+            icon: Icon(nameEditable ? Icons.undo : Icons.edit)),
+        // TITLE
+        const Text('NAME: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        if (nameEditable) ...[
+          Expanded(
+            // EDITABLE TEXT FIELD
+            child: TextFormField(
+              initialValue: localName,
+              maxLength: 200,
+              maxLines: 1,
+              onChanged: (value) {
+                nameEdited = value;
+              },
+            ),
+          ),
+          // SAVE CHANGES LOCALLY
+          IconButton(
+            onPressed: () {
+              setState(() {
+                nameEditable = false;
+                nameEditedCommit = nameEdited!;
+                localName = nameEditedCommit!;
+                if (nameEditedCommit == widget.lessonGroup.name) {
+                  nameEditedCommit = null;
+                }
+              });
+            },
+            icon: const Icon(Icons.save),
+          )
+        ] else
+          // NON-EDITABLE TEXT
+          Text(localName),
+      ],
+    );
+    return nameRow;
+  }
+
+  Row _generateTipsRow() {
+    final tipsRow = Row(
+      children: [
+        // EDIT/UNDO BUTTON
+        IconButton(
+            onPressed: () {
+              setState(() {
+                tipsEditable = !tipsEditable;
+                tipsEdited = localTips;
+              });
+            },
+            icon: Icon(tipsEditable ? Icons.undo : Icons.edit)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // TITLE
+              const Text('TIPS: ',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              tipsEditable
+                  // EDITABLE TEXT FIELD
+                  ? TextFormField(
+                      initialValue: tipsEdited,
+                      maxLines: 10,
+                      onChanged: (value) {
+                        tipsEdited = value;
+                      },
+                    )
+                  // NON-EDITABLE TEXT
+                  : Text(
+                      localTips,
+                      maxLines: 10,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+            ],
+          ),
+        ),
+        // SAVE CHANGES LOCALLY
+        if (tipsEditable)
+          IconButton(
+            onPressed: () {
+              setState(() {
+                tipsEditable = false;
+                tipsEditedCommit = tipsEdited!;
+                localTips = tipsEditedCommit!;
+                if (tipsEditedCommit == widget.lessonGroup.tips) {
+                  tipsEditedCommit = null;
+                }
+              });
+            },
+            icon: const Icon(Icons.save),
+          ),
+      ],
+    );
+    return tipsRow;
+  }
+
+  Row _generateLessonsRow() {
+    final lessonsRow = Row(
+      children: [
+        // EDIT/UNDO BUTTON
+        IconButton(
+            onPressed: () {
+              setState(() {
+                lessonsEdited = List.of(localLessons);
                 lessonsEditable = !lessonsEditable;
               });
             },
             icon: Icon(lessonsEditable ? Icons.undo : Icons.edit)),
+        // TITLE
         const Text('LESSONS: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        // EDITABLE LIST
         if (lessonsEditable) ...[
           Expanded(
             child: Column(
@@ -155,108 +288,28 @@ class _EditSingleLessonGroupScreenState
               ],
             ),
           ),
+          // SAVE CHANGES LOCALLY
           IconButton(
             onPressed: () {
               setState(() {
                 lessonsEditable = false;
-                widget.lessonGroup.lessons =
-                    lessonsEdited!.map((e) => e.id).toList();
-                lessons = List.of(lessonsEdited!);
+                lessonsEditedCommit = lessonsEdited!;
+                if (listEquals(lessonsEditedCommit!.map((e) => e.id).toList(),
+                    widget.lessonGroup.lessons)) {
+                  lessonsEditedCommit = null;
+                  lessonsEdited = null;
+                } else {
+                  localLessons = List.of(lessonsEdited!);
+                }
               });
             },
             icon: const Icon(Icons.save),
           )
         ] else
-          Text(widget.lessonGroup.lessons.map((e) => e.toString()).join(", ")),
+          // NON-EDITABLE LIST
+          Text(localLessons.map((e) => e.id.toString()).join(", ")),
       ],
     );
     return lessonsRow;
-  }
-
-  Row _generateTipsRow() {
-    final tipsRow = Row(
-      children: [
-        IconButton(
-            onPressed: () {
-              setState(() {
-                tipsEditable = !tipsEditable;
-                tipsEdited = widget.lessonGroup.tips;
-              });
-            },
-            icon: Icon(tipsEditable ? Icons.undo : Icons.edit)),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('TIPS: ',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              tipsEditable
-                  ? TextFormField(
-                      initialValue: widget.lessonGroup.tips,
-                      maxLines: 10,
-                      onChanged: (value) {
-                        tipsEdited = value;
-                      },
-                    )
-                  : Text(
-                      widget.lessonGroup.tips,
-                      maxLines: 10,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-            ],
-          ),
-        ),
-        if (tipsEditable)
-          IconButton(
-            onPressed: () {
-              setState(() {
-                tipsEditable = false;
-                widget.lessonGroup.tips = tipsEdited!;
-              });
-            },
-            icon: const Icon(Icons.save),
-          ),
-      ],
-    );
-    return tipsRow;
-  }
-
-  Row _generateNameRow() {
-    final nameRow = Row(
-      children: [
-        IconButton(
-            onPressed: () {
-              setState(() {
-                nameEditable = !nameEditable;
-                nameEdited = widget.lessonGroup.name;
-              });
-            },
-            icon: Icon(nameEditable ? Icons.undo : Icons.edit)),
-        const Text('NAME: ', style: TextStyle(fontWeight: FontWeight.bold)),
-        if (nameEditable) ...[
-          Expanded(
-            child: TextFormField(
-              initialValue: widget.lessonGroup.name,
-              maxLength: 200,
-              maxLines: 1,
-              onChanged: (value) {
-                nameEdited = value;
-              },
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                nameEditable = false;
-                widget.lessonGroup.name = nameEdited!;
-              });
-            },
-            icon: const Icon(Icons.save),
-          )
-        ] else
-          Text(widget.lessonGroup.name),
-      ],
-    );
-    return nameRow;
   }
 }

@@ -52,5 +52,10 @@ namespace CodeyBe.Services
             return updatedGroup;
         }
 
+        public async Task<List<LessonGroup>> UpdateLessonGroupOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList)
+        {
+            List<LessonGroup> reorderedGroups = await _lessonGroupsRepository.UpdateOrderAsync(lessonGroupOrderList);
+            return reorderedGroups;
+        }
     }
 }
