@@ -15,7 +15,7 @@ class ExerciseSCW extends Exercise {
     String? statementOutput,
     String? specificTip,
   }) : super(
-          type: ExerciseType.SA,
+          type: ExerciseType.SCW,
           id: id,
           difficulty: difficulty,
           statement: statement,
