@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace CodeyBE.API.Controllers
         //    return await lessonsService.GetLessonByIDAsync(id);
         //}
 
-        [Authorize(Roles = "CREATOR")]
+        [Authorize(Roles = "CREATOR,STUDENT")]
         [HttpGet(Name = "getLessonsByID")]
         [ProducesResponseType(typeof(List<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<List<Lesson>> GetLessonsByIDs([FromQuery] List<int> ids)
@@ -67,9 +68,13 @@ namespace CodeyBE.API.Controllers
             {
                 return Ok(await lessonsService.UpdateLessonAsync(id, lesson));
             }
-            catch (Exception e)
+            catch (EntityNotFoundException e)
             {
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
 

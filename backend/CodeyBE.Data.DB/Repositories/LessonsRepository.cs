@@ -30,6 +30,7 @@ namespace CodeyBE.Data.DB.Repositories
                 PrivateId = nextId,
                 Name = lesson.Name,
                 Exercises = lesson.Exercises,
+                SpecificTips = lesson.SpecificTips,
             });
             return (await GetByIdAsync(nextId))!;
         }
@@ -40,11 +41,20 @@ namespace CodeyBE.Data.DB.Repositories
                                 lesson => lesson.PrivateId == id,
                                 Builders<Lesson>.Update
                                 .Set(lesson => lesson.Name, lesson.Name)
+                                .Set(lesson => lesson.SpecificTips, lesson.SpecificTips)
                                 .Set(lesson => lesson.Exercises, lesson.Exercises)
                                 );
-            if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)
+            if (!updateResult.IsAcknowledged)
             {
-                throw new EntityNotFoundException("Update failed");
+                throw new Exception("Update failed");
+            }
+            if (updateResult.MatchedCount == 0)
+            {
+                throw new EntityNotFoundException("Lesson not found");
+            }
+            if(updateResult.ModifiedCount == 0)
+            {
+                throw new NoChangesException("No changes");
             }
 
             return (await GetByIdAsync(id))!;

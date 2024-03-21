@@ -1,6 +1,6 @@
 class Lesson {
   int id;
-  List<String> exerciseIds;
+  List<int> exerciseIds;
   String name;
   String? specificTips;
 
@@ -15,7 +15,7 @@ class Lesson {
     return Lesson(
       id: json['privateId'],
       name: json['name'],
-      exerciseIds: json['exercises'].cast<String>(),
+      exerciseIds: json['exercises'].cast<int>(),
       specificTips: json['specificTips'],
     );
   }

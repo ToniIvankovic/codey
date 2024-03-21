@@ -45,8 +45,9 @@ Future main() async {
               context.read<AuthenticatedClient>()),
         ),
         Provider<LessonsRepository>(
-          create: (context) =>
-              LessonsRepository1(context.read<AuthenticatedClient>()),
+          create: (context) => LessonsRepository1(
+              context.read<AuthenticatedClient>(),
+              context.read<ExercisesRepository>()),
         ),
         Provider<LessonsService>(
           create: (context) =>

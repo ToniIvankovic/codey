@@ -18,5 +18,7 @@ namespace CodeyBE.Contracts.Entities
         public IEnumerable<int> Exercises { get; set; } = new List<int>();
         [BsonElement("id")]
         public int PrivateId { get; set; }
+        [BsonElement("specificTips")]
+        public string? SpecificTips { get; set; }
     }
 }

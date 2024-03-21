@@ -22,6 +22,7 @@ abstract class ExercisesService {
   Future<bool> checkAnswer(Exercise exercise, dynamic answer);
   EndReport? getEndReport();
   Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson);
+  Future<List<Exercise>> getAllExercises();
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -135,10 +136,15 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
-    return _getAllExercisesForLessonById(lesson.id.toString());
+    return _getAllExercisesForLessonById(lesson.id);
   }
 
-  Future<List<Exercise>> _getAllExercisesForLessonById(String lessonId) {
+  Future<List<Exercise>> _getAllExercisesForLessonById(int lessonId) {
     return _exRepo.getExercisesForLesson(lessonId);
+  }
+  
+  @override
+  Future<List<Exercise>> getAllExercises() {
+    return _exRepo.getAllExercises();
   }
 }

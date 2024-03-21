@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'edit_lesson_groups_screen.dart';
+import 'edit_lessons_screen.dart';
 
 class CreatorHomePage extends StatelessWidget {
   const CreatorHomePage({
@@ -107,24 +108,6 @@ class CreatorHomePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class EditLessonsScreen extends StatelessWidget {
-  const EditLessonsScreen({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lessons'),
-      ),
-      body: const Center(
-        child: Text('Lessons'),
       ),
     );
   }
