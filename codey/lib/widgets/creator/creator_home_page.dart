@@ -2,8 +2,8 @@ import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'edit_lesson_groups_screen.dart';
-import 'edit_lessons_screen.dart';
+import 'lesson_group/edit_lesson_groups_screen.dart';
+import 'lesson/edit_lessons_screen.dart';
 
 class CreatorHomePage extends StatelessWidget {
   const CreatorHomePage({

@@ -3,7 +3,7 @@ import 'package:codey/services/lessons_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'pick_exercise_screen.dart';
+import '../exercise/pick_exercise_screen.dart';
 
 class CreateLessonScreen extends StatefulWidget {
   const CreateLessonScreen({super.key});

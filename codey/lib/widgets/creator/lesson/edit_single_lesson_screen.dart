@@ -2,7 +2,7 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
-import 'package:codey/widgets/creator/pick_exercise_screen.dart';
+import 'package:codey/widgets/creator/exercise/pick_exercise_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,6 +1,6 @@
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/lesson_groups_service.dart';
-import 'package:codey/widgets/creator/pick_lesson_screen.dart';
+import 'package:codey/widgets/creator/lesson/pick_lesson_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

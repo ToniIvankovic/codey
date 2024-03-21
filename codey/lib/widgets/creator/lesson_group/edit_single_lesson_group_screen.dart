@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'pick_lesson_screen.dart';
+import '../lesson/pick_lesson_screen.dart';
 
 class EditSingleLessonGroupScreen extends StatefulWidget {
   const EditSingleLessonGroupScreen({
