@@ -5,23 +5,24 @@ import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
 class ExerciseSCW extends Exercise {
+  final List<int> defaultGapLengths;
+  final String statementCode;
+  final List<List<String>>? correctAnswers;
+
   ExerciseSCW({
     required id,
     required difficulty,
     String? statement,
-    required String statementCode,
-    required List<int> defaultGapLengths,
-    required List<int> defaultGapLines,
-    String? statementOutput,
+    required this.statementCode,
+    required String statementOutput,
+    required this.defaultGapLengths,
     String? specificTip,
+    this.correctAnswers,
   }) : super(
           type: ExerciseType.SCW,
           id: id,
           difficulty: difficulty,
           statement: statement,
-          statementCode: statementCode,
-          defaultGapLengths: defaultGapLengths,
-          defaultGapLines: defaultGapLines,
           statementOutput: statementOutput,
           specificTip: specificTip,
         );
@@ -29,8 +30,9 @@ class ExerciseSCW extends Exercise {
   factory ExerciseSCW.fromJson(Map<String, dynamic> json) {
     List<dynamic> defaultGapLengths = json['defaultGapLengths'];
     List<int> defaultGapLengthsInt = defaultGapLengths.cast<int>().toList();
-    List<dynamic> defaultGapLines = json['defaultGapLines'];
-    List<int> defaultGapLinesInt = defaultGapLines.cast<int>().toList();
+    List<dynamic>? correctAnswers = json['correctAnswers'];
+    List<List<String>>? correctAnswersList =
+        correctAnswers?.map((answer) => List<String>.from(answer)).toList();
     return ExerciseSCW(
       id: json['privateId'],
       difficulty: json['difficulty'],
@@ -38,8 +40,21 @@ class ExerciseSCW extends Exercise {
       statementCode: json['statementCode'],
       specificTip: json['specificTip'],
       defaultGapLengths: defaultGapLengthsInt,
-      defaultGapLines: defaultGapLinesInt,
       statementOutput: json['statementOutput'],
+      correctAnswers: correctAnswersList,
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'difficulty': difficulty,
+        'type': type.toString(),
+        'statement': statement,
+        'statementCode': statementCode,
+        'specificTip': specificTip,
+        'defaultGapLengths': defaultGapLengths,
+        'statementOutput': statementOutput,
+        'correctAnswers': correctAnswers,
+      };
 }

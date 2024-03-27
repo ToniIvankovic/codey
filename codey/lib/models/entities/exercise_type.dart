@@ -5,6 +5,7 @@ class ExerciseType {
   static ExerciseType SA = ExerciseType._("SA");
   static ExerciseType LA = ExerciseType._("LA");
   static ExerciseType SCW = ExerciseType._("SCW");
+  static List<ExerciseType> values = [MC, SA, LA, SCW];
 
   String type;
   ExerciseType._(this.type);

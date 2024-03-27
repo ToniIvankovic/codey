@@ -4,23 +4,23 @@ import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
 class ExerciseLA extends Exercise {
-  Map<String, dynamic> answerOptions;
+  Map<String, String>? answerOptions;
+  List<String> correctAnswers = [];
 
   ExerciseLA({
     required id,
     required difficulty,
     String? statement,
-    String? statementCode,
-    String? question,
+    String? statementOutput,
     String? specificTip,
-    required this.answerOptions,
+    this.answerOptions,
+    required this.correctAnswers,
   }) : super(
           type: ExerciseType.LA,
           id: id,
           difficulty: difficulty,
           statement: statement,
-          statementCode: statementCode,
-          question: question,
+          statementOutput: statementOutput,
           specificTip: specificTip,
         );
 
@@ -29,10 +29,25 @@ class ExerciseLA extends Exercise {
       id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
-      statementCode: json['statementCode'],
-      question: json['question'],
+      statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
-      answerOptions: json['answerOptions'],
+      answerOptions: (json['answerOptions'] as Map<String, dynamic>)
+          .cast<String, String>(),
+      correctAnswers: json['correctAnswers'] != null
+          ? List<String>.from(json['correctAnswers'])
+          : [],
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'difficulty': difficulty,
+        'type': type.toString(),
+        'statement': statement,
+        'statementOutput': statementOutput,
+        'specificTip': specificTip,
+        'answerOptions': answerOptions,
+        'correctAnswers': correctAnswers,
+      };
 }

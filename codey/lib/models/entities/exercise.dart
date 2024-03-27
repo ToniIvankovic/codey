@@ -9,23 +9,15 @@ abstract class Exercise {
   final int difficulty;
   final ExerciseType type;
   final String? statement;
-  final String? statementCode;
-  final String? question;
-  final List<int>? defaultGapLengths;
-  final List<int>? defaultGapLines;
-  final String? statementOutput;
   final String? specificTip;
+  final String? statementOutput;
 
   Exercise({
     required this.id,
     required this.difficulty,
     required this.type,
     this.statement,
-    this.statementCode,
-    this.question,
     this.specificTip,
-    this.defaultGapLengths,
-    this.defaultGapLines,
     this.statementOutput,
   });
   
@@ -44,13 +36,5 @@ abstract class Exercise {
     }
   }
 
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'difficulty': difficulty,
-  //       'type': type.toString().split('.').last,
-  //       'statement': statement,
-  //       'statementCode': statementCode,
-  //       'question': question,
-  //       'specificTip': specificTip,
-  //     };
+  Map<String, dynamic> toJson();
 }
