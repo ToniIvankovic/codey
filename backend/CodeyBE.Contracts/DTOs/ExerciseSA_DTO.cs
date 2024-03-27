@@ -7,11 +7,20 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.DTOs
 {
-    public class ExerciseSA_DTO(Exercise ex) : ExerciseDTO(ex)
+    public class ExerciseSA_DTO : ExerciseDTO
     {
-        public string? StatementCode { get; set; } = ex.StatementCode;
-        public string Question { get; set; } = ex.Question!;
-        public bool? RaisesError { get; set; } = ex.RaisesError;
-        //public List<string>? CorrectAnswers { get; set; } = ex.CorrectAnswers;
+        public ExerciseSA_DTO(Exercise ex) : base(ex)
+        {
+            // Check requirements
+            _ = new ExerciseSA(ex);
+            StatementCode = ex.StatementCode;
+            Question = ex.Question!;
+            RaisesError = ex.RaisesError;
+            CorrectAnswers = ex.CorrectAnswers;
+        }
+        public string? StatementCode { get; set; }
+        public string Question { get; set; }
+        public bool? RaisesError { get; set; }
+        public List<dynamic>? CorrectAnswers { get; set; }
     }
 }

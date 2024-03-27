@@ -20,36 +20,43 @@ namespace CodeyBE.Contracts.Entities
         public int Difficulty { get; set; }
 
         [BsonElement("statement")]
+        [BsonIgnoreIfNull]
         public string? Statement { get; set; }
 
         [BsonElement("statementCode")]
+        [BsonIgnoreIfNull]
         public string? StatementCode { get; set; }
 
         [BsonElement("defaultGapLengths")]
+        [BsonIgnoreIfNull]
         public List<int>? DefaultGapLengths { get; set; }
 
-        [BsonElement("defaultGapLines")]
-        public List<int>? DefaultGapLines { get; set; }
-
         [BsonElement("statementOutput")]
+        [BsonIgnoreIfNull]
         public string? StatementOutput { get; set; }
 
         [BsonElement("question")]
+        [BsonIgnoreIfNull]
         public string? Question { get; set; }
 
         [BsonElement("answerOptions")]
+        [BsonIgnoreIfNull]
         public Dictionary<string, string>? AnswerOptions { get; set; }
 
         [BsonElement("correctAnswer")]
+        [BsonIgnoreIfNull]
         public string? CorrectAnswer { get; set; }
 
         [BsonElement("correctAnswers")]
+        [BsonIgnoreIfNull]
         public List<dynamic>? CorrectAnswers { get; set; }
 
         [BsonElement("raisesError")]
+        [BsonIgnoreIfNull]
         public bool? RaisesError { get; set; }
 
         [BsonElement("specificTip")]
+        [BsonIgnoreIfNull]
         public string? SpecificTip { get; set; }
         public Exercise(Exercise ex)
         {
@@ -60,7 +67,6 @@ namespace CodeyBE.Contracts.Entities
             Statement = ex.Statement;
             StatementCode = ex.StatementCode;
             DefaultGapLengths = ex.DefaultGapLengths;
-            DefaultGapLines = ex.DefaultGapLines;
             StatementOutput = ex.StatementOutput;
             Question = ex.Question;
             AnswerOptions = ex.AnswerOptions;
@@ -78,7 +84,6 @@ namespace CodeyBE.Contracts.Entities
             Statement = exerciseCreationDTO.Statement;
             StatementCode = exerciseCreationDTO.StatementCode;
             DefaultGapLengths = exerciseCreationDTO.DefaultGapLengths;
-            DefaultGapLines = exerciseCreationDTO.DefaultGapLines;
             StatementOutput = exerciseCreationDTO.StatementOutput;
             Question = exerciseCreationDTO.Question;
             AnswerOptions = exerciseCreationDTO.AnswerOptions;
@@ -163,13 +168,13 @@ namespace CodeyBE.Contracts.Entities
             {
                 throw new Exception($"Missing field DefaultGapLengths in exercise {ex.PrivateId} {ex.Type}");
             }
-            if (ex.DefaultGapLines == null)
-            {
-                throw new Exception($"Missing field DefaultGapLines in exercise {ex.PrivateId} {ex.Type}");
-            }
             if (ex.CorrectAnswers == null)
             {
                 throw new Exception($"Missing field CorrectAnswers in exercise {ex.PrivateId} {ex.Type}");
+            }
+            if (ex.StatementOutput == null)
+            {
+                throw new Exception($"Missing field StatementOutput in exercise {ex.PrivateId} {ex.Type}");
             }
         }
     }
