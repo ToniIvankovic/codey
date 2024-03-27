@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -85,6 +86,10 @@ namespace CodeyBE.API.Controllers
             try
             {
                 return Ok(await exercisesService.UpdateExerciseAsync(id, exercise));
+            }
+            catch (NoChangesException)
+            {
+                return StatusCode(204);
             }
             catch (Exception e)
             {
