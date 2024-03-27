@@ -2,6 +2,7 @@ import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'exercise/edit_exercises_screen.dart';
 import 'lesson_group/edit_lesson_groups_screen.dart';
 import 'lesson/edit_lessons_screen.dart';
 
@@ -108,24 +109,6 @@ class CreatorHomePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class EditExercisesScreen extends StatelessWidget {
-  const EditExercisesScreen({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Exercises'),
-      ),
-      body: const Center(
-        child: Text('Exercises'),
       ),
     );
   }

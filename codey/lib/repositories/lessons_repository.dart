@@ -111,7 +111,10 @@ class LessonsRepository1 implements LessonsRepository {
 
   @override
   Future<Lesson> createLesson(
-      String name, String? tips, List<int> exerciseIds) async {
+    String name,
+    String? tips,
+    List<int> exerciseIds,
+  ) async {
     var apiUri = Uri.parse('${dotenv.env["API_BASE"]}/lessons');
     final response = await _authenticatedClient.post(
       apiUri,
@@ -160,7 +163,11 @@ class LessonsRepository1 implements LessonsRepository {
 
   @override
   Future<Lesson> updateLesson(
-      int id, String name, String? tips, List<int> exerciseIds) async {
+    int id,
+    String name,
+    String? tips,
+    List<int> exerciseIds,
+  ) async {
     invalidateCache(id);
     var response = await _authenticatedClient
         .put(Uri.parse('${dotenv.env["API_BASE"]}/lessons/$id'),

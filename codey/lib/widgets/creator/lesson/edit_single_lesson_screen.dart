@@ -228,18 +228,6 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(
-                                  exercisesEdited[index]
-                                      .statementCode
-                                      .toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  exercisesEdited[index].question.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
                               ],
                             )
                           : null,
@@ -268,7 +256,8 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                     Navigator.of(context)
                         .push(
                       MaterialPageRoute(
-                        builder: (context) => PickExerciseScreen(exercises: exercisesLocal),
+                        builder: (context) =>
+                            PickExerciseScreen(exercises: exercisesLocal),
                       ),
                     )
                         .then((value) {
@@ -296,18 +285,6 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                               children: [
                                 Text(
                                   exercisesLocal[index].statement.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  exercisesLocal[index]
-                                      .statementCode
-                                      .toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  exercisesLocal[index].question.toString(),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
