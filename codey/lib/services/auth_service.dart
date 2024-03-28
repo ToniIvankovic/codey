@@ -10,7 +10,7 @@ abstract class AuthService {
   Future<String?> get token;
   Future<void> login(String username, String password);
   Future<void> logout();
-  Future<void> register(String username, String password);
+  Future<void> registerUser(String username, String password);
 }
 
 class AuthService1 implements AuthService {
@@ -45,7 +45,7 @@ class AuthService1 implements AuthService {
   }
 
   @override
-  Future<void> register(String username, String password) async {
+  Future<void> registerUser(String username, String password) async {
     final response = await http.post(
       _registerEndpoint,
       body: json.encode({'email': username, 'password': password}),
@@ -54,7 +54,11 @@ class AuthService1 implements AuthService {
 
     if (response.statusCode != 200) {
       var errorMessage = json.decode(response.body);
-      errorMessage = errorMessage['message'].toString().substring(1, errorMessage['message'].toString().length - 1).split(", ").join("\n");
+      errorMessage = errorMessage['message']
+          .toString()
+          .substring(1, errorMessage['message'].toString().length - 1)
+          .split(", ")
+          .join("\n");
       throw AuthenticationException(errorMessage);
     }
   }

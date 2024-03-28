@@ -3,11 +3,13 @@ import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/services/admin_functions_service.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
+import 'package:codey/widgets/creator/admin_home_page.dart';
 import 'package:codey/widgets/lesson_groups/lesson_groups_screen.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/auth/auth_screen.dart';
@@ -30,6 +32,10 @@ Future main() async {
         ),
         Provider<AuthenticatedClient>(
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
+        ),
+        Provider<AdminFunctionsService>(
+          create: (context) =>
+              AdminFunctionsServiceImpl(context.read<AuthenticatedClient>()),
         ),
         Provider<ExercisesRepository>(
           create: (context) =>
@@ -128,17 +134,20 @@ class _MyHomePageState extends State<MyHomePage> {
             } else {
               final user = snapshot.data!;
 
+              if (user.roles.contains("ADMIN")) {
+                return AdminHomePage(onLogoutSuper: () => setState(() => loggedIn = false));
+              }
               if (user.roles.contains("CREATOR")) {
                 return CreatorHomePage(
                     title: widget.title,
                     onLogoutSuper: () => setState(() => loggedIn = false));
-              } else if (user.roles.contains("STUDENT")) {
+              }
+              if (user.roles.contains("STUDENT")) {
                 return LessonGroupsScreen(
                   onLogoutSuper: () => setState(() => loggedIn = false),
                 );
-              } else {
-                return const Text('Error: User has no roles');
               }
+              return const Text('Error: User has no roles');
             }
           },
         );
