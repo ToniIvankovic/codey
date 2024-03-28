@@ -111,6 +111,7 @@ namespace CodeyBe.Services
              {
                  if (exercise is ExerciseLA exerciseLA)
                  {
+                     if(exerciseLA.AnswerOptions.IsNullOrEmpty() && exerciseLA.CorrectAnswers != null)
                      GenerateAnswerOptionsForExerciseLA(exerciseLA);
                  }
                  return exercise;

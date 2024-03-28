@@ -42,7 +42,9 @@ class _ExerciseCreationSAComponentState
       specificTip: specificTip,
       correctAnswers:
           answers.where((element) => element != null).toList().cast<String>(),
-      answerOptions: {for (var option in options) option: option},
+      answerOptions: {
+        for (var i = 0; i < options.length; i++) i.toString(): options[i]
+      },
     );
   }
 

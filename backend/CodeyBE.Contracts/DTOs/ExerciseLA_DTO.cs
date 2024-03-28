@@ -15,11 +15,11 @@ namespace CodeyBE.Contracts.DTOs
             _ = new ExerciseLA(ex);
             AnswerOptions = ex.AnswerOptions!;
             CorrectAnswers = ex.CorrectAnswers!;
+            StatementOutput = ex.StatementOutput;
         }
 
         public Dictionary<string, string> AnswerOptions { get; set; }
         public List<dynamic> CorrectAnswers { get; set; }
-        //TODO: add statementOutput
-        //public string StatementOutput { get; set; } = ex.StatementOutput!;
+        public string? StatementOutput { get; set; }
     }
 }

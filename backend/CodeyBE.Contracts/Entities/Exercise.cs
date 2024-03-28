@@ -107,7 +107,8 @@ namespace CodeyBE.Contracts.Entities
             {
                 throw new Exception($"Missing field CorrectAnswers in exercise {ex.PrivateId} {ex.Type}");
             }
-            AnswerOptions = ex.AnswerOptions ?? [];
+            AnswerOptions = ex.AnswerOptions;
+            StatementOutput = ex.StatementOutput;
         }
     }
 
