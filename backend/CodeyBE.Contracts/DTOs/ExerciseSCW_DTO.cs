@@ -16,12 +16,12 @@ namespace CodeyBE.Contracts.DTOs
             _ = new ExerciseSCW(ex);
             StatementCode = ex.StatementCode!;
             DefaultGapLengths = ex.DefaultGapLengths!;
-            StatementOutput = ex.StatementOutput!;
+            StatementOutput = ex.StatementOutput;
             CorrectAnswers = ex.CorrectAnswers!;
         }
         public string StatementCode { get; set; }
         public List<int> DefaultGapLengths { get; set; }
-        public string StatementOutput { get; set; }
+        public string? StatementOutput { get; set; }
         public List<dynamic> CorrectAnswers { get; set; }
     }
 }

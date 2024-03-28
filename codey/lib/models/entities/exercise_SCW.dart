@@ -14,7 +14,7 @@ class ExerciseSCW extends Exercise {
     required difficulty,
     String? statement,
     required this.statementCode,
-    required String statementOutput,
+    String? statementOutput,
     required this.defaultGapLengths,
     String? specificTip,
     this.correctAnswers,

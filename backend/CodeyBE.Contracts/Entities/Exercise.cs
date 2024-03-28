@@ -173,10 +173,10 @@ namespace CodeyBE.Contracts.Entities
             {
                 throw new Exception($"Missing field CorrectAnswers in exercise {ex.PrivateId} {ex.Type}");
             }
-            if (ex.StatementOutput == null)
-            {
-                throw new Exception($"Missing field StatementOutput in exercise {ex.PrivateId} {ex.Type}");
-            }
+            //if (ex.StatementOutput == null)
+            //{
+            //    throw new Exception($"Missing field StatementOutput in exercise {ex.PrivateId} {ex.Type}");
+            //}
         }
     }
 }
