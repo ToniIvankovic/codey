@@ -2,8 +2,9 @@ class AppUser {
   final String email;
   final int? highestLessonId;
   final int? highestLessonGroupId;
-  final int nextLessonId;
-  final int nextLessonGroupId;
+  final int? nextLessonId;
+  final int? nextLessonGroupId;
+  final List<String> roles;
 
   AppUser({
     required this.email,
@@ -11,6 +12,7 @@ class AppUser {
     this.highestLessonGroupId,
     required this.nextLessonId,
     required this.nextLessonGroupId,
+    required this.roles,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class AppUser {
       highestLessonGroupId: json['lastLessonGroupId'],
       nextLessonId: json['nextLessonId'],
       nextLessonGroupId: json['nextLessonGroupId'],
+      roles: (json['roles'] as List<dynamic>).map((role) => role.toString()).toList(),
     );
   }
 }

@@ -8,11 +8,20 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.DTOs
 {
-    public class ExerciseSCW_DTO(Exercise ex) : ExerciseDTO(ex)
+    public class ExerciseSCW_DTO : ExerciseDTO
     {
-        public string StatementCode { get; set; } = ex.StatementCode!;
-        public List<int> DefaultGapLengths { get; set; } = ex.DefaultGapLengths!;
-        public List<int> DefaultGapLines { get; set; } = ex.DefaultGapLines!;
-        public string StatementOutput { get; set; } = ex.StatementOutput!;
+        public ExerciseSCW_DTO(Exercise ex) : base(ex)
+        {
+            // Check requirements
+            _ = new ExerciseSCW(ex);
+            StatementCode = ex.StatementCode!;
+            DefaultGapLengths = ex.DefaultGapLengths!;
+            StatementOutput = ex.StatementOutput;
+            CorrectAnswers = ex.CorrectAnswers!;
+        }
+        public string StatementCode { get; set; }
+        public List<int> DefaultGapLengths { get; set; }
+        public string? StatementOutput { get; set; }
+        public List<dynamic> CorrectAnswers { get; set; }
     }
 }

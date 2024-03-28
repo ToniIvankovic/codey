@@ -56,6 +56,21 @@ namespace CodeyBE.API.Controllers
         }
 
         [Authorize(Roles = "CREATOR")]
+        [HttpPut("", Name = "updateLessonGroupsOrder")]
+        [ProducesResponseType(typeof(LessonGroup), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateLessonGroupsOrder([FromBody] List<LessonGroupsReorderDTO> lessonGroupOrderList)
+        {
+            try
+            {
+                return Ok(await _lessonGroupsService.UpdateLessonGroupOrderAsync(lessonGroupOrderList));
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "CREATOR")]
         [HttpDelete("{id}", Name = "deleteLessonGroup")]
         [ProducesResponseType(typeof(LessonGroup), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteLessonGroup(int id)

@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,22 +17,33 @@ namespace CodeyBE.API.Controllers
         private readonly ILessonsService lessonsService = lessonsService;
 
         [Authorize(Roles = "CREATOR")]
-        [HttpGet(Name = "getAllLessons")]
+        [HttpGet("all", Name = "getAllLessons")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Lesson>> GetAllLessons()
         {
             return await lessonsService.GetAllLessonsAsync();
         }
 
-        [Authorize(Roles = "CREATOR")]
-        [HttpGet("{id}", Name = "getLessonByID")]
-        [ProducesResponseType(typeof(Lesson), (int)HttpStatusCode.OK)]
-        public async Task<Lesson?> GetLessonByID(int id)
+        //[Authorize(Roles = "CREATOR")]
+        //[HttpGet("{id}", Name = "getLessonByID")]
+        //[ProducesResponseType(typeof(Lesson), (int)HttpStatusCode.OK)]
+        //public async Task<Lesson?> GetLessonByID(int id)
+        //{
+        //    return await lessonsService.GetLessonByIDAsync(id);
+        //}
+
+        [Authorize(Roles = "CREATOR,STUDENT")]
+        [HttpGet(Name = "getLessonsByID")]
+        [ProducesResponseType(typeof(List<Lesson>), (int)HttpStatusCode.OK)]
+        public async Task<List<Lesson>> GetLessonsByIDs([FromQuery] List<int> ids)
         {
-            return await lessonsService.GetLessonByIDAsync(id);
+            ids.ForEach(id => Console.WriteLine(id));
+            return await lessonsService.GetLessonsByIDsAsync(ids);
         }
 
-        [Authorize(Roles = "STUDENT")]
+
+
+        [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpGet("lessonGroup/{lessonGroupId}", Name = "getLessonsForLessonGroup")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Lesson>> GetLessonsForLessonGroup(int lessonGroupId)
@@ -56,9 +68,13 @@ namespace CodeyBE.API.Controllers
             {
                 return Ok(await lessonsService.UpdateLessonAsync(id, lesson));
             }
-            catch (Exception e)
+            catch (EntityNotFoundException e)
             {
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
 

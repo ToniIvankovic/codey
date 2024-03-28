@@ -7,7 +7,7 @@
         public string? Statement { get; set; }
         public string? StatementCode { get; set; }
         public List<int>? DefaultGapLengths { get; set; }
-        public List<int>? DefaultGapLines { get; set; }
+        //public List<int>? DefaultGapLines { get; set; }
         public string? StatementOutput { get; set; }
         public string? Question { get; set; }
         public Dictionary<string, string>? AnswerOptions { get; set; }

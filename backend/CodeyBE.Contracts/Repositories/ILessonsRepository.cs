@@ -12,6 +12,7 @@ namespace CodeyBE.Contracts.Repositories
     {
         Task<Lesson> CreateAsync(LessonCreationDTO lesson);
         Task DeleteAsync(int id);
+        Task<List<Lesson>> GetLessonsByIDsAsync(List<int> id);
         Task<Lesson> UpdateAsync(int id, LessonCreationDTO lesson);
     }
 }

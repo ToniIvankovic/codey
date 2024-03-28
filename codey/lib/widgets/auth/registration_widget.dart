@@ -95,7 +95,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                   });
                   await context
                       .read<AuthService>()
-                      .register(username, password);
+                      .registerUser(username, password);
                   setState(() {
                     waitingResponse = false;
                   });

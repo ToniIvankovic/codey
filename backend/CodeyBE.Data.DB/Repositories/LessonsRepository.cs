@@ -2,6 +2,7 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace CodeyBE.Data.DB.Repositories
                 PrivateId = nextId,
                 Name = lesson.Name,
                 Exercises = lesson.Exercises,
-                LessonGroupId = lesson.LessonGroupId
+                SpecificTips = lesson.SpecificTips,
             });
             return (await GetByIdAsync(nextId))!;
         }
@@ -40,12 +41,20 @@ namespace CodeyBE.Data.DB.Repositories
                                 lesson => lesson.PrivateId == id,
                                 Builders<Lesson>.Update
                                 .Set(lesson => lesson.Name, lesson.Name)
+                                .Set(lesson => lesson.SpecificTips, lesson.SpecificTips)
                                 .Set(lesson => lesson.Exercises, lesson.Exercises)
-                                .Set(lesson => lesson.LessonGroupId, lesson.LessonGroupId)
                                 );
-            if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)
+            if (!updateResult.IsAcknowledged)
             {
-                throw new EntityNotFoundException("Update failed");
+                throw new Exception("Update failed");
+            }
+            if (updateResult.MatchedCount == 0)
+            {
+                throw new EntityNotFoundException("Lesson not found");
+            }
+            if(updateResult.ModifiedCount == 0)
+            {
+                throw new NoChangesException("No changes");
             }
 
             return (await GetByIdAsync(id))!;
@@ -58,6 +67,15 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 throw new EntityNotFoundException("Delete failed");
             }
+        }
+
+        public async Task<List<Lesson>> GetLessonsByIDsAsync(List<int> ids)
+        {
+            return (await _collection
+                .Find(lesson => ids.Contains(lesson.PrivateId))
+                .ToListAsync())
+                .OrderBy(lesson => ids.IndexOf(lesson.PrivateId))
+                .ToList();
         }
     }
 }

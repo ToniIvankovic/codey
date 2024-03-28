@@ -68,7 +68,7 @@ class LessonGroupsScreen extends StatelessWidget {
                         .map<ListItem>(
                           (item) => ListItem(
                             lessonGroup: item,
-                            clickable: item.id <= user.nextLessonGroupId,
+                            clickable: item.id <= (user.nextLessonGroupId ?? 0),
                             isExpanded: false,
                           ),
                         )
@@ -87,6 +87,7 @@ class LessonGroupsScreen extends StatelessWidget {
                                   "Last lesson group: ${user.highestLessonGroupId ?? 'Just begun'}"),
                               Text("Next lesson: ${user.nextLessonId}"),
                               Text("Next lesson group: ${user.nextLessonGroupId}"),
+                              Text("Roles: ${user.roles}")
                             ],
                           ),
                         ),

@@ -63,7 +63,7 @@ class LessonsScreen extends StatelessWidget {
                     itemCount: lessons.length,
                     itemBuilder: (BuildContext context, int index) {
                       var lesson = lessons[index];
-                      bool isClickable = lesson.id <= user.nextLessonId;
+                      bool isClickable = lesson.id <= (user.nextLessonId ?? 0);
                       return ListTile(
                         title: Text('${lesson.id} ${lesson.name}'),
                         subtitle: ButtonBar(

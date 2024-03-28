@@ -11,6 +11,8 @@ namespace CodeyBE.Contracts.Entities
     {
         [BsonElement("lessonId")]
         public int LessonId { get; set; }
+        [BsonElement("lessonGroupId")]
+        public int LessonGroupId { get; set; }
         [BsonElement("correctAnswers")]
         public int CorrectAnswers { get; set; }
         [BsonElement("totalAnswers")]

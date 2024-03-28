@@ -92,13 +92,12 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                 });
               },
               statementArea: _buildStaticStatementArea(),
-              codeArea: _buildStaticCodeArea(),
-              questionArea: _buildStaticQuestionArea(),
+              // questionArea: _buildStaticQuestionArea(),
             ),
           if (exercise is ExerciseSCW)
             ExerciseSCWWidget(
               key: ValueKey(exercise!.id + 100 * repeatCount),
-              exercise: exercise!,
+              exercise: exercise! as ExerciseSCW,
               onAnswerSelected: (answer) {
                 setState(() {
                   this.answer = answer;
@@ -176,10 +175,15 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   }
 
   Widget _buildStaticQuestionArea() {
+    if (!(exercise is ExerciseMC || exercise is ExerciseSA)) {
+      throw Exception(
+          "Question area is only available for MC and SA exercises");
+    }
+
     Widget questionArea;
-    if (exercise!.question?.isEmpty == false) {
-      questionArea =
-          Text(exercise!.question!, style: const TextStyle(fontSize: 20.0));
+    if ((exercise! as dynamic).question?.isEmpty == false) {
+      questionArea = Text((exercise! as dynamic).question!,
+          style: const TextStyle(fontSize: 20.0));
     } else {
       questionArea = const SizedBox.shrink();
     }
@@ -187,8 +191,14 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   }
 
   Widget _buildStaticCodeArea() {
+    if (!(exercise is ExerciseMC ||
+        exercise is ExerciseSA ||
+        exercise is ExerciseSCW)) {
+      throw Exception(
+          "Code area is only available for MC, SA and SCW exercises");
+    }
     Widget codeArea;
-    if (exercise!.statementCode?.isEmpty == false) {
+    if ((exercise! as dynamic).statementCode?.isNotEmpty) {
       codeArea = Padding(
         padding: const EdgeInsets.all(20.0),
         child: DottedBorder(
@@ -199,7 +209,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             child: Row(
               children: [
                 Text(
-                  exercise!.statementCode!,
+                  (exercise! as dynamic).statementCode!,
                   style: const TextStyle(
                     fontFamily: 'courier new',
                     fontSize: 20.0,

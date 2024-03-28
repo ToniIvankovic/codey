@@ -21,6 +21,12 @@ abstract class ExercisesService {
   void endSession(bool completed);
   Future<bool> checkAnswer(Exercise exercise, dynamic answer);
   EndReport? getEndReport();
+  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson);
+  Future<List<Exercise>> getAllExercises();
+  Future<void> deleteExercise(int exerciseId);
+  Future<Exercise> createExercise(Exercise exercise);
+  Future<Exercise> updateExercise(Exercise exercise);
+  Future<void> startMockExerciseSession(Exercise exercise);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -36,6 +42,7 @@ class ExercisesServiceV1 implements ExercisesService {
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
   EndReport? _endReport;
+  bool _isMockInProgress = false;
 
   ExercisesServiceV1(
       this._exRepo, this._authenticatedClient, this._userService);
@@ -52,7 +59,7 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<void> startSessionForLesson(Lesson lesson) async {
-    _sessionExercises = await _getAllExercisesForLesson(lesson);
+    _sessionExercises = await getAllExercisesForLesson(lesson);
     _endReport = EndReport(lesson.id, 0, 0, _sessionExercises!.length);
   }
 
@@ -70,6 +77,9 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
+    if (_isMockInProgress) {
+      return _mockCheckAnswer(exercise, answer);
+    }
     bool correct;
     final request = _authenticatedClient.post(
       _exerciseAnswerValidationEndpoint(exercise),
@@ -80,7 +90,9 @@ class ExercisesServiceV1 implements ExercisesService {
     );
     if (exercise is ExerciseMC) {
       correct = exercise.correctAnswer == answer;
-    } else if (exercise is ExerciseSA || exercise is ExerciseLA || exercise is ExerciseSCW) {
+    } else if (exercise is ExerciseSA ||
+        exercise is ExerciseLA ||
+        exercise is ExerciseSCW) {
       final response = await request;
       if (response.statusCode != 200) {
         throw Exception('Failed to validate answer');
@@ -132,11 +144,63 @@ class ExercisesServiceV1 implements ExercisesService {
     return _endReport;
   }
 
-  Future<List<Exercise>> _getAllExercisesForLesson(Lesson lesson) {
-    return _getAllExercisesForLessonById(lesson.id.toString());
+  @override
+  Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
+    return _getAllExercisesForLessonById(lesson.id);
   }
 
-  Future<List<Exercise>> _getAllExercisesForLessonById(String lessonId) {
+  Future<List<Exercise>> _getAllExercisesForLessonById(int lessonId) {
     return _exRepo.getExercisesForLesson(lessonId);
+  }
+
+  @override
+  Future<List<Exercise>> getAllExercises() {
+    return _exRepo.getAllExercises();
+  }
+
+  @override
+  Future<void> deleteExercise(int exerciseId) {
+    return _exRepo.deleteExercise(exerciseId);
+  }
+
+  @override
+  Future<Exercise> createExercise(Exercise exercise) {
+    return _exRepo.createExercise(exercise);
+  }
+
+  @override
+  Future<Exercise> updateExercise(Exercise exercise) {
+    return _exRepo.updateExercise(exercise);
+  }
+
+  @override
+  Future<void> startMockExerciseSession(Exercise exercise) async {
+    _sessionExercises = [exercise];
+    _endReport = EndReport(0, 0, 0, 1);
+    _isMockInProgress = true;
+  }
+
+  Future<bool> _mockCheckAnswer(Exercise exercise, answer) {
+    if (exercise is ExerciseMC) {
+      return Future.value(exercise.correctAnswer == answer);
+    } else if (exercise is ExerciseSA) {
+      return Future.value(exercise.correctAnswers?.contains(answer) ?? false);
+    } else if (exercise is ExerciseLA) {
+      return Future.value(exercise.correctAnswers.contains(answer));
+    } else if (exercise is ExerciseSCW) {
+      List<String> answers = answer;
+      if (exercise.correctAnswers == null ||
+          exercise.correctAnswers!.length != answers.length) {
+        return Future.value(false);
+      }
+      for (var i = 0; i < exercise.correctAnswers!.length; i++) {
+        if (!exercise.correctAnswers![i].contains(answers[i])) {
+          return Future.value(false);
+        }
+      }
+      return Future.value(true);
+    } else {
+      throw Exception('Unknown exercise type');
+    }
   }
 }

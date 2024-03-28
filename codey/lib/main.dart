@@ -1,12 +1,15 @@
 import 'package:codey/auth/authenticated_client.dart';
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
+import 'package:codey/services/admin_functions_service.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
+import 'package:codey/widgets/creator/admin_home_page.dart';
 import 'package:codey/widgets/lesson_groups/lesson_groups_screen.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/auth/auth_screen.dart';
@@ -14,9 +17,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
+import 'widgets/creator/creator_home_page.dart';
+
 Future main() async {
-  String mode = 'prod';
-  // String mode = 'dev';
+  // String mode = 'prod';
+  String mode = 'dev';
   String env = '$mode.env';
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -28,6 +33,10 @@ Future main() async {
         Provider<AuthenticatedClient>(
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
+        Provider<AdminFunctionsService>(
+          create: (context) =>
+              AdminFunctionsServiceImpl(context.read<AuthenticatedClient>()),
+        ),
         Provider<ExercisesRepository>(
           create: (context) =>
               ExercisesRepository1(context.read<AuthenticatedClient>()),
@@ -37,12 +46,14 @@ Future main() async {
               LessonGroupsRepository1(context.read<AuthenticatedClient>()),
         ),
         Provider<LessonGroupsService>(
-          create: (context) =>
-              LessonGroupsServiceV1(context.read<LessonGroupsRepository>()),
+          create: (context) => LessonGroupsServiceV1(
+              context.read<LessonGroupsRepository>(),
+              context.read<AuthenticatedClient>()),
         ),
         Provider<LessonsRepository>(
-          create: (context) =>
-              LessonsRepository1(context.read<AuthenticatedClient>()),
+          create: (context) => LessonsRepository1(
+              context.read<AuthenticatedClient>(),
+              context.read<ExercisesRepository>()),
         ),
         Provider<LessonsService>(
           create: (context) =>
@@ -113,8 +124,33 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }
 
-        return LessonGroupsScreen(
-            onLogoutSuper: () => setState(() => loggedIn = false));
+        return StreamBuilder<AppUser>(
+          stream: context.read<UserService>().userStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError || snapshot.data == null) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final user = snapshot.data!;
+
+              if (user.roles.contains("ADMIN")) {
+                return AdminHomePage(onLogoutSuper: () => setState(() => loggedIn = false));
+              }
+              if (user.roles.contains("CREATOR")) {
+                return CreatorHomePage(
+                    title: widget.title,
+                    onLogoutSuper: () => setState(() => loggedIn = false));
+              }
+              if (user.roles.contains("STUDENT")) {
+                return LessonGroupsScreen(
+                  onLogoutSuper: () => setState(() => loggedIn = false),
+                );
+              }
+              return const Text('Error: User has no roles');
+            }
+          },
+        );
       },
     );
   }

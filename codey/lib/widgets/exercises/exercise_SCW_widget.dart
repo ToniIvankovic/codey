@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
 
-import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +12,7 @@ class ExerciseSCWWidget extends StatefulWidget {
     required this.statementArea,
   }) : super(key: key);
 
-  final Exercise exercise;
+  final ExerciseSCW exercise;
   final ValueChanged<List<String>> onAnswerSelected;
   final Widget statementArea;
 
@@ -27,7 +27,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
   @override
   void initState() {
     super.initState();
-    var gaps = widget.exercise.statementCode!.split('\\gap').length - 1;
+    var gaps = widget.exercise.statementCode.split('\\gap').length - 1;
     controllers = List<TextEditingController>.generate(
       gaps,
       (index) => TextEditingController(),
@@ -36,7 +36,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var codeParts = widget.exercise.statementCode!.split('\\gap');
+    var codeParts = widget.exercise.statementCode.split('\\gap');
     var gaps = codeParts.length - 1;
     Widget codeArea = Padding(
       padding: const EdgeInsets.all(20.0),
@@ -58,9 +58,9 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
                 if (i < gaps)
                   ConstrainedBox(
                     constraints: BoxConstraints(
-                        minWidth: widget.exercise.defaultGapLengths![i] * 20,
+                        minWidth: widget.exercise.defaultGapLengths[i] * 20,
                         maxWidth:
-                            widget.exercise.defaultGapLengths![i] * 20 * 2.5),
+                            widget.exercise.defaultGapLengths[i] * 20 * 2.5),
                     child: IntrinsicWidth(
                       stepWidth: 20.0,
                       child: TextField(

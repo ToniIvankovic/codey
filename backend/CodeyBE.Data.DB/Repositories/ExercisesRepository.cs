@@ -42,33 +42,111 @@ namespace CodeyBE.Data.DB.Repositories
                 .AsQueryable()
                 .OrderByDescending(exercise => exercise.PrivateId)
                 .FirstOrDefault()!.PrivateId + 1;
-            Exercise newExercise = new Exercise(nextId, exercise);
+            Exercise newExercise = new(nextId, exercise);
             await _collection.InsertOneAsync(newExercise);
             return (await GetByIdAsync(nextId))!;
         }
         public async Task<Exercise> UpdateAsync(int id, ExerciseCreationDTO exercise)
         {
+            var updateDefinition = Builders<Exercise>.Update;
+            UpdateDefinition<Exercise>? updates = null;
 
-            UpdateResult updateResult = await _collection.UpdateOneAsync(
-                                exercise => exercise.PrivateId == id,
-                                Builders<Exercise>.Update
-                                .Set(exercise => exercise.Type, exercise.Type)
-                                .Set(exercise => exercise.Difficulty, exercise.Difficulty)
-                                .Set(exercise => exercise.Statement, exercise.Statement)
-                                .Set(exercise => exercise.StatementCode, exercise.StatementCode)
-                                .Set(exercise => exercise.DefaultGapLengths, exercise.DefaultGapLengths)
-                                .Set(exercise => exercise.DefaultGapLines, exercise.DefaultGapLines)
-                                .Set(exercise => exercise.StatementOutput, exercise.StatementOutput)
-                                .Set(exercise => exercise.Question, exercise.Question)
-                                .Set(exercise => exercise.AnswerOptions, exercise.AnswerOptions)
-                                .Set(exercise => exercise.CorrectAnswer, exercise.CorrectAnswer)
-                                .Set(exercise => exercise.CorrectAnswers, exercise.CorrectAnswers)
-                                .Set(exercise => exercise.RaisesError, exercise.RaisesError)
-                                .Set(exercise => exercise.SpecificTip, exercise.SpecificTip)
-                                );
-            if (!updateResult.IsAcknowledged || updateResult.MatchedCount == 0)
+            updates = updateDefinition.Set(e => e.Type, exercise.Type)
+                .Set(e => e.Difficulty, exercise.Difficulty);
+            if (exercise.Statement != null)
             {
-                throw new EntityNotFoundException("Update failed");
+                updates = updates.Set(e => e.Statement, exercise.Statement);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.Statement);
+            }
+            if (exercise.StatementCode != null)
+            {
+                updates = updates.Set(e => e.StatementCode, exercise.StatementCode);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.StatementCode);
+            }
+            if (exercise.DefaultGapLengths != null)
+            {
+                updates = updates.Set(e => e.DefaultGapLengths, exercise.DefaultGapLengths);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.DefaultGapLengths);
+            }
+            if (exercise.StatementOutput != null)
+            {
+                updates = updates.Set(e => e.StatementOutput, exercise.StatementOutput);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.StatementOutput);
+            }
+            if (exercise.Question != null)
+            {
+                updates = updates.Set(e => e.Question, exercise.Question);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.Question);
+            }
+            if (exercise.AnswerOptions != null)
+            {
+                updates = updates.Set(e => e.AnswerOptions, exercise.AnswerOptions);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.AnswerOptions);
+            }
+            if (exercise.CorrectAnswer != null)
+            {
+                updates = updates.Set(e => e.CorrectAnswer, exercise.CorrectAnswer);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.CorrectAnswer);
+            }
+            if (exercise.CorrectAnswers != null)
+            {
+                updates = updates.Set(e => e.CorrectAnswers, exercise.CorrectAnswers);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.CorrectAnswers);
+            }
+            if (exercise.RaisesError != null)
+            {
+                updates = updates.Set(e => e.RaisesError, exercise.RaisesError);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.RaisesError);
+            }
+            if (exercise.SpecificTip != null)
+            {
+                updates = updates.Set(e => e.SpecificTip, exercise.SpecificTip);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.SpecificTip);
+            }
+
+            UpdateResult updateResult = await _collection.UpdateOneAsync(e => e.PrivateId == id, updates);
+
+            if (!updateResult.IsAcknowledged)
+            {
+                throw new Exception("Update failed");
+            }
+            if(updateResult.MatchedCount == 0)
+            {
+                throw new EntityNotFoundException("Entity not found");
+            }
+            if (updateResult.ModifiedCount == 0)
+            {
+                throw new NoChangesException("No changes made");
             }
 
             return (await GetByIdAsync(id))!;

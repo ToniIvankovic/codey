@@ -1,7 +1,5 @@
 // ignore_for_file: file_names
 
-import 'dart:math';
-
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +11,12 @@ class ExerciseLAPuzzleWidget extends StatefulWidget {
     required this.exercise,
     required this.onAnswerSelected,
     required this.statementArea,
-    required this.codeArea,
-    required this.questionArea,
+    // required this.questionArea,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
-  final Widget codeArea;
-  final Widget questionArea;
+  // final Widget questionArea;
 
   @override
   State<ExerciseLAPuzzleWidget> createState() => _ExerciseLAPuzzleWidgetState();
@@ -34,7 +30,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
   @override
   void initState() {
     super.initState();
-    answerOptions = widget.exercise.answerOptions.entries.toList();
+    answerOptions = widget.exercise.answerOptions!.entries.toList();
     answerOptions.shuffle();
   }
 
@@ -54,8 +50,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         widget.statementArea,
-        widget.codeArea,
-        widget.questionArea,
+        // widget.questionArea,
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
@@ -163,7 +158,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
 
   void updateAnswer() {
     var joinedAnswer = answerParts.map((piece) {
-      return widget.exercise.answerOptions[(piece.key as ValueKey).value];
+      return widget.exercise.answerOptions![(piece.key as ValueKey).value];
     }).join();
     widget.onAnswerSelected(joinedAnswer);
   }

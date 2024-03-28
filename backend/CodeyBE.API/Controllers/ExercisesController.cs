@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -37,7 +38,7 @@ namespace CodeyBE.API.Controllers
         }
 
 
-        [Authorize(Roles = "STUDENT")]
+        [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpGet("lesson/{lessonId}", Name = "getExercisesForLesson")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
@@ -85,6 +86,10 @@ namespace CodeyBE.API.Controllers
             try
             {
                 return Ok(await exercisesService.UpdateExerciseAsync(id, exercise));
+            }
+            catch (NoChangesException)
+            {
+                return StatusCode(204);
             }
             catch (Exception e)
             {

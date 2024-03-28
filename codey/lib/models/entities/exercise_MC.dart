@@ -5,6 +5,8 @@ import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
 class ExerciseMC extends Exercise {
+  String? statementCode;
+  String? question;
   Map<String, dynamic> answerOptions;
   String correctAnswer;
 
@@ -12,9 +14,10 @@ class ExerciseMC extends Exercise {
     required id,
     required difficulty,
     String? statement,
-    String? statementCode,
-    String? question,
+    this.statementCode,
+    this.question,
     String? specificTip,
+    String? statementOutput,
     required this.answerOptions,
     required this.correctAnswer,
   }) : super(
@@ -22,8 +25,7 @@ class ExerciseMC extends Exercise {
           difficulty: difficulty,
           type: ExerciseType.MC,
           statement: statement,
-          statementCode: statementCode,
-          question: question,
+          statementOutput: statementOutput,
           specificTip: specificTip,
         );
 
@@ -33,10 +35,40 @@ class ExerciseMC extends Exercise {
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementCode: json['statementCode'],
+      statementOutput: json['statementOutput'],
       question: json['question'],
       specificTip: json['specificTip'],
       answerOptions: json['answerOptions'],
       correctAnswer: json['correctAnswer'],
     );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {
+      'id': id,
+      'difficulty': difficulty,
+      'type': type.toString(),
+      'answerOptions': answerOptions,
+      'correctAnswer': correctAnswer,
+    };
+
+    if (statement != null) {
+      json['statement'] = statement;
+    }
+    if (statementCode != null) {
+      json['statementCode'] = statementCode;
+    }
+    if (statementOutput != null) {
+      json['statementOutput'] = statementOutput;
+    }
+    if (question != null) {
+      json['question'] = question;
+    }
+    if (specificTip != null) {
+      json['specificTip'] = specificTip;
+    }
+
+    return json;
   }
 }

@@ -10,14 +10,12 @@ class ExerciseLAWritingWidget extends StatelessWidget {
     required this.exercise,
     required this.onAnswerSelected,
     required this.statementArea,
-    required this.codeArea,
-    required this.questionArea,
+    // required this.questionArea,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
-  final Widget codeArea;
-  final Widget questionArea;
+  // final Widget questionArea;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +23,7 @@ class ExerciseLAWritingWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         statementArea,
-        codeArea,
-        questionArea,
+        // questionArea,
         TextField(
           decoration: const InputDecoration(
             labelText: 'Answer',

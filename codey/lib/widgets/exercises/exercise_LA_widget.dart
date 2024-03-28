@@ -12,14 +12,12 @@ class ExerciseLAWidget extends StatefulWidget {
     required this.exercise,
     required this.onAnswerSelected,
     required this.statementArea,
-    required this.codeArea,
-    required this.questionArea,
+    // required this.questionArea,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
-  final Widget codeArea;
-  final Widget questionArea;
+  // final Widget questionArea;
 
   @override
   State<ExerciseLAWidget> createState() => _ExerciseLAWidgetState();
@@ -35,34 +33,36 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
       children: [
         if (writingMode)
           ExerciseLAWritingWidget(
-              exercise: widget.exercise,
-              onAnswerSelected: widget.onAnswerSelected,
-              statementArea: widget.statementArea,
-              codeArea: widget.codeArea,
-              questionArea: widget.questionArea)
+            exercise: widget.exercise,
+            onAnswerSelected: widget.onAnswerSelected,
+            statementArea: widget.statementArea,
+            // questionArea: widget.questionArea
+          )
         else
           ExerciseLAPuzzleWidget(
-              exercise: widget.exercise,
-              onAnswerSelected: widget.onAnswerSelected,
-              statementArea: widget.statementArea,
-              codeArea: widget.codeArea,
-              questionArea: widget.questionArea),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    writingMode = !writingMode;
-                  });
-                },
-                child: Text(writingMode ? 'Puzzle mode' : 'Writing mode'),
+            exercise: widget.exercise,
+            onAnswerSelected: widget.onAnswerSelected,
+            statementArea: widget.statementArea,
+            // questionArea: widget.questionArea
+          ),
+        if (widget.exercise.answerOptions != null &&
+            widget.exercise.answerOptions!.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      writingMode = !writingMode;
+                    });
+                  },
+                  child: Text(writingMode ? 'Puzzle mode' : 'Writing mode'),
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
   }
