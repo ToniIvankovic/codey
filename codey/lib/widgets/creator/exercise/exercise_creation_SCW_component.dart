@@ -5,11 +5,11 @@ import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class ExerciseCreationSCWComponent extends ExerciseCreationComponent {
-  ExerciseCreationSCWComponent({
+  const ExerciseCreationSCWComponent({
     super.key,
     required super.formKey,
+    required super.onChange,
     this.existingExercise,
   });
 
@@ -29,33 +29,22 @@ class _ExerciseCreationSCWComponentState
   List<List<String>> answerKeys = [];
   int numberOfGaps = 0;
 
-  Exercise createExercise({
-    int? difficulty,
-    String? statement,
-    String? statementOutput,
-    String? specificTip,
-  }) {
+  dynamic _packFields() {
     List<int> defaultGapLengths = answers
         .map((answer) => answer[0])
         .map((answer) => answer.length)
         .toList();
-    return ExerciseSCW(
-      id: widget.existingExercise?.id ?? 0,
-      difficulty: difficulty,
-      statement: statement,
-      statementOutput: statementOutput!,
-      statementCode: statementCode!,
-      specificTip: specificTip,
-      defaultGapLengths: defaultGapLengths,
-      correctAnswers:
+    return {
+      "statementCode": statementCode,
+      "defaultGapLengths": defaultGapLengths,
+      "correctAnswers":
           answers.map((answer) => List<String>.from(answer)).toList(),
-    );
+    };
   }
 
   @override
   void initState() {
     super.initState();
-    widget.createExercise = createExercise;
     if (widget.existingExercise != null) {
       final ExerciseSCW exercise = widget.existingExercise as ExerciseSCW;
       statementCode = exercise.statementCode;
@@ -74,6 +63,7 @@ class _ExerciseCreationSCWComponentState
       answers[index].add("");
       answerKeys[index].add(DateTime.now().toIso8601String()); // Add this line
     });
+    widget.onChange(_packFields());
   }
 
   @override
@@ -89,7 +79,7 @@ class _ExerciseCreationSCWComponentState
             setState(() {
               statementCode = value;
               while (answers.length < numberOfGaps) {
-                answers.add([]);
+                answers.add([""]);
                 answerKeys.add([DateTime.now().toIso8601String()]);
               }
               while (answerKeys.length > numberOfGaps) {
@@ -102,6 +92,12 @@ class _ExerciseCreationSCWComponentState
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter statement code'
               : null,
+          onSaved: (value) {
+            setState(() {
+              statementCode = value;
+            });
+            widget.onChange(_packFields());
+          },
         ),
         TextButton.icon(
             onPressed: () {
@@ -112,6 +108,7 @@ class _ExerciseCreationSCWComponentState
                 answers.add([""]);
                 answerKeys.add([DateTime.now().toIso8601String()]);
               });
+              widget.onChange(_packFields());
             },
             icon: const Icon(Icons.add),
             label: const Text("Add Gap")),
@@ -139,6 +136,12 @@ class _ExerciseCreationSCWComponentState
                       validator: (value) => value == null || value.isEmpty
                           ? 'Please enter an answer'
                           : null,
+                      onSaved: (value) {
+                        setState(() {
+                          answers[gapIndex][index] = value!;
+                        });
+                        widget.onChange(_packFields());
+                      },
                     ),
                   ),
                   if (index > 0)
@@ -149,6 +152,7 @@ class _ExerciseCreationSCWComponentState
                           answers[gapIndex].removeAt(index);
                           answerKeys[gapIndex].removeAt(index);
                         });
+                        widget.onChange(_packFields());
                       },
                     ),
                 ],

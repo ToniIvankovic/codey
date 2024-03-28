@@ -1,6 +1,8 @@
 import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
+import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/exercises_service.dart';
@@ -32,6 +34,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
   ExerciseType? type;
   String? statementOutput;
   String? specificTip;
+  dynamic innerFields;
 
   @override
   void initState() {
@@ -43,29 +46,96 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     specificTip = widget.existingExercise?.specificTip;
   }
 
+  Exercise createExercise() {
+    if (type == ExerciseType.MC) {
+      return ExerciseMC(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementOutput: statementOutput,
+        specificTip: specificTip,
+        statementCode: innerFields['statementCode'],
+        question: innerFields['question'],
+        answerOptions: innerFields['answerOptions'],
+        correctAnswer: innerFields['correctAnswer'],
+      );
+    } else if (type == ExerciseType.SA) {
+      return ExerciseSA(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementOutput: statementOutput,
+        specificTip: specificTip,
+        correctAnswers: innerFields['correctAnswers']!.cast<String>(),
+        statementCode: innerFields['statementCode'],
+        question: innerFields['question'],
+        raisesError: innerFields['raisesError'],
+      );
+    } else if (type == ExerciseType.LA) {
+      return ExerciseLA(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementOutput: statementOutput,
+        specificTip: specificTip,
+        correctAnswers: innerFields['correctAnswers'].cast<String>(),
+        answerOptions: innerFields['answerOptions'].cast<String, String>(),
+      );
+    } else if (type == ExerciseType.SCW) {
+      return ExerciseSCW(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementCode: innerFields['statementCode'],
+        statementOutput: statementOutput,
+        defaultGapLengths: innerFields['defaultGapLengths'],
+        specificTip: specificTip,
+        correctAnswers: innerFields['correctAnswers'],
+      );
+    } else {
+      throw Exception('Invalid exercise type');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ExerciseCreationComponent? exerciseCreationComponent;
     if (type == ExerciseType.MC) {
       exerciseCreationComponent = ExerciseCreationMCComponent(
-        formKey: _formKey,
-        existingExercise: widget.existingExercise as ExerciseMC,
-      );
+          formKey: _formKey,
+          existingExercise: widget.existingExercise as ExerciseMC?,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
     } else if (type == ExerciseType.SA) {
       exerciseCreationComponent = ExerciseCreationSAComponent(
-        formKey: _formKey,
-        existingExercise: widget.existingExercise as ExerciseSA,
-      );
+          formKey: _formKey,
+          existingExercise: widget.existingExercise as ExerciseSA?,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
     } else if (type == ExerciseType.LA) {
       exerciseCreationComponent = ExerciseCreationLAComponent(
-        formKey: _formKey,
-        existingExercise: widget.existingExercise,
-      );
+          formKey: _formKey,
+          existingExercise: widget.existingExercise,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
     } else if (type == ExerciseType.SCW) {
       exerciseCreationComponent = ExerciseCreationSCWComponent(
-        formKey: _formKey,
-        existingExercise: widget.existingExercise,
-      );
+          formKey: _formKey,
+          existingExercise: widget.existingExercise,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
     } else {
       exerciseCreationComponent = null;
     }
@@ -183,15 +253,9 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                               if (!_formKey.currentState!.validate()) {
                                 return;
                               }
-                              
+
                               _formKey.currentState!.save();
-                              Exercise exercise =
-                                  exerciseCreationComponent!.createExercise!(
-                                difficulty: difficulty,
-                                statement: statement,
-                                statementOutput: statementOutput,
-                                specificTip: specificTip,
-                              );
+                              Exercise exercise = createExercise();
                               final exercisesService =
                                   context.read<ExercisesService>();
                               exercisesService
@@ -223,19 +287,18 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
                                   _formKey.currentState!.save();
-                                  Exercise exercise = exerciseCreationComponent!
-                                      .createExercise!(
-                                    difficulty: difficulty,
-                                    statement: statement,
-                                    statementOutput: statementOutput,
-                                    specificTip: specificTip,
-                                  );
+                                  Exercise exercise = createExercise();
                                   final exercisesService =
                                       context.read<ExercisesService>();
                                   exercisesService
                                       .createExercise(exercise)
                                       .then((value) =>
                                           Navigator.of(context).pop(value));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Exercise created successfully'),
+                                    ),
+                                  );
                                 }
                               },
                               child: const Text('Create'),
@@ -244,13 +307,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
                                   _formKey.currentState!.save();
-                                  Exercise exercise = exerciseCreationComponent!
-                                      .createExercise!(
-                                    difficulty: difficulty,
-                                    statement: statement,
-                                    statementOutput: statementOutput,
-                                    specificTip: specificTip,
-                                  );
+                                  Exercise exercise = createExercise();
                                   final exercisesService =
                                       context.read<ExercisesService>();
                                   exercisesService

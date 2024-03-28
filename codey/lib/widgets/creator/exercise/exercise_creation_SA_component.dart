@@ -1,15 +1,14 @@
 // ignore_for_file: file_names
 
-import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class ExerciseCreationSAComponent extends ExerciseCreationComponent {
-  ExerciseCreationSAComponent({
+  const ExerciseCreationSAComponent({
     super.key,
     required super.formKey,
+    required super.onChange,
     this.existingExercise,
   });
 
@@ -32,33 +31,23 @@ class _ExerciseCreationSAComponentState
       answers.add('');
       answerKeys.add(DateTime.now().toIso8601String()); // Add this line
     });
+    widget.onChange(_packFields());
   }
 
-  Exercise createExercise({
-    int? difficulty,
-    String? statement,
-    String? statementOutput,
-    String? specificTip,
-  }) {
-    return ExerciseSA(
-      id: widget.existingExercise?.id ?? 0,
-      difficulty: difficulty,
-      statement: statement,
-      statementCode: statementCode!,
-      statementOutput: statementOutput,
-      question: question!,
-      specificTip: specificTip,
-      correctAnswers: raisesError
+  dynamic _packFields() {
+    return {
+      "statementCode": statementCode,
+      "question": question,
+      "correctAnswers": raisesError
           ? []
           : answers.where((element) => element != null).toList().cast<String>(),
-      raisesError: raisesError ? true : null,
-    );
+      "raisesError": raisesError ? true : null,
+    };
   }
 
   @override
   void initState() {
     super.initState();
-    widget.createExercise = createExercise;
     if (widget.existingExercise != null) {
       statementCode = widget.existingExercise!.statementCode;
       question = widget.existingExercise!.question;
@@ -83,7 +72,10 @@ class _ExerciseCreationSAComponentState
             decoration: const InputDecoration(labelText: 'Statement code'),
             initialValue: statementCode,
             onSaved: (value) {
-              statementCode = value;
+              setState(() {
+                statementCode = value;
+              });
+              widget.onChange(_packFields());
             },
             validator: (value) => value == null || value.isEmpty
                 ? 'Please enter statement code'
@@ -96,7 +88,10 @@ class _ExerciseCreationSAComponentState
           decoration: const InputDecoration(labelText: 'Question'),
           initialValue: question,
           onSaved: (value) {
-            question = value;
+            setState(() {
+              question = value;
+            });
+            widget.onChange(_packFields());
           },
           validator: (value) =>
               value == null || value.isEmpty ? 'Please enter a question' : null,
@@ -124,6 +119,12 @@ class _ExerciseCreationSAComponentState
                       validator: (value) => value == null || value.isEmpty
                           ? 'Please enter an answer'
                           : null,
+                      onSaved: (value) {
+                        setState(() {
+                          answers[index] = value;
+                        });
+                        widget.onChange(_packFields());
+                      },
                     ),
                   ),
                   if (index > 0)
@@ -134,6 +135,7 @@ class _ExerciseCreationSAComponentState
                           answers.removeAt(index);
                           answerKeys.removeAt(index);
                         });
+                        widget.onChange(_packFields());
                       },
                     ),
                 ],
@@ -153,7 +155,11 @@ class _ExerciseCreationSAComponentState
           onChanged: (value) {
             setState(() {
               raisesError = value ?? false;
+              if (raisesError == false && answers.isEmpty) {
+                _addAnswer();
+              }
             });
+            widget.onChange(_packFields());
           },
         ),
       ],

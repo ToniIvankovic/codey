@@ -5,11 +5,11 @@ import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class ExerciseCreationLAComponent extends ExerciseCreationComponent {
-  ExerciseCreationLAComponent({
+  const ExerciseCreationLAComponent({
     super.key,
     required super.formKey,
+    required super.onChange,
     this.existingExercise,
   });
 
@@ -28,30 +28,19 @@ class _ExerciseCreationSAComponentState
   List<String> options = [];
   String? option;
 
-  Exercise createExercise({
-    int? difficulty,
-    String? statement,
-    String? statementOutput,
-    String? specificTip,
-  }) {
-    return ExerciseLA(
-      id: widget.existingExercise?.id ?? 0,
-      difficulty: difficulty,
-      statement: statement,
-      statementOutput: statementOutput,
-      specificTip: specificTip,
-      correctAnswers:
+  dynamic _packFields() {
+    return {
+      "correctAnswers":
           answers.where((element) => element != null).toList().cast<String>(),
-      answerOptions: {
+      "answerOptions": {
         for (var i = 0; i < options.length; i++) i.toString(): options[i]
       },
-    );
+    };
   }
 
   @override
   void initState() {
     super.initState();
-    widget.createExercise = createExercise;
     if (widget.existingExercise != null) {
       final ExerciseLA exercise = widget.existingExercise as ExerciseLA;
       answers = exercise.correctAnswers;
@@ -93,6 +82,12 @@ class _ExerciseCreationSAComponentState
                     validator: (value) => value == null || value.isEmpty
                         ? 'Please enter an answer'
                         : null,
+                    onSaved: (value) {
+                      setState(() {
+                        answers[index] = value;
+                      });
+                      widget.onChange(_packFields());
+                    },
                   ),
                 ),
                 if (index > 0)
@@ -103,6 +98,7 @@ class _ExerciseCreationSAComponentState
                         answers.removeAt(index);
                         answerKeys.removeAt(index);
                       });
+                      widget.onChange(_packFields());
                     },
                   ),
               ],
@@ -126,6 +122,7 @@ class _ExerciseCreationSAComponentState
                           option = null;
                           _optionController.clear();
                         });
+                        widget.onChange(_packFields());
                       }
                     : null,
                 icon: const Icon(Icons.add),
@@ -167,6 +164,7 @@ class _ExerciseCreationSAComponentState
                           setState(() {
                             options.remove(option);
                           });
+                          widget.onChange(_packFields());
                         },
                       ),
                     ],
