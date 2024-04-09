@@ -90,34 +90,50 @@ namespace CodeyBe.Services
         {
             logsService.EndOfLesson(user, lessonReport);
             ApplicationUser? applicationUser = await GetUser(user) ??
-                throw new EntityNotFoundException($"User not found {user.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault()?.Value}");
+                throw new EntityNotFoundException($"User not found " +
+                $"{user.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault()?.Value}");
+            LessonGroup? lessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync(lessonReport.LessonGroupId)
+                ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
 
             bool solvedNewLesson;
+            // If the user has not solved any lessons yet, the new lesson is solved
             if (applicationUser.HighestLessonId == null)
             {
                 solvedNewLesson = true;
-                return applicationUser;
             }
-
-            LessonGroup? lessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync(lessonReport.LessonGroupId)
-                ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
-            int lessonIndex = lessonGroup.LessonIds.IndexOf(lessonReport.LessonId);
-            int highestSolvedLessonIndex = lessonGroup.LessonIds.IndexOf((int)applicationUser.HighestLessonId);
-            solvedNewLesson = highestSolvedLessonIndex < lessonIndex;
-
+            // Otherwise, check if the new lesson is newer than the highest solved lesson
+            else
+            {
+                LessonGroup nextLessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync((int)applicationUser.NextLessonGroupId!)
+                    ?? throw new EntityNotFoundException("User's next lesson group cannot be found");
+                if (lessonGroup.Order < nextLessonGroup.Order)
+                {
+                    solvedNewLesson = false;
+                }
+                else if (lessonGroup.Order == nextLessonGroup.Order)
+                {
+                    int newSolvedLessonIndex = lessonGroup.LessonIds.IndexOf(lessonReport.LessonId);
+                    int nextLessonToSolveIndex = lessonGroup.LessonIds.IndexOf((int)applicationUser.NextLessonId!);
+                    solvedNewLesson = nextLessonToSolveIndex == -1 || newSolvedLessonIndex >= nextLessonToSolveIndex;
+                }
+                else
+                {
+                    throw new InvalidDataException("Invalid next lesson group ID");
+                }
+            }
 
             if (solvedNewLesson)
             {
                 await SetHighestSolvedLesson(applicationUser, lessonReport.LessonId);
-                int nextLessonId = await lessonsService.GetNextLessonForLessonId(lessonReport.LessonId);
+                int nextLessonId = await lessonsService.GetNextLessonForLessonId(lessonReport.LessonId, lessonGroup);
                 await SetNextLesson(applicationUser, nextLessonId);
 
+                // If this is the last lesson in the lesson group, set the next lesson group
                 if (lessonGroup.LessonIds.IndexOf(lessonReport.LessonId) == lessonGroup.LessonIds.Count - 1)
                 {
-                    Lesson lesson = await lessonsService.GetLessonByIDAsync(lessonReport.LessonId) ?? throw new EntityNotFoundException();
                     await SetHighestSolvedLessonGroup(applicationUser, lessonGroup.PrivateId);
 
-                    int? nextLessonGroupId = await lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId);
+                    int? nextLessonGroupId = (await lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId))?.PrivateId;
                     await SetNextLessonGroup(applicationUser, nextLessonGroupId);
                 }
             }

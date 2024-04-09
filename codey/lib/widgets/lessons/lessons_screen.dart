@@ -5,10 +5,10 @@ import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/exercises/pre_post_exercise_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Replace with the actual path
+import 'package:provider/provider.dart';
 
 class LessonsScreen extends StatelessWidget {
-  final LessonGroup lessonGroup; // Inject the LessonsRepository
+  final LessonGroup lessonGroup;
 
   const LessonsScreen({
     Key? key,
@@ -17,8 +17,7 @@ class LessonsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LessonsService lessonsService =
-        Provider.of<LessonsService>(context);
+    LessonsService lessonsService = Provider.of<LessonsService>(context);
     Future<List<Lesson>> lessonsFuture =
         lessonsService.getLessonsForGroup(lessonGroup);
     Stream<AppUser?> user$ = context.read<UserService>().userStream;
@@ -63,7 +62,14 @@ class LessonsScreen extends StatelessWidget {
                     itemCount: lessons.length,
                     itemBuilder: (BuildContext context, int index) {
                       var lesson = lessons[index];
-                      bool isClickable = lesson.id <= (user.nextLessonId ?? 0);
+                      bool isClickable;
+                      // Lesson group not already solved
+                      if (lessonGroup.lessons.contains(user.nextLessonId)) {
+                        isClickable = lessonGroup.lessons.indexOf(lesson.id) <=
+                            lessonGroup.lessons.indexOf(user.nextLessonId ?? 0);
+                      } else {
+                        isClickable = true;
+                      }
                       return ListTile(
                         title: Text('${lesson.id} ${lesson.name}'),
                         subtitle: ButtonBar(
@@ -77,6 +83,7 @@ class LessonsScreen extends StatelessWidget {
                                           builder: (context) =>
                                               PrePostExerciseScreen(
                                             lesson: lesson,
+                                            lessonGroup: lessonGroup,
                                           ),
                                         ),
                                       );

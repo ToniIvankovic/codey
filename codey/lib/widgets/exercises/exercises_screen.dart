@@ -1,4 +1,5 @@
 import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
@@ -6,16 +7,21 @@ import 'package:provider/provider.dart';
 
 class ExercisesScreen extends StatelessWidget {
   final Lesson lesson;
+  final LessonGroup lessonGroup;
   final VoidCallback onSessionCompleted;
 
-  const ExercisesScreen(
-      {super.key, required this.lesson, required this.onSessionCompleted});
+  const ExercisesScreen({
+    super.key,
+    required this.lesson,
+    required this.lessonGroup,
+    required this.onSessionCompleted,
+  });
 
   @override
   Widget build(BuildContext context) {
     final exercisesService = context.read<ExercisesService>();
     final Future<void> startSessionFuture =
-        exercisesService.startSessionForLesson(lesson);
+        exercisesService.startSessionForLesson(lesson, lessonGroup);
 
     return WillPopScope(
       onWillPop: () async {

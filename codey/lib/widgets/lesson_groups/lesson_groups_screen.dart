@@ -37,8 +37,8 @@ class LessonGroupsScreen extends StatelessWidget {
           child: FutureBuilder<List<LessonGroup>>(
             future: lessonGroupsService.getAllLessonGroups(),
             // Call the getUser method from AuthService to get the user
-            builder:
-                (BuildContext context, AsyncSnapshot<List<LessonGroup>> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<List<LessonGroup>> snapshot) {
               // Error handling
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator(
@@ -52,7 +52,7 @@ class LessonGroupsScreen extends StatelessWidget {
               } else if (snapshot.data == null) {
                 return const Text('No data');
               }
-              
+
               // Lesson groups exist, find user
               List<LessonGroup> lessonGroups = snapshot.data!;
               return StreamBuilder(
@@ -61,14 +61,20 @@ class LessonGroupsScreen extends StatelessWidget {
                     if (!snapshot.hasData) {
                       return const CircularProgressIndicator();
                     }
-              
+
                     // Received data and user exists - form the list of lesson groups
                     AppUser user = snapshot.data!;
                     lessonGroupsListItems = lessonGroups
                         .map<ListItem>(
                           (item) => ListItem(
                             lessonGroup: item,
-                            clickable: item.id <= (user.nextLessonGroupId ?? 0),
+                            clickable: item.order <=
+                                (lessonGroups
+                                    .where((lessonGroup) =>
+                                        lessonGroup.id ==
+                                        user.nextLessonGroupId)
+                                    .first
+                                    .order),
                             isExpanded: false,
                           ),
                         )
@@ -86,7 +92,8 @@ class LessonGroupsScreen extends StatelessWidget {
                               Text(
                                   "Last lesson group: ${user.highestLessonGroupId ?? 'Just begun'}"),
                               Text("Next lesson: ${user.nextLessonId}"),
-                              Text("Next lesson group: ${user.nextLessonGroupId}"),
+                              Text(
+                                  "Next lesson group: ${user.nextLessonGroupId}"),
                               Text("Roles: ${user.roles}")
                             ],
                           ),

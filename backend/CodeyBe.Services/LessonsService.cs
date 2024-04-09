@@ -33,10 +33,17 @@ namespace CodeyBe.Services
                 .Where(lesson => lessonGroup.LessonIds.Contains(lesson.PrivateId))
                 .OrderBy(lesson => lessonGroup.LessonIds.IndexOf(lesson.PrivateId));
         }
-        public async Task<int> GetNextLessonForLessonId(int lessonId)
+        public async Task<int> GetNextLessonForLessonId(int lessonId, LessonGroup lessonGroup)
         {
-            Lesson? lesson = await GetLessonByIDAsync(lessonId) ?? throw new EntityNotFoundException($"Lesson with id {lessonId} not found.");
-            return lesson.PrivateId + 1;
+            List<int> lessonsInCurrentGroup = [.. lessonGroup.LessonIds];
+            int currentIndex = lessonsInCurrentGroup.IndexOf(lessonId);
+            if (currentIndex < lessonsInCurrentGroup.Count - 1)
+            {
+                return lessonsInCurrentGroup[currentIndex + 1];
+            }
+            LessonGroup? nextLessonGroup = await _lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId)
+                ?? throw new EntityNotFoundException("Next lesson group not found");
+            return nextLessonGroup.LessonIds[0];
         }
 
         public async Task<Lesson> CreateLessonAsync(LessonCreationDTO lesson)

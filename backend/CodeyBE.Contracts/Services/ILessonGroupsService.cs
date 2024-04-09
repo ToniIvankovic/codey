@@ -14,10 +14,10 @@ namespace CodeyBE.Contracts.Services
 
         public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync();
         public Task<LessonGroup?> GetLessonGroupByIDAsync(int id);
-        public Task<int?> GetNextLessonGroupForLessonGroupId(int lessonGroupId);
+        public Task<LessonGroup?> GetNextLessonGroupForLessonGroupId(int lessonGroupId);
         public Task<LessonGroup> CreateLessonGroupAsync(LessonGroupCreationDTO lessonGroup);
         public Task DeleteLessonGroupAsync(int id);
         public Task<LessonGroup> UpdateLessonGroupAsync(int id, LessonGroupCreationDTO lessonGroup);
-        Task<List<LessonGroup>> UpdateLessonGroupOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList);
+        public Task<List<LessonGroup>> UpdateLessonGroupOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList);
     }
 }

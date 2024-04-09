@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/end_report.dart';
 import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/exercises/exercises_screen.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,13 @@ import 'package:provider/provider.dart';
 
 class PrePostExerciseScreen extends StatefulWidget {
   final Lesson lesson;
+  final LessonGroup lessonGroup;
 
-  const PrePostExerciseScreen({Key? key, required this.lesson})
-      : super(key: key);
+  const PrePostExerciseScreen({
+    Key? key,
+    required this.lesson,
+    required this.lessonGroup,
+  }) : super(key: key);
 
   @override
   State<PrePostExerciseScreen> createState() => _PrePostExerciseScreenState();
@@ -32,24 +37,28 @@ class _PrePostExerciseScreenState extends State<PrePostExerciseScreen> {
         body: completedLesson == false
             ? _PreLessonReport(
                 lesson: widget.lesson,
+                lessonGroup: widget.lessonGroup,
                 postLessonCallback: () {
                   setState(() {
                     completedLesson = true;
                   });
-                })
+                },
+              )
             : _PostLessonReport(endReport: exercisesService.getEndReport()!));
   }
 }
 
 class _PreLessonReport extends StatelessWidget {
+  final Lesson lesson;
+  final LessonGroup lessonGroup;
+  final VoidCallback postLessonCallback;
+
   const _PreLessonReport({
     Key? key,
     required this.lesson,
+    required this.lessonGroup,
     required this.postLessonCallback,
   }) : super(key: key);
-
-  final Lesson lesson;
-  final VoidCallback postLessonCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +73,7 @@ class _PreLessonReport extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => ExercisesScreen(
                     lesson: lesson,
+                    lessonGroup: lessonGroup,
                     onSessionCompleted: () {
                       // The callback is delayed to after drawing is finished
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,7 +112,7 @@ class _PostLessonReport extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('Go back'),
+            child: const Text('Finish'),
           ),
         ],
       ),

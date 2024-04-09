@@ -8,13 +8,14 @@ import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ExercisesService {
-  Future<void> startSessionForLesson(Lesson lesson);
+  Future<void> startSessionForLesson(Lesson lesson, LessonGroup lessonGroup);
   Exercise? getNextExercise();
   Exercise? get currentExercise;
   bool get sessionActive;
@@ -58,9 +59,9 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  Future<void> startSessionForLesson(Lesson lesson) async {
+  Future<void> startSessionForLesson(Lesson lesson, LessonGroup lessonGroup) async {
     _sessionExercises = await getAllExercisesForLesson(lesson);
-    _endReport = EndReport(lesson.id, 0, 0, _sessionExercises!.length);
+    _endReport = EndReport(lesson.id, lessonGroup.id, 0, 0, _sessionExercises!.length);
   }
 
   @override
@@ -132,6 +133,8 @@ class ExercisesServiceV1 implements ExercisesService {
       },
     );
     if (response.statusCode != 200) {
+      //TODO: handle end of course
+      print(response.body);
       return;
     }
 
@@ -176,7 +179,7 @@ class ExercisesServiceV1 implements ExercisesService {
   @override
   Future<void> startMockExerciseSession(Exercise exercise) async {
     _sessionExercises = [exercise];
-    _endReport = EndReport(0, 0, 0, 1);
+    _endReport = EndReport(0, 0, 0, 0, 1);
     _isMockInProgress = true;
   }
 

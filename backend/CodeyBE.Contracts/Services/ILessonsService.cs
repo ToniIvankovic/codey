@@ -15,7 +15,7 @@ namespace CodeyBE.Contracts.Services
         public Task<IEnumerable<Lesson>> GetAllLessonsAsync();
         public Task<Lesson?> GetLessonByIDAsync(int id);
         public Task<IEnumerable<Lesson>> GetLessonsForLessonGroupAsync(int lessonGroupId);
-        public Task<int> GetNextLessonForLessonId(int lessonId);
+        public Task<int> GetNextLessonForLessonId(int lessonId, LessonGroup lessonGroup);
         Task<Lesson> CreateLessonAsync(LessonCreationDTO lesson);
         Task<Lesson> UpdateLessonAsync(int id, LessonCreationDTO lesson);
         Task DeleteLessonAsync(int id);
