@@ -74,16 +74,7 @@ namespace CodeyBE.API.Controllers
             try
             {
                 ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
-                return new OkObjectResult(
-                    new UserDataDTO
-                    {
-                        Email = applicationUser.Email,
-                        HighestLessonId = applicationUser.HighestLessonId,
-                        HighestLessonGroupId = applicationUser.HighestLessonGroupId,
-                        NextLessonId = applicationUser.NextLessonId,
-                        NextLessonGroupId = applicationUser.NextLessonGroupId,
-                        Roles = applicationUser.Roles
-                    });
+                return new OkObjectResult(ProduceUserDataDTO(applicationUser));
             }
             catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
             {
@@ -98,20 +89,27 @@ namespace CodeyBE.API.Controllers
             try
             {
                 ApplicationUser? applicationUser = await userService.EndLessonAsync(User, lessonReport);
-                var dto = new UserDataDTO
-                {
-                    Email = applicationUser.Email,
-                    HighestLessonId = applicationUser.HighestLessonId,
-                    HighestLessonGroupId = applicationUser.HighestLessonGroupId,
-                    NextLessonId = applicationUser.NextLessonId,
-                    NextLessonGroupId = applicationUser.NextLessonGroupId,
-                    Roles = applicationUser.Roles
-                };
+                var dto = ProduceUserDataDTO(applicationUser);
                 return new OkObjectResult(dto);
-            } catch (EntityNotFoundException e)
+            }
+            catch (EntityNotFoundException e)
             {
                 return StatusCode(400, e.Message);
             }
+        }
+
+        private UserDataDTO ProduceUserDataDTO(ApplicationUser applicationUser)
+        {
+            return new UserDataDTO
+            {
+                Email = applicationUser.Email ?? throw new MissingFieldException("Email missing from user"),
+                HighestLessonId = applicationUser.HighestLessonId,
+                HighestLessonGroupId = applicationUser.HighestLessonGroupId,
+                NextLessonId = applicationUser.NextLessonId,
+                NextLessonGroupId = applicationUser.NextLessonGroupId,
+                Roles = applicationUser.Roles,
+                TotalXP = applicationUser.TotalXP
+            };
         }
 
         [Authorize(Roles = "ADMIN")]

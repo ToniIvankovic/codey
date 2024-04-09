@@ -8,11 +8,12 @@ namespace CodeyBE.Contracts.DTOs
 {
     public class UserDataDTO
     {
-        public string? Email { get; set; }
+        public required string Email { get; set; }
         public int? HighestLessonId { get; set; }
         public int? HighestLessonGroupId { get; set; }
         public int? NextLessonId { get; set; }
         public int? NextLessonGroupId { get; set; }
-        public List<string>? Roles { get; set; }
+        public required List<string>? Roles { get; set; }
+        public required int TotalXP { get; set; }
     }
 }

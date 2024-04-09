@@ -94,7 +94,8 @@ class LessonGroupsScreen extends StatelessWidget {
                               Text("Next lesson: ${user.nextLessonId}"),
                               Text(
                                   "Next lesson group: ${user.nextLessonGroupId}"),
-                              Text("Roles: ${user.roles}")
+                              Text("Roles: ${user.roles}"),
+                              Text("XP: ${user.totalXp}")
                             ],
                           ),
                         ),

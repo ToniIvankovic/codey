@@ -59,6 +59,8 @@ namespace CodeyBe.Services
                 HighestLessonId = null,
                 NextLessonGroupId = lessonGroupsService.FirstLessonGroupId,
                 NextLessonId = lessonsService.FirstLessonId,
+                TotalXP = 0,
+                XPachieved = [],
             }, user.Password);
             return result;
         }
