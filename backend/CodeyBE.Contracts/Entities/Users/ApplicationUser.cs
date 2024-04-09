@@ -13,7 +13,7 @@ namespace CodeyBE.Contracts.Entities.Users
         public int? HighestLessonGroupId { get; set; }
         public int? NextLessonId { get; set; }
         public int? NextLessonGroupId { get; set; }
-        public int TotalXP { get; set; } = 0;
+        public int TotalXP { get; set; }
         public List<KeyValuePair<DateTime, int>> XPachieved { get; set; } = [];
     }
 }

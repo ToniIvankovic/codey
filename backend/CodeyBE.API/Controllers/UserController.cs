@@ -96,6 +96,14 @@ namespace CodeyBE.API.Controllers
             {
                 return StatusCode(400, e.Message);
             }
+            catch (InvalidDataException e)
+            {
+                return StatusCode(400, e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         private UserDataDTO ProduceUserDataDTO(ApplicationUser applicationUser)
