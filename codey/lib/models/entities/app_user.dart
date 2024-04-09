@@ -18,8 +18,8 @@ class AppUser {
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
       email: json['email'],
-      highestLessonId: json['lastLessonId'],
-      highestLessonGroupId: json['lastLessonGroupId'],
+      highestLessonId: json['highestLessonId'],
+      highestLessonGroupId: json['highestLessonGroupId'],
       nextLessonId: json['nextLessonId'],
       nextLessonGroupId: json['nextLessonGroupId'],
       roles: (json['roles'] as List<dynamic>).map((role) => role.toString()).toList(),
