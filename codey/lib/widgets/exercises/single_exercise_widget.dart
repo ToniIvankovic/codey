@@ -205,18 +205,28 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           borderType: BorderType.RRect,
           dashPattern: const [6, 3],
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              children: [
-                Text(
-                  (exercise! as dynamic).statementCode!,
-                  style: const TextStyle(
-                    fontFamily: 'courier new',
-                    fontSize: 20.0,
-                  ),
-                ),
-              ],
+        padding: const EdgeInsets.all(10.0),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: constraints.maxWidth,
+              minWidth: constraints.maxWidth,
             ),
+            child: Text(
+              (exercise! as dynamic).statementCode!,
+              style: const TextStyle(
+            fontFamily: 'courier new',
+            fontSize: 20.0,
+              ),
+              softWrap: true, // Added line
+            ),
+          ),
+            );
+          },
+        ),
           ),
         ),
       );
