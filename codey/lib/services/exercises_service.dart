@@ -184,6 +184,7 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   Future<bool> _mockCheckAnswer(Exercise exercise, answer) {
+    //TODO: consider moving this check to backend
     if (exercise is ExerciseMC) {
       return Future.value(exercise.correctAnswer == answer);
     } else if (exercise is ExerciseSA) {
