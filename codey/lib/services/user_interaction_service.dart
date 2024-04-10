@@ -11,6 +11,7 @@ abstract class UserInteractionService {
   Future<Class> updateClass(Object id, String name, List<AppUser> students);
   Future<List<Class>> getClasses();
   Future<List<AppUser>> queryUsers(String query);
+  Future<List<AppUser>> getAllUsers();
 }
 
 class UserInteractionServiceImpl implements UserInteractionService {
@@ -37,14 +38,33 @@ class UserInteractionServiceImpl implements UserInteractionService {
   @override
   Future<List<AppUser>> queryUsers(String query) async {
     final response = await _authenticatedClient.get(
-      Uri.parse('$_baseEndpoint/users?query=$query'),
+      Uri.parse('$_baseEndpoint/students?query=$query'),
     );
 
-    if(response.statusCode != 200) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to query users');
     }
 
-    return json.decode(response.body);
+    return json
+        .decode(response.body)
+        .map<AppUser>((user) => AppUser.fromJson(user))
+        .toList();
+  }
+
+  @override
+  Future<List<AppUser>> getAllUsers() async {
+    final response = await _authenticatedClient.get(
+      Uri.parse('$_baseEndpoint/students/all'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get all users');
+    }
+
+    return json
+        .decode(response.body)
+        .map<AppUser>((user) => AppUser.fromJson(user))
+        .toList();
   }
 
   @override

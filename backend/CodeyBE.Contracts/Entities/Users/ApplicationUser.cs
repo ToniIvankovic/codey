@@ -15,5 +15,6 @@ namespace CodeyBE.Contracts.Entities.Users
         public int? NextLessonGroupId { get; set; }
         public int TotalXP { get; set; }
         public List<KeyValuePair<DateTime, int>> XPachieved { get; set; } = [];
+        public string? School { get; set; }
     }
 }

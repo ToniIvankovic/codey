@@ -120,6 +120,7 @@ namespace CodeyBE.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<ILogsService, LogsService>();
+            services.AddScoped<IInteractionService, InteractionService>();
         }
     }
 

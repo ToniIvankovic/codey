@@ -23,10 +23,12 @@ namespace CodeyBE.API.Controllers
         {
             var email = body["email"];
             var password = body["password"];
+            var school = body["school"];
             var result = await userService.RegisterStudent(new UserRegistrationInternalDTO
             {
                 Email = email,
-                Password = password
+                Password = password,
+                School = school
             });
             if (result.Succeeded)
             {
@@ -106,7 +108,7 @@ namespace CodeyBE.API.Controllers
             }
         }
 
-        private UserDataDTO ProduceUserDataDTO(ApplicationUser applicationUser)
+        private static UserDataDTO ProduceUserDataDTO(ApplicationUser applicationUser)
         {
             return new UserDataDTO
             {
@@ -150,12 +152,23 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(UserRegistrationDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> RegisterTeacher([FromBody] Dictionary<string, string> body)
         {
-            var email = body["email"];
-            var password = body["password"];
+            string email, password, school;
+            try
+            {
+                email = body["email"];
+                password = body["password"];
+                school = body["school"];
+            }
+            catch (KeyNotFoundException e)
+            {
+                return StatusCode(400, e.Message);
+            }
+
             var result = await userService.RegisterTeacher(new UserRegistrationInternalDTO
             {
                 Email = email,
-                Password = password
+                Password = password,
+                School = school
             });
             if (!result.Succeeded)
             {

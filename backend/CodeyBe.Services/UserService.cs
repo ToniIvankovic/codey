@@ -61,6 +61,7 @@ namespace CodeyBe.Services
                 NextLessonId = lessonsService.FirstLessonId,
                 TotalXP = 0,
                 XPachieved = [],
+                School = user.School,
             }, user.Password);
             return result;
         }
@@ -98,6 +99,7 @@ namespace CodeyBe.Services
                         ClaimValue = user.Email
                     },
                 ],
+                School = user.School,
             }, user.Password);
             return result;
         }
