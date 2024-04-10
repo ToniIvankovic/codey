@@ -111,6 +111,11 @@ namespace CodeyBE.API
                 IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
                 return new LogsRepository(dbContext);
             });
+            services.AddScoped<IClassesRepository>(provider =>
+            {
+                IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
+                return new ClassesRepository(dbContext);
+            });
 
 
             // Configure the services

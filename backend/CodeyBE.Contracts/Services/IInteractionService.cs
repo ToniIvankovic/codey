@@ -1,4 +1,6 @@
-﻿using CodeyBE.Contracts.Entities.Users;
+﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,9 @@ namespace CodeyBE.Contracts.Services
     {
         public Task<IEnumerable<ApplicationUser>> GetAllStudentsForTeacher(ClaimsPrincipal teacher);
         public Task<IEnumerable<ApplicationUser>> GetStudentByQuery(ClaimsPrincipal teacher, string? query);
+        public Task<Class> CreateClass(ClaimsPrincipal user, ClassCreationDTO classCreationDTO);
+        public Task<Class> UpdateClass(ClaimsPrincipal user, int id, ClassCreationDTO classCreationDTO);
+        public Task DeleteClass(ClaimsPrincipal user, int id);
+        public Task<IEnumerable<Class>> GetAllClassesForTeacher(ClaimsPrincipal user);
     }
 }
