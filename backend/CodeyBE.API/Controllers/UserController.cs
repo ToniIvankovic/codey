@@ -144,5 +144,30 @@ namespace CodeyBE.API.Controllers
                 Message = result.Errors.Select(error => error.Description)
             });
         }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("register/teacher", Name = "registerTeacher")]
+        [ProducesResponseType(typeof(UserRegistrationDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RegisterTeacher([FromBody] Dictionary<string, string> body)
+        {
+            var email = body["email"];
+            var password = body["password"];
+            var result = await userService.RegisterTeacher(new UserRegistrationInternalDTO
+            {
+                Email = email,
+                Password = password
+            });
+            if (!result.Succeeded)
+            {
+                return StatusCode(400, new UserRegistrationDTO
+                {
+                    Message = result.Errors.Select(error => error.Description)
+                });
+            }
+            return Ok(new UserRegistrationDTO
+            {
+                Message = ["User created successfully"]
+            });
+        }
     }
 }

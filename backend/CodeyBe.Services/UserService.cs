@@ -83,6 +83,25 @@ namespace CodeyBe.Services
             return result;
         }
 
+        public async Task<IdentityResult> RegisterTeacher(UserRegistrationInternalDTO user)
+        {
+
+            IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
+            {
+                UserName = user.Email,
+                Email = user.Email,
+                Roles = ["TEACHER"],
+                Claims = [
+                    new()
+                    {
+                        ClaimType = ClaimTypes.Email,
+                        ClaimValue = user.Email
+                    },
+                ],
+            }, user.Password);
+            return result;
+        }
+
         public async Task<ApplicationUser?> GetUser(ClaimsPrincipal user)
         {
             return await _userManager.FindByEmailAsync(user.FindFirst(ClaimTypes.Email)?.Value ?? throw new EntityNotFoundException());
@@ -174,6 +193,5 @@ namespace CodeyBe.Services
             applicationUser.NextLessonGroupId = lessonGroupId;
             await _userManager.UpdateAsync(applicationUser);
         }
-
     }
 }

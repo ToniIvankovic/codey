@@ -3,6 +3,8 @@ import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'create_creator_screen.dart';
+
 class AdminHomePage extends StatelessWidget {
   final void Function() onLogoutSuper;
 
@@ -39,6 +41,19 @@ class AdminHomePage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const CreateTeacherScreen(),
+                    ),
+                  );
+                },
+                child: const Text("Create Teacher"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
                   context.read<SessionService>().logout();
                   onLogoutSuper();
                 },
@@ -52,22 +67,22 @@ class AdminHomePage extends StatelessWidget {
   }
 }
 
-class CreateCreatorScreen extends StatefulWidget {
-  const CreateCreatorScreen({Key? key}) : super(key: key);
+class CreateTeacherScreen extends StatefulWidget {
+  const CreateTeacherScreen({Key? key}) : super(key: key);
 
   @override
-  State<CreateCreatorScreen> createState() => _CreateCreatorScreenState();
+  State<CreateTeacherScreen> createState() => _CreateTeacherScreenState();
 }
 
-class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
-  String email = '';
-  String password = '';
+class _CreateTeacherScreenState extends State<CreateTeacherScreen> {
+  String email = "";
+  String password = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Creator'),
+        title: const Text('Create Teacher'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -76,29 +91,25 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
           TextField(
             decoration: const InputDecoration(labelText: 'Email'),
             onChanged: (value) {
-              setState(() {
-                email = value;
-              });
+              email = value;
             },
           ),
           TextField(
             decoration: const InputDecoration(labelText: 'Password'),
             onChanged: (value) {
-              setState(() {
-                password = value;
-              });
+              password = value;
             },
           ),
           ElevatedButton(
             onPressed: () {
               context
                   .read<AdminFunctionsService>()
-                  .registerCreator(email, password)
+                  .registerTeacher(email, password)
                   .then((value) {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Creator created successfully'),
+                    content: Text('Teacher created successfully'),
                   ),
                 );
               }).catchError((error) {
@@ -109,7 +120,7 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
                 );
               });
             },
-            child: const Text('Create Creator'),
+            child: const Text('Create Teacher'),
           ),
         ],
       ),

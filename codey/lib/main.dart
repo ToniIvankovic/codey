@@ -8,11 +8,13 @@ import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
+import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/creator/admin_home_page.dart';
+import 'package:codey/widgets/admin/admin_home_page.dart';
 import 'package:codey/widgets/lesson_groups/lesson_groups_screen.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/auth/auth_screen.dart';
+import 'package:codey/widgets/teacher/teacher_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
@@ -72,6 +74,11 @@ Future main() async {
         Provider<SessionService>(
           create: (context) => SessionService1(
               context.read<AuthService>(), context.read<UserService>()),
+        ),
+        Provider<UserInteractionService>(
+          create: (context) => UserInteractionServiceImpl(
+            context.read<AuthenticatedClient>(),
+            ),
         ),
       ],
       child: const MyApp(),
@@ -135,19 +142,27 @@ class _MyHomePageState extends State<MyHomePage> {
               final user = snapshot.data!;
 
               if (user.roles.contains("ADMIN")) {
-                return AdminHomePage(onLogoutSuper: () => setState(() => loggedIn = false));
+                return AdminHomePage(
+                    onLogoutSuper: () => setState(() => loggedIn = false));
               }
               if (user.roles.contains("CREATOR")) {
                 return CreatorHomePage(
                     title: widget.title,
                     onLogoutSuper: () => setState(() => loggedIn = false));
               }
+              if (user.roles.contains("TEACHER")) {
+                return Scaffold(
+                    body: TeacherHomePage(
+                  onLogoutSuper: () => setState(() => loggedIn = false),
+                ));
+              }
               if (user.roles.contains("STUDENT")) {
                 return LessonGroupsScreen(
                   onLogoutSuper: () => setState(() => loggedIn = false),
                 );
               }
-              return const Text('Error: User has no roles');
+              return const Scaffold(
+                  body: Center(child: Text('Error: User has no roles')));
             }
           },
         );
