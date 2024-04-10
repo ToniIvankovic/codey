@@ -78,7 +78,7 @@ Future main() async {
         Provider<UserInteractionService>(
           create: (context) => UserInteractionServiceImpl(
             context.read<AuthenticatedClient>(),
-            ),
+          ),
         ),
       ],
       child: const MyApp(),
@@ -122,7 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
       future: context.read<AuthService>().token,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (!snapshot.hasData || snapshot.data == null) {
@@ -135,7 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
           stream: context.read<UserService>().userStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
             } else if (snapshot.hasError || snapshot.data == null) {
               return Text('Error: ${snapshot.error}');
             } else {
