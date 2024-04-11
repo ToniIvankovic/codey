@@ -13,8 +13,9 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class UserController(IUserService userService) : ControllerBase
+    public class UserController(IUserService userService, IInteractionService interactionService) : ControllerBase
     {
+        private readonly IInteractionService interactionService = interactionService;
 
         [AllowAnonymous]
         [HttpPost("register", Name = "register")]
@@ -76,7 +77,7 @@ namespace CodeyBE.API.Controllers
             try
             {
                 ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
-                return new OkObjectResult(ProduceUserDataDTO(applicationUser));
+                return new OkObjectResult(await ProduceUserDataDTO(applicationUser));
             }
             catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
             {
@@ -91,7 +92,7 @@ namespace CodeyBE.API.Controllers
             try
             {
                 ApplicationUser? applicationUser = await userService.EndLessonAsync(User, lessonReport);
-                var dto = ProduceUserDataDTO(applicationUser);
+                var dto = await ProduceUserDataDTO(applicationUser);
                 return new OkObjectResult(dto);
             }
             catch (EntityNotFoundException e)
@@ -108,18 +109,11 @@ namespace CodeyBE.API.Controllers
             }
         }
 
-        private static UserDataDTO ProduceUserDataDTO(ApplicationUser applicationUser)
+        private async Task<UserDataDTO> ProduceUserDataDTO(ApplicationUser applicationUser)
         {
-            return new UserDataDTO
-            {
-                Email = applicationUser.Email ?? throw new MissingFieldException("Email missing from user"),
-                HighestLessonId = applicationUser.HighestLessonId,
-                HighestLessonGroupId = applicationUser.HighestLessonGroupId,
-                NextLessonId = applicationUser.NextLessonId,
-                NextLessonGroupId = applicationUser.NextLessonGroupId,
-                Roles = applicationUser.Roles,
-                TotalXP = applicationUser.TotalXP
-            };
+            var dto = UserDataDTO.FromUser(applicationUser);
+            dto.ClassId = (await interactionService.GetClassForStuedntByTeacher(User, applicationUser.UserName!))?.PrivateId;
+            return dto;
         }
 
         [Authorize(Roles = "ADMIN")]

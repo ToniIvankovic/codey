@@ -1,4 +1,4 @@
-﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
@@ -41,17 +41,9 @@ namespace CodeyBE.API.Controllers
 
         private async Task<UserDataDTO> ConstructUserDataDTO(ApplicationUser student)
         {
-            return new UserDataDTO
-            {
-                Email = student.Email!,
-                HighestLessonId = student.HighestLessonId,
-                HighestLessonGroupId = student.HighestLessonGroupId,
-                NextLessonId = student.NextLessonId,
-                NextLessonGroupId = student.NextLessonGroupId,
-                Roles = student.Roles,
-                TotalXP = student.TotalXP,
-                ClassId = (await interactionService.GetClassForStuedntByTeacher(User, student.UserName!))?.PrivateId,
-            };
+            var dto = UserDataDTO.FromUser(student);
+            dto.ClassId = (await interactionService.GetClassForStuedntByTeacher(User, student.UserName!))?.PrivateId;
+            return dto;
         }
 
         [HttpPost("classes", Name = "createClass")]
