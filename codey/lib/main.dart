@@ -148,25 +148,30 @@ class _MyHomePageState extends State<MyHomePage> {
               return Text('Error: ${snapshot.error}');
             } else {
               final user = snapshot.data!;
+              onLogout() {
+                context.read<SessionService>().logout();
+                setState(() => loggedIn = false);
+              }
 
               if (user.roles.contains("ADMIN")) {
                 return AdminHomePage(
-                    onLogoutSuper: () => setState(() => loggedIn = false));
+                  onLogoutSuper: onLogout,
+                );
               }
               if (user.roles.contains("CREATOR")) {
                 return CreatorHomePage(
-                    title: widget.title,
-                    onLogoutSuper: () => setState(() => loggedIn = false));
+                  title: widget.title,
+                  onLogoutSuper: onLogout,
+                );
               }
               if (user.roles.contains("TEACHER")) {
-                return Scaffold(
-                    body: TeacherHomePage(
-                  onLogoutSuper: () => setState(() => loggedIn = false),
-                ));
+                return TeacherHomePage(
+                  onLogoutSuper: onLogout,
+                );
               }
               if (user.roles.contains("STUDENT")) {
                 return LessonGroupsScreen(
-                  onLogoutSuper: () => setState(() => loggedIn = false),
+                  onLogoutSuper: onLogout,
                 );
               }
               return const Scaffold(

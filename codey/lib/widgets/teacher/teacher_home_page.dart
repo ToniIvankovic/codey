@@ -41,7 +41,6 @@ class TeacherHomePage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  context.read<SessionService>().logout();
                   onLogoutSuper();
                 },
                 child: const Text('Logout'),

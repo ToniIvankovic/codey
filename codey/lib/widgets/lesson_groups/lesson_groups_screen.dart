@@ -21,13 +21,8 @@ class LessonGroupsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     LessonGroupsService lessonGroupsService =
         context.read<LessonGroupsService>();
-    final sessionService = context.read<SessionService>();
     Stream<AppUser?> user$ = context.read<UserService>().userStream;
     List<ListItem> lessonGroupsListItems = [];
-    void onLogout() {
-      sessionService.logout();
-      onLogoutSuper();
-    }
 
     try {
       return Scaffold(
@@ -47,13 +42,14 @@ class LessonGroupsScreen extends StatelessWidget {
                   );
                 } else if (snapshot.hasError) {
                   if (snapshot.error is UnauthenticatedException) {
-                    onLogout();
+                    onLogoutSuper();
                   }
+                  // throw snapshot.error!;
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.data == null) {
                   return const Text('No data');
                 }
-        
+
                 // Lesson groups exist, find user
                 List<LessonGroup> lessonGroups = snapshot.data!;
                 return StreamBuilder(
@@ -62,7 +58,7 @@ class LessonGroupsScreen extends StatelessWidget {
                       if (!snapshot.hasData) {
                         return const CircularProgressIndicator();
                       }
-        
+
                       // Received data and user exists - form the list of lesson groups
                       AppUser user = snapshot.data!;
                       lessonGroupsListItems = lessonGroups
@@ -104,7 +100,7 @@ class LessonGroupsScreen extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
-                              onPressed: onLogout,
+                              onPressed: onLogoutSuper,
                               child: const Text('Logout'),
                             ),
                           ),
@@ -118,7 +114,7 @@ class LessonGroupsScreen extends StatelessWidget {
       );
     } on UnauthenticatedException catch (e) {
       //TODO Does this ever run?
-      onLogout();
+      onLogoutSuper();
       return Text('Error: $e');
     }
   }

@@ -101,7 +101,6 @@ class CreatorHomePage extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  await context.read<SessionService>().logout();
                   onLogoutSuper();
                 },
                 child: const Text('Logout'),
