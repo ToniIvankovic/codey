@@ -1,6 +1,4 @@
-import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'exercise/edit_exercises_screen.dart';
 import 'lesson_group/edit_lesson_groups_screen.dart';

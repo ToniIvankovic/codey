@@ -1,6 +1,4 @@
-import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'create_class_screen.dart';
 import 'view_classes_screen.dart';
