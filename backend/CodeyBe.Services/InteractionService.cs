@@ -134,5 +134,40 @@ namespace CodeyBe.Services
 
             return await _classesRepository.GetClassForStudent(student);
         }
+
+        public async Task<Leaderboard> GetLeaderboardForStudentSelf(ClaimsPrincipal userStudent)
+        {
+            ApplicationUser? student = await _userService.GetUser(userStudent)
+                ?? throw new EntityNotFoundException("Student not found in the database");
+            Class? _class = await GetClassForStudentSelf(userStudent, student.UserName!)
+                ?? throw new EntityNotFoundException("Student is not in any class");
+            return ProduceLeaderboardForClass(_class);
+        }
+
+        public async Task<Leaderboard> GetLeaderboardForClass(ClaimsPrincipal userTeacher, int classId)
+        {
+            ApplicationUser? teacher = await _userService.GetUser(userTeacher)
+                ?? throw new EntityNotFoundException("Teacher not found in the database");
+            Class? _class = await _classesRepository.GetByIdAsync(classId)
+                ?? throw new EntityNotFoundException($"No class found with ID {classId}");
+            if (_class.TeacherUsername != teacher.Email)
+            {
+                throw new UnauthorizedAccessException("Teacher is not allowed to access this class");
+            }
+            return ProduceLeaderboardForClass(_class);
+        }
+
+        private Leaderboard ProduceLeaderboardForClass(Class @class)
+        {
+            return new Leaderboard
+            {
+                ClassId = @class.PrivateId,
+                Students = _userManager.Users
+                    .Where(user => @class.Students.Contains(user.UserName!))
+                    .OrderByDescending(student => student.TotalXP)
+                    .Select(UserDataDTO.FromUser)
+                    .ToList(),
+            };
+        }
     }
 }

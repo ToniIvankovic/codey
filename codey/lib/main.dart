@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
             seedColor: const Color.fromARGB(255, 37, 9, 198)),
         useMaterial3: true,
       ),
+      debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Codey - Python Course'),
     );
   }

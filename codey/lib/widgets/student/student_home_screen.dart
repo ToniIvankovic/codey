@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'lesson_groups/lesson_groups_list_widget.dart';
+import 'student_profile_screen.dart';
 
-class StudentHomeScreen extends StatelessWidget {
+class StudentHomeScreen extends StatefulWidget {
   final VoidCallback onLogoutSuper;
 
   const StudentHomeScreen({
@@ -15,12 +16,39 @@ class StudentHomeScreen extends StatelessWidget {
   });
 
   @override
+  State<StudentHomeScreen> createState() => _StudentHomeScreenState();
+}
+
+class _StudentHomeScreenState extends State<StudentHomeScreen> {
+  AppUser? userForProfile;
+
+  @override
   Widget build(BuildContext context) {
     Stream<AppUser?> user$ = context.read<UserService>().userStream;
 
     try {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        appBar: AppBar(
+          title: const Text('Student Home'),
+          actions: [
+            if (userForProfile != null)
+              IconButton(
+                icon: const Icon(Icons.person),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StudentProfileScreen(
+                              user: userForProfile!,
+                            ))),
+              ),
+            //profile
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: widget.onLogoutSuper,
+            ),
+          ],
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
@@ -30,9 +58,13 @@ class StudentHomeScreen extends StatelessWidget {
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();
                 }
-
-                // Received data and user exists - form the list of lesson groups
                 AppUser user = snapshot.data!;
+                //cannot call setState in build method
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                  setState(() {
+                    userForProfile = snapshot.data!;
+                  });
+                });
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -42,14 +74,6 @@ class StudentHomeScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(user.email),
-                          Text(
-                              "Last lesson: ${user.highestLessonId ?? 'Just begun'}"),
-                          Text(
-                              "Last lesson group: ${user.highestLessonGroupId ?? 'Just begun'}"),
-                          Text("Next lesson: ${user.nextLessonId}"),
-                          Text("Next lesson group: ${user.nextLessonGroupId}"),
-                          Text("Roles: ${user.roles}"),
-                          Text("XP: ${user.totalXp}"),
                         ],
                       ),
                     ),
@@ -57,7 +81,7 @@ class StudentHomeScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ElevatedButton(
-                        onPressed: onLogoutSuper,
+                        onPressed: widget.onLogoutSuper,
                         child: const Text('Logout'),
                       ),
                     ),
@@ -70,7 +94,7 @@ class StudentHomeScreen extends StatelessWidget {
       );
     } on UnauthenticatedException catch (e) {
       //TODO Does this ever run?
-      onLogoutSuper();
+      widget.onLogoutSuper();
       return Text('Error: $e');
     }
   }

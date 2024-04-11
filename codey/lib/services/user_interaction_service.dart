@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/class.dart';
+import 'package:codey/models/entities/leaderboard.dart';
 import 'package:codey/models/exceptions/invalid_data_exception.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,6 +16,8 @@ abstract class UserInteractionService {
   Future<List<AppUser>> queryUsers(String query);
   Future<List<AppUser>> getAllUsers();
   Future<List<String>> getAllSchools();
+  Future<Leaderboard> getLeaderboardStudent();
+  Future<Leaderboard> getLeaderboardClass(int classId);
 }
 
 class UserInteractionServiceImpl implements UserInteractionService {
@@ -139,5 +142,31 @@ class UserInteractionServiceImpl implements UserInteractionService {
     }
 
     return json.decode(response.body).cast<String>();
+  }
+
+  @override
+  Future<Leaderboard> getLeaderboardStudent() async {
+    final response = await _authenticatedClient.get(
+      Uri.parse('$_baseEndpoint/leaderboard'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get student leaderboard');
+    }
+
+    return Leaderboard.fromJson(json.decode(response.body));
+  }
+
+  @override
+  Future<Leaderboard> getLeaderboardClass(int classId) async {
+    final response = await _authenticatedClient.get(
+      Uri.parse('$_baseEndpoint/leaderboard/$classId'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get class leaderboard');
+    }
+
+    return Leaderboard.fromJson(json.decode(response.body));
   }
 }

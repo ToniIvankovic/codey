@@ -1,4 +1,4 @@
-using CodeyBE.Contracts.DTOs;
+﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
@@ -145,5 +145,28 @@ namespace CodeyBE.API.Controllers
             return await Task.FromResult(new List<string> { "School11", "School22", "School33" });
         }
 
+        [HttpGet("classes/my", Name = "getClassForStudentSelf")]
+        [Authorize(Roles = "STUDENT")]
+        [ProducesResponseType(typeof(Class), (int)HttpStatusCode.OK)]
+        public async Task<Class?> GetClassForStudentSelf()
+        {
+            return await interactionService.GetClassForStudentSelf(User, User.Identity?.Name!);
+        }
+
+        [HttpGet("leaderboard", Name = "getLeaderboardForStudentSelf")]
+        [Authorize(Roles = "STUDENT")]
+        [ProducesResponseType(typeof(Leaderboard), (int)HttpStatusCode.OK)]
+        public async Task<Leaderboard> GetLeaderboardForStudentSelf()
+        {
+            return await interactionService.GetLeaderboardForStudentSelf(User);
+        }
+
+        [HttpGet("leaderboard/{classId}", Name = "getLeaderboardForClass")]
+        [Authorize(Roles = "TEACHER")]
+        [ProducesResponseType(typeof(Leaderboard), (int)HttpStatusCode.OK)]
+        public async Task<Leaderboard> GetLeaderboardForClass([FromRoute] int classId)
+        {
+            return await interactionService.GetLeaderboardForClass(User, classId);
+        }
     }
 }
