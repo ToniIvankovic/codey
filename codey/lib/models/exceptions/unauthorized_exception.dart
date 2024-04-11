@@ -5,6 +5,6 @@ class UnauthenticatedException implements Exception {
 
   @override
   String toString() {
-    return 'UnauthorizedException: $message';
+    return message;
   }
 }

@@ -20,17 +20,38 @@ namespace CodeyBE.API.Controllers
         [HttpGet("students/all", Name = "getStudentsForTeacher")]
         [Authorize(Roles = "TEACHER")]
         [ProducesResponseType(typeof(IEnumerable<ApplicationUser>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<ApplicationUser>> GetAllStudentsForTeacher()
+        public async Task<IEnumerable<UserDataDTO>> GetAllStudentsForTeacher()
         {
-            return await interactionService.GetAllStudentsForTeacher(User);
+            return await Task.WhenAll(
+                (await interactionService.GetAllStudentsForTeacher(User))
+                .Select(async student => await ConstructUserDataDTO(student))
+            );
         }
 
-        [HttpGet("students", Name = "getStudentById")]
+        [HttpGet("students", Name = "getStudentByQuery")]
         [Authorize(Roles = "TEACHER")]
         [ProducesResponseType(typeof(IEnumerable<ApplicationUser>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<ApplicationUser>> GetStudentsByQuery([FromQuery] string? query)
+        public async Task<IEnumerable<UserDataDTO>> GetStudentsByQuery([FromQuery] string? query)
         {
-            return await interactionService.GetStudentByQuery(User, query);
+            return await Task.WhenAll(
+                (await interactionService.GetStudentByQuery(User, query))
+                .Select(async student => await ConstructUserDataDTO(student))
+            ); ;
+        }
+
+        private async Task<UserDataDTO> ConstructUserDataDTO(ApplicationUser student)
+        {
+            return new UserDataDTO
+            {
+                Email = student.Email!,
+                HighestLessonId = student.HighestLessonId,
+                HighestLessonGroupId = student.HighestLessonGroupId,
+                NextLessonId = student.NextLessonId,
+                NextLessonGroupId = student.NextLessonGroupId,
+                Roles = student.Roles,
+                TotalXP = student.TotalXP,
+                ClassId = (await interactionService.GetClassForStuedntByTeacher(User, student.UserName!))?.PrivateId,
+            };
         }
 
         [HttpPost("classes", Name = "createClass")]
@@ -38,13 +59,33 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(Class), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CreateClass([FromBody] ClassCreationDTO classCreationDTO)
         {
-            return Ok(await interactionService.CreateClass(User, classCreationDTO));
+            try
+            {
+
+                return Ok(await interactionService.CreateClass(User, classCreationDTO));
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, e.Message);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (Exception e) when (e is MissingFieldException || e is InvalidDataException)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
         [HttpPut("classes/{id}", Name = "updateClass")]
         [Authorize(Roles = "TEACHER")]
         [ProducesResponseType(typeof(Class), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateClass([FromRoute] int id,[FromBody] ClassCreationDTO classCreationDTO)
+        public async Task<IActionResult> UpdateClass([FromRoute] int id, [FromBody] ClassCreationDTO classCreationDTO)
         {
             try
             {

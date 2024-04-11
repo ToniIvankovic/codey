@@ -1,29 +1,27 @@
-import 'package:codey/models/entities/app_user.dart';
-
 class Class {
   String name;
-  Object id; //TODO determine type
-  List<AppUser> students;
+  int id;
+  List<String> studentEmails;
 
   Class({
     required this.name,
     required this.id,
-    required this.students,
+    required this.studentEmails,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'id': id,
-      'students': students,
+      'privateId': id,
+      'students': studentEmails,
     };
   }
 
   factory Class.fromJson(Map<String, dynamic> json) {
     return Class(
       name: json['name'],
-      id: json['id'],
-      students: json['students'],
+      id: json['privateId'],
+      studentEmails: json['students'].cast<String>(),
     );
   }
 }

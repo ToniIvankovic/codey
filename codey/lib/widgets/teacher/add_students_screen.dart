@@ -91,7 +91,10 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(student.email),
+                    child: student.classId == null
+                        ? Text(student.email)
+                        : Text(
+                            "${student.email} (already in a class ${student.classId})"),
                   ),
                 ],
               ),
@@ -114,7 +117,10 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(student.email),
+                    child: student.classId == null
+                        ? Text(student.email)
+                        : Text(
+                            "${student.email} (already in a class ${student.classId})"),
                   ),
                 ],
               ),

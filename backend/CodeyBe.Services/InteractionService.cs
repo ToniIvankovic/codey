@@ -22,12 +22,11 @@ namespace CodeyBe.Services
         private readonly IUserService _userService = userService;
         private readonly IClassesRepository _classesRepository = classesRepository;
 
-        public async Task<Class> CreateClass(ClaimsPrincipal user, ClassCreationDTO classCreationDTO)
+        public async Task<Class> CreateClass(ClaimsPrincipal userTeacher, ClassCreationDTO classCreationDTO)
         {
-            ApplicationUser? teacher = await _userService.GetUser(user)
+            ApplicationUser? teacher = await _userService.GetUser(userTeacher)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            //TODO check if students belong to the teacher's school
-            //TODO check if students belong to another class
+            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames);
             Class @class = new()
             {
                 Name = classCreationDTO.Name,
@@ -42,18 +41,37 @@ namespace CodeyBe.Services
         {
             ApplicationUser? teacher = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            //TODO check if students belong to the teacher's school
-            //TODO check if students belong to another class
+            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames);
             Class existingClass = await _classesRepository.GetByIdAsync(id)
                 ?? throw new EntityNotFoundException($"No class found with ID {id}");
             if (existingClass.TeacherUsername != teacher.Email)
             {
-                throw new UnauthorizedAccessException("Teacher is not allowed to update this class");
+                throw new UnauthorizedAccessException($"Teacher is not allowed to update this class " +
+                    $"because it belongs to another school ({existingClass.School})");
             }
             existingClass.Name = classCreationDTO.Name;
             existingClass.Students = classCreationDTO.StudentUsernames;
             return await _classesRepository.UpdateAsync(existingClass.PrivateId, existingClass);
         }
+
+        private async Task CheckStudentListRequirements(ApplicationUser teacher, List<string> StudentUsernames)
+        {
+            foreach (string studentUsername in StudentUsernames)
+            {
+                ApplicationUser? student = await _userManager.FindByNameAsync(studentUsername)
+                    ?? throw new EntityNotFoundException($"Student {studentUsername} not found in the database");
+                if (student.School != teacher.School)
+                {
+                    throw new UnauthorizedAccessException($"Student {studentUsername} does not belong to teacher's school");
+                }
+                var _class = await GetClassForStuedntByTeacher(teacher, studentUsername);
+                if (_class != null)
+                {
+                    throw new InvalidDataException($"Student {studentUsername} is already in a class {_class.Name}");
+                }
+            }
+        }
+
         public async Task DeleteClass(ClaimsPrincipal user, int id)
         {
             ApplicationUser? teacher = await _userService.GetUser(user)
@@ -88,9 +106,33 @@ namespace CodeyBe.Services
         {
             ApplicationUser? teacher = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            return await _classesRepository.GetAllClassesForTeacher(teacher.Email 
+            return await _classesRepository.GetAllClassesForTeacher(teacher.Email
                 ?? throw new MissingFieldException("No teacher email"));
 
+        }
+
+        public async Task<Class?> GetClassForStudentSelf(ClaimsPrincipal userStudent, string studentUsername)
+        {
+            ApplicationUser? student = await _userService.GetUser(userStudent)
+                ?? throw new EntityNotFoundException("Student not found in the database");
+            return await _classesRepository.GetClassForStudent(student);
+        }
+        public async Task<Class?> GetClassForStuedntByTeacher(ClaimsPrincipal userTeacher, string studentUsername)
+        {
+            ApplicationUser? teacher = await _userService.GetUser(userTeacher)
+                ?? throw new EntityNotFoundException("Teacher not found in the database");
+            return await GetClassForStuedntByTeacher(teacher, studentUsername);
+        }
+        public async Task<Class?> GetClassForStuedntByTeacher(ApplicationUser teacher, string studentUsername)
+        {
+            ApplicationUser? student = await _userManager.FindByNameAsync(studentUsername)
+                ?? throw new EntityNotFoundException("Student not found in the database");
+            if (student.School != teacher.School)
+            {
+                throw new UnauthorizedAccessException("Teacher is not allowed to access this student");
+            }
+
+            return await _classesRepository.GetClassForStudent(student);
         }
     }
 }

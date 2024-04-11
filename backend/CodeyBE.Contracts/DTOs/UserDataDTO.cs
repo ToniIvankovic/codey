@@ -15,5 +15,6 @@ namespace CodeyBE.Contracts.DTOs
         public int? NextLessonGroupId { get; set; }
         public required List<string>? Roles { get; set; }
         public required int TotalXP { get; set; }
+        public int? ClassId { get; set; }
     }
 }

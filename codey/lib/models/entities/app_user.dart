@@ -6,6 +6,7 @@ class AppUser {
   final int? nextLessonGroupId;
   final List<String> roles;
   final int totalXp;
+  final int? classId;
 
   AppUser({
     required this.email,
@@ -15,6 +16,7 @@ class AppUser {
     required this.nextLessonGroupId,
     required this.roles,
     required this.totalXp,
+    this.classId,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class AppUser {
       nextLessonGroupId: json['nextLessonGroupId'],
       roles: (json['roles'] as List<dynamic>).map((role) => role.toString()).toList(),
       totalXp: json['totalXP'],
+      classId: json['classId'],
     );
   }
 }

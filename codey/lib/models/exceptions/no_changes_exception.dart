@@ -5,6 +5,6 @@ class NoChangesException implements Exception {
 
   @override
   String toString() {
-    return 'NoChangesException: $message';
+    return message;
   }
 }

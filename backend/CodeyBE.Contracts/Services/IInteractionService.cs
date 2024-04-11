@@ -18,5 +18,8 @@ namespace CodeyBE.Contracts.Services
         public Task<Class> UpdateClass(ClaimsPrincipal user, int id, ClassCreationDTO classCreationDTO);
         public Task DeleteClass(ClaimsPrincipal user, int id);
         public Task<IEnumerable<Class>> GetAllClassesForTeacher(ClaimsPrincipal user);
+        public Task<Class?> GetClassForStudentSelf(ClaimsPrincipal userStudent, string studentUsername);
+        public Task<Class?> GetClassForStuedntByTeacher(ApplicationUser teacher, string studentUsername);
+        public Task<Class?> GetClassForStuedntByTeacher(ClaimsPrincipal userTeacher, string studentUsername);
     }
 }

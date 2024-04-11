@@ -1,4 +1,5 @@
 ﻿using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace CodeyBE.Contracts.Repositories
         public Task<Class> UpdateAsync(int id, Class @class);
         public Task DeleteAsync(int id);
         public Task<IEnumerable<Class>> GetAllClassesForTeacher(string teacherUsername);
+        public Task<Class?> GetClassForStudent(ApplicationUser student);
     }
 }

@@ -62,7 +62,10 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(student.email),
+                            child: student.classId == null
+                                ? Text(student.email)
+                                : Text(
+                                    "${student.email} (already in a class ${student.classId})"),
                           ),
                         ],
                       ),
@@ -94,8 +97,19 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
                       formKey.currentState!.save();
-                      userInteractionService.createClass(className, students);
-                      Navigator.of(context).pop();
+                      userInteractionService
+                          .createClass(className, students)
+                          .then(
+                            (createdClass) =>
+                                Navigator.of(context).pop(createdClass.name),
+                          )
+                          .catchError((error) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(error.toString()),
+                          ),
+                        );
+                      });
                     },
                     child: const Text("Create Class"),
                   ),

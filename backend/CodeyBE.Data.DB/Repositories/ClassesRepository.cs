@@ -1,4 +1,5 @@
 ﻿using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using MongoDB.Bson;
@@ -67,6 +68,17 @@ namespace CodeyBE.Data.DB.Repositories
             return await _collection
                 .Find(@class => @class.TeacherUsername == teacherUsername)
                 .ToListAsync();
+        }
+
+        public async Task<Class?> GetClassForStudent(ApplicationUser student)
+        {
+            if(student.Email == null)
+            {
+                throw new MissingFieldException("Student email is missing");
+            }
+            return await _collection
+                .Find(@class => @class.School == student.School && @class.Students.Contains(student.Email))
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -85,11 +85,22 @@ class ManageClassesScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context)
+                      .push(
                     MaterialPageRoute(
                       builder: (context) => const CreateClassScreen(),
                     ),
-                  );
+                  )
+                      .then((className) {
+                    if (className == null) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Created class $className"),
+                      ),
+                    );
+                  });
                 },
                 child: const Text("Create Class"),
               ),
