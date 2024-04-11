@@ -14,6 +14,7 @@ abstract class UserInteractionService {
   Future<List<Class>> getAllClasses();
   Future<List<AppUser>> queryUsers(String query);
   Future<List<AppUser>> getAllUsers();
+  Future<List<String>> getAllSchools();
 }
 
 class UserInteractionServiceImpl implements UserInteractionService {
@@ -125,5 +126,18 @@ class UserInteractionServiceImpl implements UserInteractionService {
     }
 
     return Class.fromJson(json.decode(response.body));
+  }
+
+  @override
+  Future<List<String>> getAllSchools() async {
+    final response = await http.get(
+      Uri.parse('$_baseEndpoint/schools'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get all schools');
+    }
+
+    return json.decode(response.body).cast<String>();
   }
 }

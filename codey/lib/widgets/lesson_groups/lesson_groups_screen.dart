@@ -32,85 +32,87 @@ class LessonGroupsScreen extends StatelessWidget {
     try {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
-          child: FutureBuilder<List<LessonGroup>>(
-            future: lessonGroupsService.getAllLessonGroups(),
-            // Call the getUser method from AuthService to get the user
-            builder: (BuildContext context,
-                AsyncSnapshot<List<LessonGroup>> snapshot) {
-              // Error handling
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator(
-                  strokeWidth: 5,
-                );
-              } else if (snapshot.hasError) {
-                if (snapshot.error is UnauthenticatedException) {
-                  onLogout();
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
+            child: FutureBuilder<List<LessonGroup>>(
+              future: lessonGroupsService.getAllLessonGroups(),
+              // Call the getUser method from AuthService to get the user
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<LessonGroup>> snapshot) {
+                // Error handling
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator(
+                    strokeWidth: 5,
+                  );
+                } else if (snapshot.hasError) {
+                  if (snapshot.error is UnauthenticatedException) {
+                    onLogout();
+                  }
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.data == null) {
+                  return const Text('No data');
                 }
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.data == null) {
-                return const Text('No data');
-              }
-
-              // Lesson groups exist, find user
-              List<LessonGroup> lessonGroups = snapshot.data!;
-              return StreamBuilder(
-                  stream: user$,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    // Received data and user exists - form the list of lesson groups
-                    AppUser user = snapshot.data!;
-                    lessonGroupsListItems = lessonGroups
-                        .map<ListItem>(
-                          (item) => ListItem(
-                            lessonGroup: item,
-                            clickable: item.order <=
-                                (lessonGroups
-                                    .where((lessonGroup) =>
-                                        lessonGroup.id ==
-                                        user.nextLessonGroupId)
-                                    .first
-                                    .order),
-                            isExpanded: false,
+        
+                // Lesson groups exist, find user
+                List<LessonGroup> lessonGroups = snapshot.data!;
+                return StreamBuilder(
+                    stream: user$,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const CircularProgressIndicator();
+                      }
+        
+                      // Received data and user exists - form the list of lesson groups
+                      AppUser user = snapshot.data!;
+                      lessonGroupsListItems = lessonGroups
+                          .map<ListItem>(
+                            (item) => ListItem(
+                              lessonGroup: item,
+                              clickable: item.order <=
+                                  (lessonGroups
+                                      .where((lessonGroup) =>
+                                          lessonGroup.id ==
+                                          user.nextLessonGroupId)
+                                      .first
+                                      .order),
+                              isExpanded: false,
+                            ),
+                          )
+                          .toList();
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text(user.email),
+                                Text(
+                                    "Last lesson: ${user.highestLessonId ?? 'Just begun'}"),
+                                Text(
+                                    "Last lesson group: ${user.highestLessonGroupId ?? 'Just begun'}"),
+                                Text("Next lesson: ${user.nextLessonId}"),
+                                Text(
+                                    "Next lesson group: ${user.nextLessonGroupId}"),
+                                Text("Roles: ${user.roles}"),
+                                Text("XP: ${user.totalXp}")
+                              ],
+                            ),
                           ),
-                        )
-                        .toList();
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Text(user.email),
-                              Text(
-                                  "Last lesson: ${user.highestLessonId ?? 'Just begun'}"),
-                              Text(
-                                  "Last lesson group: ${user.highestLessonGroupId ?? 'Just begun'}"),
-                              Text("Next lesson: ${user.nextLessonId}"),
-                              Text(
-                                  "Next lesson group: ${user.nextLessonGroupId}"),
-                              Text("Roles: ${user.roles}"),
-                              Text("XP: ${user.totalXp}")
-                            ],
+                          LessonGroupsListView(data: lessonGroupsListItems),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: ElevatedButton(
+                              onPressed: onLogout,
+                              child: const Text('Logout'),
+                            ),
                           ),
-                        ),
-                        LessonGroupsListView(data: lessonGroupsListItems),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ElevatedButton(
-                            onPressed: onLogout,
-                            child: const Text('Logout'),
-                          ),
-                        ),
-                      ],
-                    );
-                  });
-            },
+                        ],
+                      );
+                    });
+              },
+            ),
           ),
         ),
       );

@@ -145,5 +145,13 @@ namespace CodeyBE.API.Controllers
             return await interactionService.GetAllClassesForTeacher(User);
         }
 
+        [HttpGet("schools", Name = "getAllSchools")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<string>> GetAllSchools()
+        {
+            return await Task.FromResult(new List<string> { "School11", "School22", "School33" });
+        }
+
     }
 }

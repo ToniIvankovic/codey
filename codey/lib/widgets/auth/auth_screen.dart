@@ -33,9 +33,17 @@ class _AuthScreenState extends State<AuthScreen> {
               )
             else
               RegistrationWidget(
-                onRegistration: () => setState(() {
-                  showLogin = true;
-                }),
+                onRegistration: () {
+                  setState(() {
+                    showLogin = true;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Registration successful'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
               ),
             TextButton(
               onPressed: () {

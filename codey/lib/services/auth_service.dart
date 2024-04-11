@@ -10,7 +10,7 @@ abstract class AuthService {
   Future<String?> get token;
   Future<void> login(String username, String password);
   Future<void> logout();
-  Future<void> registerUser(String username, String password);
+  Future<void> registerUser(String username, String password, String school);
 }
 
 class AuthService1 implements AuthService {
@@ -45,10 +45,15 @@ class AuthService1 implements AuthService {
   }
 
   @override
-  Future<void> registerUser(String username, String password) async {
+  Future<void> registerUser(
+      String username, String password, String school) async {
     final response = await http.post(
       _registerEndpoint,
-      body: json.encode({'email': username, 'password': password}),
+      body: json.encode({
+        'email': username,
+        'password': password,
+        'school': school,
+      }),
       headers: {'Content-Type': 'application/json'},
     );
 
