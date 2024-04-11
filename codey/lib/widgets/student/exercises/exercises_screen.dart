@@ -1,7 +1,7 @@
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
-import 'package:codey/widgets/exercises/single_exercise_widget.dart';
+import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

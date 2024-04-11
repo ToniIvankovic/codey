@@ -1,8 +1,8 @@
 // ignore_for_file: file_names
 
 import 'package:codey/models/entities/exercise_LA.dart';
-import 'package:codey/widgets/exercises/exercise_LA_puzzle_widget.dart';
-import 'package:codey/widgets/exercises/exercise_LA_writing_widget.dart';
+import 'package:codey/widgets/student/exercises/exercise_LA_puzzle_widget.dart';
+import 'package:codey/widgets/student/exercises/exercise_LA_writing_widget.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseLAWidget extends StatefulWidget {

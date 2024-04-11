@@ -11,7 +11,7 @@ import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/admin/admin_home_page.dart';
-import 'package:codey/widgets/lesson_groups/lesson_groups_screen.dart';
+import 'package:codey/widgets/student/student_home_screen.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/auth/auth_screen.dart';
 import 'package:codey/widgets/teacher/teacher_home_page.dart';
@@ -170,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               }
               if (user.roles.contains("STUDENT")) {
-                return LessonGroupsScreen(
+                return StudentHomeScreen(
                   onLogoutSuper: onLogout,
                 );
               }

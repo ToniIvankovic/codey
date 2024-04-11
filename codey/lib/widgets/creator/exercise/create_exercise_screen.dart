@@ -9,7 +9,7 @@ import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_LA_component.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_SCW_component.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
-import 'package:codey/widgets/exercises/single_exercise_widget.dart';
+import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -1,6 +1,9 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson_group.dart';
-import 'package:codey/widgets/lessons/lessons_screen.dart';
+import 'package:codey/services/lesson_groups_service.dart';
+import 'package:codey/widgets/student/lessons/lessons_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ListItem {
   ListItem({
@@ -15,11 +18,11 @@ class ListItem {
 }
 
 class LessonGroupsListView extends StatefulWidget {
-  final List<ListItem> data;
+  final AppUser user;
 
   const LessonGroupsListView({
     Key? key,
-    required this.data,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -27,26 +30,50 @@ class LessonGroupsListView extends StatefulWidget {
 }
 
 class _LessonGroupsListViewState extends State<LessonGroupsListView> {
-  late final List<ListItem> data;
+  List<ListItem>? data;
   @override
   void initState() {
     super.initState();
-    data = widget.data; // Initialize data from the parent widget
   }
 
   @override
   Widget build(BuildContext context) {
+    var lessonGroupsService = context.read<LessonGroupsService>();
+    if (data == null) {
+      lessonGroupsService.getAllLessonGroups().then((value) {
+        List<LessonGroup> lessonGroups = value;
+        setState(() {
+          data = lessonGroups
+              .map<ListItem>(
+                (item) => ListItem(
+                  lessonGroup: item,
+                  clickable: item.order <=
+                      (lessonGroups
+                          .where((lessonGroup) =>
+                              lessonGroup.id == widget.user.nextLessonGroupId)
+                          .first
+                          .order),
+                  isExpanded: false,
+                ),
+              )
+              .toList();
+        });
+      });
+      return const CircularProgressIndicator(
+        strokeWidth: 5,
+      );
+    }
     return SingleChildScrollView(
       child: ExpansionPanelList(
         expansionCallback: (int index, bool isExpanded) {
           setState(() {
             // Set the current panel, close all others
-            for (int i = 0; i < data.length; i++) {
-              data[i].isExpanded = (i == index) ? isExpanded : false;
+            for (int i = 0; i < data!.length; i++) {
+              data![i].isExpanded = (i == index) ? isExpanded : false;
             }
           });
         },
-        children: data.map<ExpansionPanel>((ListItem item) {
+        children: data!.map<ExpansionPanel>((ListItem item) {
           return ExpansionPanel(
             isExpanded: item.isExpanded,
             canTapOnHeader: item.clickable,
