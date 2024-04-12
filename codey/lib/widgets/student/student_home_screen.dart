@@ -33,14 +33,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           title: const Text('Student Home'),
           actions: [
             if (userForProfile != null)
-              IconButton(
-                icon: const Icon(Icons.person),
-                onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentProfileScreen(
-                              user: userForProfile!,
-                            ))),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(userForProfile!.email),
+              ),
+            if (userForProfile != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: IconButton(
+                  icon: const Icon(Icons.person),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentProfileScreen(
+                                user: userForProfile!,
+                              ))),
+                ),
               ),
             //profile
             IconButton(
@@ -49,47 +57,40 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             ),
           ],
         ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
-            child: StreamBuilder(
-              stream: user$,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                }
-                AppUser user = snapshot.data!;
-                //cannot call setState in build method
-                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  setState(() {
-                    userForProfile = snapshot.data!;
-                  });
-                });
+        body: StreamBuilder(
+          stream: user$,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const CircularProgressIndicator();
+            }
+            AppUser user = snapshot.data!;
+            //cannot call setState in build method
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              setState(() {
+                userForProfile = snapshot.data!;
+              });
+            });
 
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(user.email),
+                          Expanded(child: LessonGroupsListView(user: user)),
                         ],
                       ),
                     ),
-                    LessonGroupsListView(user: user),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton(
-                        onPressed: widget.onLogoutSuper,
-                        child: const Text('Logout'),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       );
     } on UnauthenticatedException catch (e) {
