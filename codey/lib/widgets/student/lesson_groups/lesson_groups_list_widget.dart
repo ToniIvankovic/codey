@@ -77,7 +77,9 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
             for (var group in data!) ...[
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: paddingHorizontal, vertical: paddingVertical),
+                  horizontal: paddingHorizontal,
+                  vertical: paddingVertical,
+                ),
                 child: Container(
                   constraints: BoxConstraints(
                       minWidth: tileSize,
@@ -95,17 +97,13 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                     onPressed: group.clickable
                         ? () => setState(() {
                               group.isExpanded = !group.isExpanded;
+                              for (var otherGroup in data!) {
+                                if (otherGroup.lessonGroup.id !=
+                                    group.lessonGroup.id) {
+                                  otherGroup.isExpanded = false;
+                                }
+                              }
                             })
-                        // () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => LessonsScreen(
-                        //           lessonGroup: group.lessonGroup,
-                        //         ),
-                        //       ),
-                        //     );
-                        //   }
                         : null,
                     child: Text(
                       group.lessonGroup.name,
@@ -122,77 +120,13 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
           Positioned(
             top: 10 +
                 (i + 1) * (tileSize + 2 * paddingVertical) -
-                paddingVertical, // adjust this value to position the cloud widget
-            child: Visibility(
-              maintainState: true,
-              maintainAnimation: true,
-              visible: data![i].isExpanded,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 100),
-                opacity: data![i].isExpanded ? 1.0 : 0.0,
-                child: Container(
-                  width: 2.5 * tileSize,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.7),
-                        spreadRadius: 3,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: Text(
-                            data![i].lessonGroup.name,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LessonsScreen(
-                                      lessonGroup: data![i].lessonGroup,
-                                    ),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.lightbulb),
-                              label: const Text('Learn'),
-                            ),
-                            IconButton.filled(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LessonsScreen(
-                                      lessonGroup: data![i].lessonGroup,
-                                    ),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.play_arrow),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                paddingVertical,
+            child: _FloatingWindow(
+              isVisible: () => data![i].isExpanded,
+              onVisibleChange: (newValue) => setState(() {
+                data![i].isExpanded = newValue;
+              }),
+              lessonGroup: data![i].lessonGroup,
             ),
           ),
         ],
@@ -201,54 +135,120 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   }
 }
 
-class HoverButton extends StatefulWidget {
-  const HoverButton({super.key});
+class _FloatingWindow extends StatefulWidget {
+  final bool Function() isVisible;
+  final LessonGroup lessonGroup;
+  final void Function(bool) onVisibleChange;
+
+  const _FloatingWindow({
+    Key? key,
+    required this.isVisible,
+    required this.lessonGroup,
+    required this.onVisibleChange,
+  }) : super(key: key);
 
   @override
-  _HoverButtonState createState() => _HoverButtonState();
+  State<_FloatingWindow> createState() => _FloatingWindowState();
 }
 
-class _HoverButtonState extends State<HoverButton> {
-  bool _isHovering = false;
+class _FloatingWindowState extends State<_FloatingWindow> {
+
+  set isVisible(bool newValue) {
+    widget.onVisibleChange(newValue);
+  }
+
+  bool get isVisible => widget.isVisible();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              _isHovering = !_isHovering;
-            });
-          },
-          child: Text('Show cloud'),
-        ),
-        if (_isHovering)
-          Positioned(
-            top: 10, // adjust this value to position the cloud widget
-            child: Visibility(
-              visible: _isHovering,
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 100),
+    return Visibility(
+      maintainState: true,
+      maintainAnimation: true,
+      visible: isVisible,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 100),
+        opacity: isVisible ? 1.0 : 0.0,
+        child: Container(
+          width: 2.5 * 125.0,
+          height: 150,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.7),
+                spreadRadius: 3,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                        widget.lessonGroup.name,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LessonsScreen(
+                                  lessonGroup: widget.lessonGroup,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.lightbulb),
+                          label: const Text('Learn'),
+                        ),
+                        IconButton.filled(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LessonsScreen(
+                                  lessonGroup: widget.lessonGroup,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.play_arrow),
+                        ),
+                      ],
+                    )
                   ],
                 ),
-                child: Center(child: Text('This is a cloud')),
               ),
-            ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: IconButton(
+                  onPressed: () => isVisible = false,
+                  icon: const Icon(Icons.clear),
+                ),
+              ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 }
+

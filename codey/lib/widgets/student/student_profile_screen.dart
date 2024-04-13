@@ -43,6 +43,11 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
               for (var i = 0; i < leaderboard!.students.length; i++)
                 Text(
                     "${i + 1}. ${leaderboard!.students[i].email} ${leaderboard!.students[i].totalXp}"),
+            if(leaderboard == null)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
           ],
         ),
       ),
