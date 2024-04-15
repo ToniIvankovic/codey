@@ -29,7 +29,7 @@ namespace CodeyBE.Contracts.Entities.Logs
             LessonId = report.LessonId;
             CorrectAnswers = report.CorrectAnswers;
             TotalAnswers = report.TotalAnswers;
-            Duration = report.Duration;
+            Duration = report.DurationMiliseconds;
             Accuracy = report.Accuracy;
         }
     }

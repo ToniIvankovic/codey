@@ -6,6 +6,7 @@ using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace CodeyBE.API.Controllers
@@ -113,8 +114,13 @@ namespace CodeyBE.API.Controllers
         {
             var dto = UserDataDTO.FromUser(applicationUser);
             dto.ClassId = (await interactionService.GetClassForStuedntByTeacher(User, applicationUser.UserName!))?.PrivateId;
+            if (dto.DailyQuests.IsNullOrEmpty())
+            {
+                dto.DailyQuests = await userService.GenerateDailyQuestsForUser(applicationUser);
+            }
             return dto;
         }
+
 
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/creator", Name = "registerCreator")]

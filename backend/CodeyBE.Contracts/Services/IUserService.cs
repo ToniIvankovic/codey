@@ -19,5 +19,6 @@ namespace CodeyBE.Contracts.Services
         public Task<JWTTokenDTO> LoginUser(UserRegistrationInternalDTO user);
         public Task<ApplicationUser?> GetUser(ClaimsPrincipal user);
         public Task<ApplicationUser> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);
+        public Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser);
     }
 }

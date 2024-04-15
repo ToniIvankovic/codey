@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.Entities.Users;
+﻿using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace CodeyBE.Contracts.DTOs
         public bool? DidLessonToday { get; set; }
         public bool? JustUpdatedStreak { get; set; }
         public required int? HighestStreak { get; set; }
+        public ISet<Quest>? DailyQuests { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -42,7 +44,12 @@ namespace CodeyBE.Contracts.DTOs
                         .Select(u => u.Key.Date)
                         .Where(date => date == DateTime.Now.Date)
                         .Count() == 1,
-                DidLessonToday = CalculateDidLessonToday(user)
+                DidLessonToday = CalculateDidLessonToday(user),
+                DailyQuests = user.Quests
+                    ?.Where(q => q.Key == DateOnly.FromDateTime(DateTime.Now))
+                    .SelectMany(q => q.Value)
+                    .ToHashSet()
+                    ?? [],
             };
         }
 

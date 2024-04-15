@@ -18,7 +18,7 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("totalAnswers")]
         public int TotalAnswers { get; set; }
         [BsonElement("duration")]
-        public int Duration { get; set; }
+        public int DurationMiliseconds { get; set; }
         [BsonElement("accuracy")]
         public double Accuracy { get; set; }
     }
