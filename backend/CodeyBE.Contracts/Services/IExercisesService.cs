@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Enumerations;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,10 +22,10 @@ namespace CodeyBE.Contracts.Services
         {
             return exercise.Type switch
             {
-                "MC" => new ExerciseMC_DTO((ExerciseMC) exercise),
-                "SA" => new ExerciseSA_DTO((ExerciseSA) exercise),
-                "LA" => new ExerciseLA_DTO((ExerciseLA) exercise),
-                "SCW" => new ExerciseSCW_DTO((ExerciseSCW) exercise),
+                ExerciseTypes.MULTIPLE_CHOICE => new ExerciseMC_DTO((ExerciseMC)exercise),
+                ExerciseTypes.SHORT_ANSWER => new ExerciseSA_DTO((ExerciseSA)exercise),
+                ExerciseTypes.LONG_ANSWER => new ExerciseLA_DTO((ExerciseLA)exercise),
+                ExerciseTypes.SHORT_CODE_WRITING => new ExerciseSCW_DTO((ExerciseSCW)exercise),
                 _ => new ExerciseDTO(exercise),
             };
         }

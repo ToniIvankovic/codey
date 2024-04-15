@@ -1,4 +1,5 @@
 ﻿using CodeyBE.Contracts.DTOs;
+using CodeyBE.Contracts.Enumerations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -99,7 +100,7 @@ namespace CodeyBE.Contracts.Entities
     {
         public ExerciseLA(Exercise ex) : base(ex)
         {
-            if (ex.Type != "LA")
+            if (ex.Type != ExerciseTypes.LONG_ANSWER)
             {
                 throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
             }
@@ -116,7 +117,7 @@ namespace CodeyBE.Contracts.Entities
     {
         public ExerciseMC(Exercise ex) : base(ex)
         {
-            if (ex.Type != "MC")
+            if (ex.Type != ExerciseTypes.MULTIPLE_CHOICE)
             {
                 throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
             }
@@ -138,7 +139,7 @@ namespace CodeyBE.Contracts.Entities
     {
         public ExerciseSA(Exercise ex) : base(ex)
         {
-            if (ex.Type != "SA")
+            if (ex.Type != ExerciseTypes.SHORT_ANSWER)
             {
                 throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
             }
@@ -157,7 +158,7 @@ namespace CodeyBE.Contracts.Entities
 
         public ExerciseSCW(Exercise ex) : base(ex)
         {
-            if (ex.Type != "SCW")
+            if (ex.Type != ExerciseTypes.SHORT_CODE_WRITING)
             {
                 throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
             }

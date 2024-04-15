@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,10 @@ namespace CodeyBE.Contracts.Repositories
         {
             return exercise.Type switch
             {
-                "MC" => new ExerciseMC(exercise),
-                "SA" => new ExerciseSA(exercise),
-                "LA" => new ExerciseLA(exercise),
-                "SCW" => new ExerciseSCW(exercise),
+                ExerciseTypes.MULTIPLE_CHOICE => new ExerciseMC(exercise),
+                ExerciseTypes.SHORT_ANSWER => new ExerciseSA(exercise),
+                ExerciseTypes.LONG_ANSWER => new ExerciseLA(exercise),
+                ExerciseTypes.SHORT_CODE_WRITING => new ExerciseSCW(exercise),
                 _ => new Exercise(exercise),
             };
         }
