@@ -111,7 +111,7 @@ namespace CodeyBe.Services
 
         public async Task<ApplicationUser> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport)
         {
-            int XP_SOLVED_OLD = 30;
+            int XP_SOLVED_OLD = 40;
             int XP_SOLVED_NEW = 100;
             logsService.EndOfLesson(user, lessonReport);
             ApplicationUser? applicationUser = await GetUser(user) ??
@@ -159,14 +159,13 @@ namespace CodeyBe.Services
                 }
                 //TODO: Handle end of course
                 catch (EntityNotFoundException) { }
-                applicationUser.TotalXP += XP_SOLVED_NEW;
                 applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, XP_SOLVED_NEW));
             }
             else
             {
-                applicationUser.TotalXP += XP_SOLVED_OLD;
                 applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, XP_SOLVED_OLD));
             }
+            applicationUser.TotalXP = ApplicationUser.CalculateTotalXP(applicationUser);
             _userManager.UpdateAsync(applicationUser).Wait();
             return applicationUser;
         }

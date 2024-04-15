@@ -18,6 +18,10 @@ namespace CodeyBE.Contracts.DTOs
         public required int TotalXP { get; set; }
         public required List<KeyValuePair<DateTime, int>> XPachieved { get; set; }
         public int? ClassId { get; set; }
+        public int? CurrentStreak { get; set; }
+        public bool? DidLessonToday { get; set; }
+        public bool? JustUpdatedStreak { get; set; }
+        public required int? HighestStreak { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -29,9 +33,74 @@ namespace CodeyBE.Contracts.DTOs
                 NextLessonId = user.NextLessonId,
                 NextLessonGroupId = user.NextLessonGroupId,
                 Roles = user.Roles,
-                TotalXP = user.TotalXP,
+                TotalXP = ApplicationUser.CalculateTotalXP(user), //TODO: ApplicationUser field totalXP not used
                 XPachieved = user.XPachieved,
+                HighestStreak = CalculateHighestStreak(user),
+                CurrentStreak = CalculateStreak(user),
+                JustUpdatedStreak = CalculateDidLessonToday(user)
+                    && user.XPachieved
+                        .Select(u => u.Key.Date)
+                        .Where(date => date == DateTime.Now.Date)
+                        .Count() == 1,
+                DidLessonToday = CalculateDidLessonToday(user)
             };
+        }
+
+        public static int CalculateStreak(ApplicationUser user)
+        {
+            var today = DateTime.Now.Date;
+            var streak = 0;
+            var datesSet = user.XPachieved
+                .Where(entry => entry.Value > 0)
+                .Select(entry => entry.Key.Date)
+                .ToHashSet();
+            if (!datesSet.Contains(today))
+            {
+                today = today.AddDays(-1);
+            }
+            while (datesSet.Contains(today))
+            {
+                streak++;
+                today = today.AddDays(-1);
+            }
+            return streak;
+        }
+
+
+        public static bool CalculateDidLessonToday(ApplicationUser user)
+        {
+            return user.XPachieved.Any(x => x.Key.Date == DateTime.Now.Date);
+        }
+
+        public static int CalculateHighestStreak(ApplicationUser user)
+        {
+            var highestStreak = 0;
+            var currentStreak = 0;
+            var sortedXP = user.XPachieved.OrderByDescending(x => x.Key).ToList();
+            for (int i = 0; i < sortedXP.Count; i++)
+            {
+                if (sortedXP[i].Value > 0)
+                {
+                    currentStreak++;
+                    while (i < sortedXP.Count - 1 && sortedXP[i].Key.Date == sortedXP[i + 1].Key.Date)
+                    {
+                        i++;
+                    }
+                }
+                else
+                {
+                    if (currentStreak > highestStreak)
+                    {
+                        highestStreak = currentStreak;
+                    }
+                    currentStreak = 0;
+                }
+            }
+            if (currentStreak > highestStreak)
+            {
+                highestStreak = currentStreak;
+            }
+            return highestStreak;
         }
     }
 }

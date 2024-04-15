@@ -16,5 +16,10 @@ namespace CodeyBE.Contracts.Entities.Users
         public int TotalXP { get; set; }
         public List<KeyValuePair<DateTime, int>> XPachieved { get; set; } = [];
         public string? School { get; set; }
+
+        public static int CalculateTotalXP(ApplicationUser user)
+        {
+            return user.XPachieved.Sum(x => x.Value);
+        }
     }
 }
