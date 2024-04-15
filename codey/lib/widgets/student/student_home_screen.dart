@@ -32,12 +32,32 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         appBar: AppBar(
           title: const Text('Student Home'),
           actions: [
-            if (userForProfile != null)
+            if (userForProfile != null) ...[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    //fire emoji
+                    Icon(
+                      Icons.whatshot,
+                      color: userForProfile!.didLessonToday
+                          ? Colors.red
+                          : Colors.grey,
+                    ),
+                    Text(
+                      userForProfile!.streak.toString(),
+                      style: TextStyle(
+                          color: userForProfile!.didLessonToday
+                              ? Colors.red
+                              : Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(userForProfile!.email),
               ),
-            if (userForProfile != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: IconButton(
@@ -50,6 +70,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                               ))),
                 ),
               ),
+            ],
             //profile
             IconButton(
               icon: const Icon(Icons.logout),
@@ -65,11 +86,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             }
             AppUser user = snapshot.data!;
             //cannot call setState in build method
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              setState(() {
-                userForProfile = snapshot.data!;
+            if (userForProfile != user) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                setState(() {
+                  userForProfile = snapshot.data!;
+                });
               });
-            });
+            }
 
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +105,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(child: LessonGroupsListView(user: user)),
+                          Expanded(
+                            child: LessonGroupsListView(
+                              key: ValueKey(user),
+                              user: user,
+                            ),
+                          ),
                         ],
                       ),
                     ),

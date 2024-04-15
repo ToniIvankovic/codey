@@ -31,10 +31,6 @@ class LessonGroupsListView extends StatefulWidget {
 
 class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   List<ListItem>? data;
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

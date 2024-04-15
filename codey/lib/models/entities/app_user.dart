@@ -1,3 +1,5 @@
+import 'package:codey/models/entities/quest.dart';
+
 class AppUser {
   final String email;
   final int? highestLessonId;
@@ -7,6 +9,11 @@ class AppUser {
   final List<String> roles;
   final int totalXp;
   final int? classId;
+  final Set<Quest> quests;
+  final int streak;
+  final bool didLessonToday;
+  final bool justUpdatedStreak;
+  final int highestStreak;
 
   AppUser({
     required this.email,
@@ -17,6 +24,11 @@ class AppUser {
     required this.roles,
     required this.totalXp,
     this.classId,
+    required this.quests,
+    required this.streak,
+    required this.didLessonToday,
+    required this.justUpdatedStreak,
+    required this.highestStreak,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -29,6 +41,11 @@ class AppUser {
       roles: (json['roles'] as List<dynamic>).map((role) => role.toString()).toList(),
       totalXp: json['totalXP'],
       classId: json['classId'],
+      quests: (json['dailyQuests'] as List<dynamic>).map((quest) => Quest.fromJson(quest)).toSet(),
+      streak: json['currentStreak'],
+      didLessonToday: json['didLessonToday'],
+      justUpdatedStreak: json['justUpdatedStreak'],
+      highestStreak: json['highestStreak'],
     );
   }
 }
