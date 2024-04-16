@@ -17,6 +17,7 @@ namespace CodeyBE.Contracts.Entities.Users
         public List<KeyValuePair<DateTime, int>> XPachieved { get; set; } = [];
         public string? School { get; set; }
         public List<KeyValuePair<DateOnly, ISet<Quest>>>? Quests { get; set; } = [];
+        public double Score { get; set; } = 1;
 
         public static int CalculateTotalXP(ApplicationUser user)
         {

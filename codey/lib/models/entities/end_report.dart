@@ -5,9 +5,17 @@ class EndReport {
   int totalAnswers;
   int totalExercises;
   final DateTime _startTime = DateTime.now();
+  late final List<MapEntry<int, bool>>? answersReport;
 
-  EndReport(this.lessonId, this.lessonGroupId, this.correctAnswers, this.totalAnswers,
-      this.totalExercises);
+  EndReport({
+    required this.lessonId,
+    required this.lessonGroupId,
+    required this.correctAnswers,
+    required this.totalAnswers,
+    required this.totalExercises,
+  }) {
+    answersReport = [];
+  }
 
   double get accuracy => correctAnswers / totalAnswers;
   Duration get duration => DateTime.now().difference(_startTime);
@@ -21,6 +29,11 @@ class EndReport {
       'totalExercises': totalExercises,
       'accuracy': accuracy,
       'duration': duration.inMilliseconds,
+      //convert to list<keyValuePair<int, bool>>
+      'answersReport': answersReport!.map((entry) => {
+            'key': entry.key,
+            'value': entry.value,
+          }).toList(),
     };
   }
 }

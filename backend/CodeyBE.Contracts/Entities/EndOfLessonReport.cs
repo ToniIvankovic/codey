@@ -13,6 +13,7 @@ namespace CodeyBE.Contracts.Entities
         public int LessonId { get; set; }
         [BsonElement("lessonGroupId")]
         public int LessonGroupId { get; set; }
+        //TODO: calculate the data on the backend
         [BsonElement("correctAnswers")]
         public int CorrectAnswers { get; set; }
         [BsonElement("totalAnswers")]
@@ -21,5 +22,7 @@ namespace CodeyBE.Contracts.Entities
         public int DurationMiliseconds { get; set; }
         [BsonElement("accuracy")]
         public double Accuracy { get; set; }
+        [BsonElement("answersReport")]
+        public required List<KeyValuePair<int, bool>> AnswersReport { get; set; }
     }
 }

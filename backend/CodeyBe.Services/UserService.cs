@@ -19,6 +19,7 @@ namespace CodeyBe.Services
     public class UserService(UserManager<ApplicationUser> userManager,
         ITokenGeneratorService tokenGenerator,
         ILessonsService lessonsService,
+        IExercisesService exercisesService,
         ILogsService logsService,
         ILessonGroupsService lessonGroupsService) : IUserService
     {
@@ -134,6 +135,21 @@ namespace CodeyBe.Services
             {
                 awardedXP = XP_SOLVED_OLD;
             }
+
+            double userScore = applicationUser.Score;
+            for (int i = 0; i < lessonReport.AnswersReport.Count; i++)
+            {
+                int exerciseId = lessonReport.AnswersReport[i].Key;
+                bool correct = lessonReport.AnswersReport[i].Value;
+                var exercise = await exercisesService.GetExerciseByIDAsync(lessonReport.AnswersReport[i].Key)
+                    ?? throw new EntityNotFoundException($"Exercise with id {exerciseId} not found");
+                bool isRepeatedExercise = lessonReport.AnswersReport
+                    .Select(pair => pair.Key)
+                    .Select(id => id == exerciseId)
+                    .Count() > 1;
+                userScore = AdjustUserScore(applicationUser.Score, exercise, lessonReport.AnswersReport[i].Value, isRepeatedExercise);
+            }
+            applicationUser.Score = userScore;
 
             applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, awardedXP));
             await HandleQuestProgress(lessonReport, applicationUser, awardedXP, completedLessonGroup);
@@ -339,6 +355,29 @@ namespace CodeyBe.Services
             }
             applicationUser.NextLessonGroupId = lessonGroupId;
             await UpdateUser(applicationUser);
+        }
+
+        private static double AdjustUserScore(double userScore, Exercise exercise, bool correct, bool repeated)
+        {
+            const double POSITIVE_LEARNING_RATE = 0.05;
+            const double NEGATIVE_LEARNING_RATE = 0.05;
+            double exerciseScore = exercise.Difficulty;
+            if (correct && exerciseScore > userScore)
+            {
+                if (repeated)
+                {
+                    userScore += (exerciseScore - userScore) * POSITIVE_LEARNING_RATE / 2;
+                }
+                else
+                {
+                    userScore += (exerciseScore - userScore) * POSITIVE_LEARNING_RATE;
+                }
+            }
+            else if (!correct && exerciseScore < userScore)
+            {
+                userScore -= (userScore - exerciseScore) * NEGATIVE_LEARNING_RATE;
+            }
+            return userScore;
         }
     }
 }

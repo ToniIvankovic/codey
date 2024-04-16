@@ -59,9 +59,16 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  Future<void> startSessionForLesson(Lesson lesson, LessonGroup lessonGroup) async {
+  Future<void> startSessionForLesson(
+      Lesson lesson, LessonGroup lessonGroup) async {
     _sessionExercises = await getAllExercisesForLesson(lesson);
-    _endReport = EndReport(lesson.id, lessonGroup.id, 0, 0, _sessionExercises!.length);
+    _endReport = EndReport(
+      lessonId: lesson.id,
+      lessonGroupId: lessonGroup.id,
+      correctAnswers: 0,
+      totalAnswers: 0,
+      totalExercises: _sessionExercises!.length,
+    );
   }
 
   @override
@@ -112,6 +119,7 @@ class ExercisesServiceV1 implements ExercisesService {
       // TODO: indicate that the exercise is repeated
       _sessionExercises!.add(exercise);
     }
+    _endReport!.answersReport!.add(MapEntry(exercise.id, correct));
     return correct;
   }
 
@@ -179,7 +187,13 @@ class ExercisesServiceV1 implements ExercisesService {
   @override
   Future<void> startMockExerciseSession(Exercise exercise) async {
     _sessionExercises = [exercise];
-    _endReport = EndReport(0, 0, 0, 0, 1);
+    _endReport = EndReport(
+      lessonId: 0,
+      lessonGroupId: 0,
+      correctAnswers: 0,
+      totalAnswers: 0,
+      totalExercises: 1,
+    );
     _isMockInProgress = true;
   }
 

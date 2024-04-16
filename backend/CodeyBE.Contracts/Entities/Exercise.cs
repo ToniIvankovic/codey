@@ -18,7 +18,7 @@ namespace CodeyBE.Contracts.Entities
         public string Type { get; set; }
 
         [BsonElement("difficulty")]
-        public int Difficulty { get; set; }
+        public double Difficulty { get; set; }
 
         [BsonElement("statement")]
         [BsonIgnoreIfNull]

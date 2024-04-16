@@ -24,6 +24,7 @@ namespace CodeyBE.Contracts.DTOs
         public bool? JustUpdatedStreak { get; set; }
         public required int? HighestStreak { get; set; }
         public ISet<Quest>? DailyQuests { get; set; }
+        public required double Score { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -50,6 +51,7 @@ namespace CodeyBE.Contracts.DTOs
                     .SelectMany(q => q.Value)
                     .ToHashSet()
                     ?? [],
+                Score = user.Score
             };
         }
 
