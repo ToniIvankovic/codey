@@ -15,6 +15,7 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("name")]
         public string Name { get; set; } = string.Empty;
         [BsonElement("tips")]
+        [BsonIgnoreIfNull]
         public string? Tips { get; set; }
         [BsonElement("id")]
         public int PrivateId { get; set; }
@@ -22,6 +23,12 @@ namespace CodeyBE.Contracts.Entities
         public int Order { get; set; }
         [BsonElement("lessons")]
         public List<int> LessonIds { get; set; } = [];
+        [BsonElement("adaptive")]
+        [BsonIgnoreIfNull]
+        public bool? Adaptive { get; set; }
+        [BsonElement("recommendedLevel")]
+        [BsonIgnoreIfNull]
+        public double? RecommendedLevel { get; set; }
 
     }
 }

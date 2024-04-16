@@ -20,5 +20,8 @@ namespace CodeyBE.Contracts.Entities
         public int PrivateId { get; set; }
         [BsonElement("specificTips")]
         public string? SpecificTips { get; set; }
+        [BsonElement("adaptive")]
+        [BsonIgnoreIfNull]
+        public bool? Adaptive { get; set; }
     }
 }

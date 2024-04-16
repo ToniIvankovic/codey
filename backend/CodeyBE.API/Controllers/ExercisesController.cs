@@ -13,11 +13,16 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT,CREATOR")]
-    public class ExercisesController(IExercisesService exercisesService, ILogsService loggingService) : ControllerBase
+    public class ExercisesController(
+        IExercisesService exercisesService, 
+        ILogsService loggingService,
+        IUserService userService) : ControllerBase
     {
 
         const string version = "v2";
         private readonly IExercisesService exercisesService = exercisesService;
+        private readonly ILogsService loggingService = loggingService;
+        private readonly IUserService userService = userService;
 
         [Authorize(Roles = "CREATOR")]
         [HttpGet(Name = "getAllExercises")]
@@ -46,6 +51,20 @@ namespace CodeyBE.API.Controllers
             var user = User;
             loggingService.RequestedLesson(user, lessonId);
             return (await exercisesService.GetExercisesForLessonAsync(lessonId))
+                .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
+                .ToList<object>();
+        }
+
+        [Authorize(Roles = "STUDENT")]
+        [HttpGet("lesson/adaptive", Name = "getExercisesForAdaptiveLesson")]
+        [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<object>> GetExercisesForAdaptiveLesson(int lessonId)
+        {
+            var user = User;
+            loggingService.RequestedLesson(user, lessonId);
+            var appUser = await userService.GetUser(user) 
+                ?? throw new EntityNotFoundException("User not found");
+            return (await exercisesService.GetExercisesForAdaptiveLessonAsync(appUser))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }

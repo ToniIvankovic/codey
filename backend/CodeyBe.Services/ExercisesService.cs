@@ -1,9 +1,12 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -11,10 +14,14 @@ using System.Text.RegularExpressions;
 
 namespace CodeyBe.Services
 {
-    public partial class ExercisesService(IExercisesRepository exercisesRepository, ILessonsService lessonsService) : IExercisesService
+    public partial class ExercisesService(
+        IExercisesRepository exercisesRepository,
+        ILessonsService lessonsService,
+        ILessonGroupsService lessonGroupsService) : IExercisesService
     {
         private readonly IExercisesRepository _exercisesRepository = exercisesRepository;
         private readonly ILessonsService _lessonsService = lessonsService;
+        private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
 
         public async Task<IEnumerable<Exercise>> GetAllExercisesAsync()
         {
@@ -94,15 +101,83 @@ namespace CodeyBe.Services
 
         public async Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId)
         {
-            Lesson? lesson = await _lessonsService.GetLessonByIDAsync(lessonId);
-            if (lesson == null)
-            {
-                return new List<Exercise>();
-            }
+            Lesson lesson = await _lessonsService.GetLessonByIDAsync(lessonId)
+                ?? throw new EntityNotFoundException($"No lesson found with id {lessonId}");
             IEnumerable<int> exerciseIDs = lesson.Exercises;
             IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs);
             exercises = EnrichExercisesList(exercises);
             return exercises;
+        }
+
+        public async Task<IEnumerable<Exercise>> GetExercisesForAdaptiveLessonAsync(ApplicationUser user)
+        {
+            const int N_EXERCISES = 15;
+            const double RATIO_EASIER = 0.3;
+            int highestLessonGroup = (int)user.HighestLessonGroupId!;
+            LessonGroup lessonGroup = await _lessonGroupsService.GetLessonGroupByIDAsync(highestLessonGroup)
+                ?? throw new EntityNotFoundException($"No lesson group found with id {highestLessonGroup}");
+            List<LessonGroup> eligibleLessonGroups = [
+                .. (await _lessonGroupsService.GetAllLessonGroupsAsync())
+                                .Where(lgr => lgr.Order <= lessonGroup.Order)
+                                .OrderBy(lgr => lgr.Order)
+,
+            ];
+            List<Lesson> eligibleLessons = [
+                .. await Task.WhenAll(
+                    eligibleLessonGroups
+                        .SelectMany(lg => lg.LessonIds)
+                        .Select(lessonId => _lessonsService.GetLessonByIDAsync(lessonId))
+                        .ToList()
+                )
+            ];
+            List<Exercise> eligibleExercises = [
+                .. await Task.WhenAll(
+                    eligibleLessons
+                        .SelectMany(lesson => lesson.Exercises)
+                        .Select(exerciseId => _exercisesRepository.GetByIdAsync(exerciseId))
+                        .ToList()
+                )
+            ];
+            List<Exercise> easierExercises = eligibleExercises
+                .Where(exercise => exercise.Difficulty < user.Score)
+                .ToList();
+            List<Exercise> harderExercises = eligibleExercises
+                .Where(exercise => exercise.Difficulty > user.Score)
+                .ToList();
+            int nEasier = (int)(N_EXERCISES * RATIO_EASIER);
+            int nHarder = N_EXERCISES - nEasier;
+            List<Exercise> selectedExercises = [
+                .. PickNExercisesRouletteWheel(easierExercises, nEasier, user.Score),
+                .. PickNExercisesRouletteWheel(harderExercises, nHarder, user.Score)
+            ];
+            return selectedExercises.OrderBy(ex => ex.Difficulty);
+        }
+
+        private static List<Exercise> PickNExercisesRouletteWheel(List<Exercise> exercises, int n, double userScore)
+        {
+            double sumDistances = (double)exercises
+                .Select(exercise => 1 / Math.Abs(exercise.Difficulty - userScore))
+                .Sum();
+            List<double> probabilities = exercises
+                .Select(exercise => (1 / Math.Abs(exercise.Difficulty - userScore)) / sumDistances)
+                .ToList();
+            List<Exercise> selectedExercises = [];
+            for (int i = 0; i < n; i++)
+            {
+                double random = new Random().NextDouble();
+                double cumulativeProbability = 0;
+                for (int j = 0; j < exercises.Count; j++)
+                {
+                    cumulativeProbability += probabilities[j];
+                    if (random <= cumulativeProbability)
+                    {
+                        selectedExercises.Add(exercises[j]);
+                        exercises.RemoveAt(j);
+                        break;
+                    }
+                }
+            }
+            return selectedExercises;
         }
 
         private IEnumerable<Exercise> EnrichExercisesList(IEnumerable<Exercise> exercises)
@@ -111,8 +186,8 @@ namespace CodeyBe.Services
              {
                  if (exercise is ExerciseLA exerciseLA)
                  {
-                     if(exerciseLA.AnswerOptions.IsNullOrEmpty() && exerciseLA.CorrectAnswers != null)
-                     GenerateAnswerOptionsForExerciseLA(exerciseLA);
+                     if (exerciseLA.AnswerOptions.IsNullOrEmpty() && exerciseLA.CorrectAnswers != null)
+                         GenerateAnswerOptionsForExerciseLA(exerciseLA);
                  }
                  return exercise;
              });

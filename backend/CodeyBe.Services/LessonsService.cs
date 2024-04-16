@@ -29,10 +29,33 @@ namespace CodeyBe.Services
             {
                 return new List<Lesson>();
             }
+            if (lessonGroup.Adaptive ?? false)
+            {
+                return await Task.FromResult(GetLessonsForAdaptiveLessonGroupAsync(lessonGroup));
+            }
             return (await GetAllLessonsAsync())
                 .Where(lesson => lessonGroup.LessonIds.Contains(lesson.PrivateId))
                 .OrderBy(lesson => lessonGroup.LessonIds.IndexOf(lesson.PrivateId));
         }
+
+        private static List<Lesson> GetLessonsForAdaptiveLessonGroupAsync(LessonGroup lessonGroup)
+        {
+            return [
+                new()
+                {
+                    PrivateId = 99999,
+                    Name = "Adaptive lesson 1",
+                    Adaptive = true,
+                },
+                new()
+                {
+                    PrivateId = 99999,
+                    Name = "Adaptive lesson 2",
+                    Adaptive = true,
+                },
+            ];
+        }
+
         public async Task<int> GetNextLessonIdForLessonId(int lessonId, LessonGroup lessonGroup)
         {
             List<int> lessonsInCurrentGroup = [.. lessonGroup.LessonIds];

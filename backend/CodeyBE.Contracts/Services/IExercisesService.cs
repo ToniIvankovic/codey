@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Enumerations;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -30,8 +31,9 @@ namespace CodeyBE.Contracts.Services
             };
         }
 
-        Task<Exercise> CreateExerciseAsync(ExerciseCreationDTO exercise);
-        Task<Exercise> UpdateExerciseAsync(int id, ExerciseCreationDTO exercise);
-        Task DeleteExerciseAsync(int id);
+        public Task<Exercise> CreateExerciseAsync(ExerciseCreationDTO exercise);
+        public Task<Exercise> UpdateExerciseAsync(int id, ExerciseCreationDTO exercise);
+        public Task DeleteExerciseAsync(int id);
+        public Task<IEnumerable<Exercise>> GetExercisesForAdaptiveLessonAsync(ApplicationUser user);
     }
 }
