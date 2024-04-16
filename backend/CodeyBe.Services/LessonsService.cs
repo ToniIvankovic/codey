@@ -33,7 +33,7 @@ namespace CodeyBe.Services
                 .Where(lesson => lessonGroup.LessonIds.Contains(lesson.PrivateId))
                 .OrderBy(lesson => lessonGroup.LessonIds.IndexOf(lesson.PrivateId));
         }
-        public async Task<int> GetNextLessonForLessonId(int lessonId, LessonGroup lessonGroup)
+        public async Task<int> GetNextLessonIdForLessonId(int lessonId, LessonGroup lessonGroup)
         {
             List<int> lessonsInCurrentGroup = [.. lessonGroup.LessonIds];
             int currentIndex = lessonsInCurrentGroup.IndexOf(lessonId);

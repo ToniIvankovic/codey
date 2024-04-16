@@ -62,5 +62,53 @@ namespace CodeyBE.Contracts.Entities
                 IsCompleted = false
             };
         }
+
+
+        public static int UpdateCompleteLessonGroupQuest(bool completedLessonGroup, Quest quest)
+        {
+            quest.IsCompleted = completedLessonGroup;
+            if (quest.IsCompleted)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int UpdateHighSpeedQuest(int durationMiliseconds, Quest quest)
+        {
+            quest.Progress += (durationMiliseconds / 1000.0 <= quest.Constraint) ? 1 : 0;
+            if (quest.Progress == quest.NLessons)
+            {
+                quest.IsCompleted = true;
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int UpdateHighAccuracyQuest(double accuracy, Quest quest)
+        {
+            quest.Progress += (accuracy >= quest.Constraint / 100.0) ? 1 : 0;
+            if (quest.Progress == quest.NLessons)
+            {
+                quest.IsCompleted = true;
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int UpdateGetXPQuest(int awardedXP, Quest quest)
+        {
+            quest.Progress += awardedXP;
+            if (quest.Progress >= quest.Constraint)
+            {
+                quest.IsCompleted = true;
+                return 1;
+            }
+
+            return 0;
+        }
     }
 }

@@ -122,13 +122,19 @@ namespace CodeyBe.Services
             LessonGroup? reportedLessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync(lessonReport.LessonGroupId)
                 ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
 
-            bool solvedNewLesson = CheckIfSolvedNewLesson(lessonReport, applicationUser, reportedLessonGroup);
+            bool solvedNewLesson = CheckIfSolvedNewLesson(lessonReport.LessonId, (int)applicationUser.NextLessonId!, reportedLessonGroup);
 
             int awardedXP;
             bool completedLessonGroup = false;
             if (solvedNewLesson)
             {
-                completedLessonGroup = await SolvedNewLesson(lessonReport, applicationUser, reportedLessonGroup, completedLessonGroup);
+                await OnSolvedNewLesson(lessonReport.LessonId, applicationUser, reportedLessonGroup);
+                completedLessonGroup = CheckIfCompletedNewLessonGroup(reportedLessonGroup, lessonReport.LessonId);
+                if (completedLessonGroup)
+                {
+                    await OnCompletedNewLessonGroup(applicationUser, reportedLessonGroup);
+                }
+
                 awardedXP = XP_SOLVED_NEW;
             }
             else
@@ -136,73 +142,83 @@ namespace CodeyBe.Services
                 awardedXP = XP_SOLVED_OLD;
             }
 
-            double userScore = applicationUser.Score;
-            for (int i = 0; i < lessonReport.AnswersReport.Count; i++)
-            {
-                int exerciseId = lessonReport.AnswersReport[i].Key;
-                bool correct = lessonReport.AnswersReport[i].Value;
-                var exercise = await exercisesService.GetExerciseByIDAsync(lessonReport.AnswersReport[i].Key)
-                    ?? throw new EntityNotFoundException($"Exercise with id {exerciseId} not found");
-                bool isRepeatedExercise = lessonReport.AnswersReport
-                    .Select(pair => pair.Key)
-                    .Select(id => id == exerciseId)
-                    .Count() > 1;
-                userScore = AdjustUserScore(applicationUser.Score, exercise, lessonReport.AnswersReport[i].Value, isRepeatedExercise);
-            }
-            applicationUser.Score = userScore;
-
             applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, awardedXP));
             await HandleQuestProgress(lessonReport, applicationUser, awardedXP, completedLessonGroup);
 
             applicationUser.TotalXP = ApplicationUser.CalculateTotalXP(applicationUser);
 
+            await UpdateUserScoreFromLessonReport(lessonReport.AnswersReport, applicationUser);
+
             await UpdateUser(applicationUser);
             return applicationUser;
         }
 
-        private static bool CheckIfSolvedNewLesson(EndOfLessonReport lessonReport, ApplicationUser applicationUser, LessonGroup reportedLessonGroup)
+        private async Task UpdateUserScoreFromLessonReport(
+            List<KeyValuePair<int, bool>> answersReport,
+            ApplicationUser applicationUser)
         {
-            int newlySolvedLessonIndex = reportedLessonGroup.LessonIds.IndexOf(lessonReport.LessonId);
+            double userScore = applicationUser.Score;
+            for (int i = 0; i < answersReport.Count; i++)
+            {
+                int exerciseId = answersReport[i].Key;
+                bool correct = answersReport[i].Value;
+                var exercise = await exercisesService.GetExerciseByIDAsync(answersReport[i].Key)
+                    ?? throw new EntityNotFoundException($"Exercise with id {exerciseId} not found");
+                bool isRepeatedExercise = answersReport
+                    .Select(pair => pair.Key)
+                    .Select(id => id == exerciseId)
+                    .Count() > 1;
+                userScore = AdjustUserScore(applicationUser.Score, exercise, answersReport[i].Value, isRepeatedExercise);
+            }
+            applicationUser.Score = userScore;
+        }
+
+        private static bool CheckIfSolvedNewLesson(int lessonId,
+            int nextLessonId,
+            LessonGroup reportedLessonGroup)
+        {
+            int newlySolvedLessonIndex = reportedLessonGroup.LessonIds.IndexOf(lessonId);
             if (newlySolvedLessonIndex == -1)
             {
-                throw new InvalidDataException($"Lesson with id {lessonReport.LessonId} not found in lesson group with id {lessonReport.LessonGroupId}");
+                throw new InvalidDataException($"Lesson with id {lessonId} not found in lesson group with id {reportedLessonGroup.PrivateId}");
             }
-            int realNewLessonIndex = reportedLessonGroup.LessonIds.IndexOf((int)applicationUser.NextLessonId!);
+            int realNewLessonIndex = reportedLessonGroup.LessonIds.IndexOf(nextLessonId);
             bool solvedNewLesson = (newlySolvedLessonIndex == realNewLessonIndex);
             return solvedNewLesson;
         }
 
-        private async Task<bool> SolvedNewLesson(EndOfLessonReport lessonReport,
+        private async Task<bool> OnSolvedNewLesson(
+            int lessonId,
             ApplicationUser applicationUser,
-            LessonGroup reportedLessonGroup,
-            bool completedLessonGroup)
+            LessonGroup reportedLessonGroup)
         {
-            await SetHighestSolvedLesson(applicationUser, lessonReport.LessonId);
+            applicationUser.HighestLessonId = lessonId;
             try
             {
-                int nextLessonId = await lessonsService.GetNextLessonForLessonId(lessonReport.LessonId, reportedLessonGroup);
-                await SetNextLesson(applicationUser, nextLessonId);
-
-                // If this is the last lesson in the lesson group, set the next lesson group
-                if (reportedLessonGroup.LessonIds.IndexOf(lessonReport.LessonId) == reportedLessonGroup.LessonIds.Count - 1)
-                {
-                    completedLessonGroup = await SolvedNewLessonGroup(applicationUser, reportedLessonGroup);
-                }
+                int nextLessonId = await lessonsService.GetNextLessonIdForLessonId(lessonId, reportedLessonGroup);
+                applicationUser.NextLessonId = nextLessonId;
             }
             //TODO: Handle end of course
             catch (EntityNotFoundException) { }
-
-            return completedLessonGroup;
+            return false;
         }
 
-        private async Task<bool> SolvedNewLessonGroup(ApplicationUser applicationUser, LessonGroup reportedLessonGroup)
+        private static bool CheckIfCompletedNewLessonGroup(LessonGroup reportedLessonGroup, int lessonId)
         {
-            bool completedLessonGroup = true;
-            await SetHighestSolvedLessonGroup(applicationUser, reportedLessonGroup.PrivateId);
+            return reportedLessonGroup.LessonIds.IndexOf(lessonId) == reportedLessonGroup.LessonIds.Count - 1;
+        }
+
+        private async Task OnCompletedNewLessonGroup(ApplicationUser applicationUser, LessonGroup reportedLessonGroup)
+        {
+            applicationUser.HighestLessonGroupId = reportedLessonGroup.PrivateId;
 
             int? nextLessonGroupId = (await lessonGroupsService.GetNextLessonGroupForLessonGroupId(reportedLessonGroup.PrivateId))?.PrivateId;
-            await SetNextLessonGroup(applicationUser, nextLessonGroupId);
-            return completedLessonGroup;
+            if (nextLessonGroupId == null)
+            {
+                return;
+            }
+            applicationUser.NextLessonGroupId = nextLessonGroupId;
+            return;
         }
 
         private async Task HandleQuestProgress(EndOfLessonReport lessonReport, ApplicationUser applicationUser, int awardedXP, bool completedLessonGroup)
@@ -237,16 +253,16 @@ namespace CodeyBe.Services
                 switch (quest.Type)
                 {
                     case QuestTypes.GET_XP:
-                        newlyCompleted += UpdateGetXPQuest(awardedXP, quest);
+                        newlyCompleted += Quest.UpdateGetXPQuest(awardedXP, quest);
                         break;
                     case QuestTypes.HIGH_ACCURACY:
-                        newlyCompleted += UpdateHighAccuracyQuest(lessonReport.Accuracy, quest);
+                        newlyCompleted += Quest.UpdateHighAccuracyQuest(lessonReport.Accuracy, quest);
                         break;
                     case QuestTypes.HIGH_SPEED:
-                        newlyCompleted += UpdateHighSpeedQuest(lessonReport.DurationMiliseconds, quest);
+                        newlyCompleted += Quest.UpdateHighSpeedQuest(lessonReport.DurationMiliseconds, quest);
                         break;
                     case QuestTypes.COMPLETE_LESSON_GROUP:
-                        newlyCompleted += UpdateCompleteLessonGroupQuest(completedLessonGroup, quest);
+                        newlyCompleted += Quest.UpdateCompleteLessonGroupQuest(completedLessonGroup, quest);
                         break;
                 }
             }
@@ -254,52 +270,6 @@ namespace CodeyBe.Services
             return newlyCompleted;
         }
 
-        private static int UpdateCompleteLessonGroupQuest(bool completedLessonGroup, Quest quest)
-        {
-            quest.IsCompleted = completedLessonGroup;
-            if (quest.IsCompleted)
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        private static int UpdateHighSpeedQuest(int durationMiliseconds, Quest quest)
-        {
-            quest.Progress += (durationMiliseconds / 1000.0 <= quest.Constraint) ? 1 : 0;
-            if (quest.Progress == quest.NLessons)
-            {
-                quest.IsCompleted = true;
-                return 1;
-            }
-
-            return 0;
-        }
-
-        private static int UpdateHighAccuracyQuest(double accuracy, Quest quest)
-        {
-            quest.Progress += (accuracy >= quest.Constraint / 100.0) ? 1 : 0;
-            if (quest.Progress == quest.NLessons)
-            {
-                quest.IsCompleted = true;
-                return 1;
-            }
-
-            return 0;
-        }
-
-        private static int UpdateGetXPQuest(int awardedXP, Quest quest)
-        {
-            quest.Progress += awardedXP;
-            if (quest.Progress >= quest.Constraint)
-            {
-                quest.IsCompleted = true;
-                return 1;
-            }
-
-            return 0;
-        }
 
         public async Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser)
         {
@@ -330,31 +300,6 @@ namespace CodeyBe.Services
                 throw new InvalidDataException(result.Errors.First().Description);
             }
             return user;
-        }
-
-        private async Task SetHighestSolvedLesson(ApplicationUser applicationUser, int lessonId)
-        {
-            applicationUser.HighestLessonId = lessonId;
-            await UpdateUser(applicationUser);
-        }
-        private async Task SetNextLesson(ApplicationUser applicationUser, int lessonId)
-        {
-            applicationUser.NextLessonId = lessonId;
-            await UpdateUser(applicationUser);
-        }
-        private async Task SetHighestSolvedLessonGroup(ApplicationUser applicationUser, int lessonGroupId)
-        {
-            applicationUser.HighestLessonGroupId = lessonGroupId;
-            await UpdateUser(applicationUser);
-        }
-        private async Task SetNextLessonGroup(ApplicationUser applicationUser, int? lessonGroupId)
-        {
-            if (lessonGroupId == null)
-            {
-                return;
-            }
-            applicationUser.NextLessonGroupId = lessonGroupId;
-            await UpdateUser(applicationUser);
         }
 
         private static double AdjustUserScore(double userScore, Exercise exercise, bool correct, bool repeated)
