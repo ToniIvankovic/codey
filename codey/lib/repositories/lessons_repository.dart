@@ -30,8 +30,30 @@ class LessonsRepository1 implements LessonsRepository {
 
   @override
   Future<List<Lesson>> getLessonsForGroup(LessonGroup lessonGroup) async {
-    List<int> lessonIds = lessonGroup.lessons;
-    return getLessonsByIds(lessonIds);
+    final response = await _authenticatedClient.get(Uri.parse(
+        '${dotenv.env["API_BASE"]}/lessons/lessonGroup/${lessonGroup.id}'));
+    if (response.statusCode != 200) {
+      switch (response.statusCode) {
+        case 401:
+          throw UnauthenticatedException(
+              'Unauthorized retrieval of lessons for group');
+        default:
+          throw Exception(
+              'Failed to fetch lessons for group, Error ${response.statusCode}');
+      }
+    }
+
+    final List<dynamic> data = json.decode(response.body);
+    final lessons =
+        data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
+    if (!lessonGroup.adaptive) {
+      for (var lesson in lessons) {
+        _cache[lesson.id] = lesson;
+      }
+    }
+    return lessons;
+    // List<int> lessonIds = lessonGroup.lessons;
+    // return getLessonsByIds(lessonIds);
   }
 
   @override

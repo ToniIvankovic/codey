@@ -94,6 +94,19 @@ namespace CodeyBE.Contracts.Entities
             SpecificTip = exerciseCreationDTO.SpecificTip;
         }
 
+        override public bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+            Exercise ex = (Exercise)obj;
+            return PrivateId == ex.PrivateId;
+        }
+        override public int GetHashCode()
+        {
+            return PrivateId;
+        }
     }
 
     public class ExerciseLA : Exercise

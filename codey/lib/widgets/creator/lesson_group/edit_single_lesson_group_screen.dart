@@ -34,6 +34,7 @@ class _EditSingleLessonGroupScreenState
   String? nameEditedCommit;
   String? tipsEditedCommit;
   List<Lesson>? lessonsEditedCommit;
+  bool adaptive = false;
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _EditSingleLessonGroupScreenState
         (lessonsInGroup) => setState(() => localLessons = lessonsInGroup));
     localName = widget.lessonGroup.name;
     localTips = widget.lessonGroup.tips;
+    adaptive = widget.lessonGroup.adaptive;
   }
 
   @override
@@ -52,7 +54,8 @@ class _EditSingleLessonGroupScreenState
     final lessonsRow = _generateLessonsRow();
     final bool madeEdits = nameEditedCommit == null &&
         tipsEditedCommit == null &&
-        lessonsEditedCommit == null;
+        lessonsEditedCommit == null &&
+        adaptive == widget.lessonGroup.adaptive;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,21 +77,39 @@ class _EditSingleLessonGroupScreenState
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: lessonsRow,
+                child: Row(
+                  children: [
+                    const Text("Adaptive:"),
+                    Checkbox(
+                      value: adaptive,
+                      onChanged: (value) => setState(() {
+                        adaptive = value!;
+                      }),
+                    ),
+                  ],
+                ),
               ),
+
+              if (!adaptive)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: lessonsRow,
+                ),
               // COMMIT CHANGES TO BE
               ElevatedButton(
                   onPressed: madeEdits
                       ? null
                       : () {
                           final lessonGroup = LessonGroup(
-                              id: widget.lessonGroup.id,
-                              name: nameEdited ?? widget.lessonGroup.name,
-                              tips: tipsEdited ?? widget.lessonGroup.tips,
-                              lessons: lessonsEdited == null
-                                  ? widget.lessonGroup.lessons
-                                  : lessonsEdited!.map((e) => e.id).toList(),
-                              order: widget.lessonGroup.order);
+                            id: widget.lessonGroup.id,
+                            name: nameEdited ?? widget.lessonGroup.name,
+                            tips: tipsEdited ?? widget.lessonGroup.tips,
+                            lessons: lessonsEdited == null
+                                ? widget.lessonGroup.lessons
+                                : lessonsEdited!.map((e) => e.id).toList(),
+                            order: widget.lessonGroup.order,
+                            adaptive: adaptive,
+                          );
 
                           // Save changes on BE
                           context

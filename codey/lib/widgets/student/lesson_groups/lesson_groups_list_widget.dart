@@ -110,6 +110,9 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                 ),
               ),
             ],
+            Padding(
+              padding: EdgeInsets.only(top: tileSize + 2 * paddingVertical),
+            ),
           ],
         ),
         for (int i = 0; i < data!.length; i++) ...[
@@ -148,7 +151,6 @@ class _FloatingWindow extends StatefulWidget {
 }
 
 class _FloatingWindowState extends State<_FloatingWindow> {
-
   set isVisible(bool newValue) {
     widget.onVisibleChange(newValue);
   }
@@ -247,4 +249,3 @@ class _FloatingWindowState extends State<_FloatingWindow> {
     );
   }
 }
-

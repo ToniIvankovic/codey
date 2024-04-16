@@ -24,11 +24,8 @@ namespace CodeyBe.Services
 
         public async Task<IEnumerable<Lesson>> GetLessonsForLessonGroupAsync(int lessonGroupId)
         {
-            LessonGroup? lessonGroup = await _lessonGroupsService.GetLessonGroupByIDAsync(lessonGroupId);
-            if (lessonGroup == null)
-            {
-                return new List<Lesson>();
-            }
+            LessonGroup? lessonGroup = await _lessonGroupsService.GetLessonGroupByIDAsync(lessonGroupId)
+                ?? throw new EntityNotFoundException("Lesson group not found");
             if (lessonGroup.Adaptive ?? false)
             {
                 return await Task.FromResult(GetLessonsForAdaptiveLessonGroupAsync(lessonGroup));
@@ -43,7 +40,7 @@ namespace CodeyBe.Services
             return [
                 new()
                 {
-                    PrivateId = 99999,
+                    PrivateId = 99998,
                     Name = "Adaptive lesson 1",
                     Adaptive = true,
                 },
@@ -66,6 +63,10 @@ namespace CodeyBe.Services
             }
             LessonGroup? nextLessonGroup = await _lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId)
                 ?? throw new EntityNotFoundException("Next lesson group not found");
+            if(nextLessonGroup.Adaptive ?? false)
+            {
+                return GetLessonsForAdaptiveLessonGroupAsync(nextLessonGroup)[0].PrivateId;
+            }
             return nextLessonGroup.LessonIds[0];
         }
 

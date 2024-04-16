@@ -9,8 +9,12 @@ abstract class LessonGroupsService {
   Future<List<LessonGroup>> getAllLessonGroups();
   void updateLessonGroup(LessonGroup lessonGroup);
   void reorderLessonGroups(List<LessonGroup> list);
-  Future<LessonGroup> createLessonGroup(
-      {required String name, required String tips, required List<int> lessons});
+  Future<LessonGroup> createLessonGroup({
+    required String name,
+    required String tips,
+    required List<int> lessons,
+    required bool adaptive,
+  });
   Future<void> deleteLessonGroup(int id);
 }
 
@@ -72,10 +76,12 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
   }
 
   @override
-  Future<LessonGroup> createLessonGroup(
-      {required String name,
-      required String tips,
-      required List<int> lessons}) async{
+  Future<LessonGroup> createLessonGroup({
+    required String name,
+    required String tips,
+    required List<int> lessons,
+    required bool adaptive,
+  }) async {
     _lessonGroupsRepository.invalidateCache();
     var response = await _authenticatedClient.post(_apiUriBase,
         headers: <String, String>{
@@ -85,20 +91,20 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
           "name": name,
           "tips": tips,
           "lessons": lessons,
+          "adaptive": adaptive,
         }));
     if (response.statusCode != 200) {
       throw Exception('Failed to create lesson group, '
           'Error ${response.statusCode}');
     }
-    
+
     return LessonGroup.fromJson(jsonDecode(response.body));
   }
 
   @override
   Future<void> deleteLessonGroup(int id) async {
     _lessonGroupsRepository.invalidateCache();
-    var response =
-        await _authenticatedClient.delete(_apiUriDeleteLG(id));
+    var response = await _authenticatedClient.delete(_apiUriDeleteLG(id));
     if (response.statusCode != 200) {
       throw Exception('Failed to delete lesson group: $id, '
           'Error ${response.statusCode}');

@@ -30,6 +30,10 @@ namespace CodeyBE.Data.DB.Repositories
                 .OrderByDescending(lessonGroup => lessonGroup.Order)
                 .FirstOrDefault()!.Order + 1;
             int newId = lastId + 1;
+            if (lessonGroup.Adaptive ?? false)
+            {
+                lessonGroup.Lessons = new List<int>() { 99998, 99999 };
+            }
             await _collection.InsertOneAsync(new LessonGroup
             {
                 PrivateId = newId,
@@ -37,12 +41,17 @@ namespace CodeyBE.Data.DB.Repositories
                 Tips = lessonGroup.Tips,
                 LessonIds = lessonGroup.Lessons.ToList(),
                 Order = newOrder,
+                Adaptive = lessonGroup.Adaptive,
             });
             return (await GetByIdAsync(newId))!;
         }
 
         public async Task<LessonGroup> UpdateAsync(int id, LessonGroupCreationDTO lessonGroup)
         {
+            if(lessonGroup.Adaptive ?? false)
+            {
+                lessonGroup.Lessons = new List<int>() { 99998, 99999 };
+            }
             UpdateResult updateResult = await _collection.UpdateOneAsync(
                                 lessonGroup => lessonGroup.PrivateId == id,
                                 Builders<LessonGroup>.Update
@@ -50,6 +59,7 @@ namespace CodeyBE.Data.DB.Repositories
                                 .Set(lessonGroup => lessonGroup.Tips, lessonGroup.Tips)
                                 .Set(lessonGroup => lessonGroup.LessonIds, lessonGroup.Lessons.ToList())
                                 .Set(lessonGroup => lessonGroup.Order, lessonGroup.Order)
+                                .Set(lessonGroup => lessonGroup.Adaptive, lessonGroup.Adaptive)
                                 );
             if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)
             {

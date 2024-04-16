@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,7 +7,7 @@ import 'dart:convert';
 import '../models/entities/exercise.dart';
 
 abstract class ExercisesRepository {
-  Future<List<Exercise>> getExercisesForLesson(int lessonId);
+  Future<List<Exercise>> getExercisesForLesson(Lesson lesson);
   Future<List<Exercise>> getAllExercises();
   Future<void> deleteExercise(int exerciseId);
   Future<Exercise> createExercise(Exercise exercise);
@@ -17,21 +18,23 @@ abstract class ExercisesRepository {
 class ExercisesRepository1 implements ExercisesRepository {
   static Uri _apiUrl(lessonId) =>
       Uri.parse('${dotenv.env["API_BASE"]}/exercises/lesson/$lessonId');
+  static final Uri _apiAdaptiveUrl =
+      Uri.parse('${dotenv.env["API_BASE"]}/exercises/lesson/adaptive');
   final Map<int, List<Exercise>> cachedLessonExercises = {};
   final http.Client _authenticatedClient;
 
   ExercisesRepository1(this._authenticatedClient);
 
   @override
-  Future<List<Exercise>> getExercisesForLesson(int lessonId) {
-    if (cachedLessonExercises.containsKey(lessonId)) {
-      return Future.value(List.of(cachedLessonExercises[lessonId]!));
+  Future<List<Exercise>> getExercisesForLesson(Lesson lesson) {
+    if (cachedLessonExercises.containsKey(lesson.id)) {
+      return Future.value(List.of(cachedLessonExercises[lesson.id]!));
     }
-    return _fetchExercises(lessonId);
+    return _fetchExercises(lesson);
   }
 
-  Future<List<Exercise>> _fetchExercises(int lessonId) async {
-    final uri = _apiUrl(lessonId);
+  Future<List<Exercise>> _fetchExercises(Lesson lesson) async {
+    final uri = lesson.adaptive ? _apiAdaptiveUrl : _apiUrl(lesson.id);
     final response = await _authenticatedClient.get(uri);
 
     if (response.statusCode != 200) {
@@ -48,7 +51,9 @@ class ExercisesRepository1 implements ExercisesRepository {
     final List<dynamic> data = json.decode(response.body);
     final exercises =
         data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
-    cachedLessonExercises[lessonId] = exercises;
+    if (!lesson.adaptive) {
+      cachedLessonExercises[lesson.id] = exercises;
+    }
     return List.of(exercises);
   }
 
@@ -114,7 +119,7 @@ class ExercisesRepository1 implements ExercisesRepository {
     });
 
     if (response.statusCode != 200) {
-      if(response.statusCode == 204){
+      if (response.statusCode == 204) {
         throw NoChangesException('No changes');
       }
       throw Exception('Failed to update exercise');

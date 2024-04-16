@@ -37,7 +37,6 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(List<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<List<Lesson>> GetLessonsByIDs([FromQuery] List<int> ids)
         {
-            ids.ForEach(id => Console.WriteLine(id));
             return await lessonsService.GetLessonsByIDsAsync(ids);
         }
 

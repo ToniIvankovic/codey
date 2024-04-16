@@ -118,7 +118,7 @@ namespace CodeyBe.Services
                 ?? throw new EntityNotFoundException($"No lesson group found with id {highestLessonGroup}");
             List<LessonGroup> eligibleLessonGroups = [
                 .. (await _lessonGroupsService.GetAllLessonGroupsAsync())
-                                .Where(lgr => lgr.Order <= lessonGroup.Order)
+                                .Where(lgr => lgr.Order <= lessonGroup.Order && !(lgr.Adaptive ?? false))
                                 .OrderBy(lgr => lgr.Order)
 ,
             ];
@@ -138,6 +138,8 @@ namespace CodeyBe.Services
                         .ToList()
                 )
             ];
+            //make sure that the exercises are unique
+            eligibleExercises = [.. eligibleExercises.ToHashSet()];
             List<Exercise> easierExercises = eligibleExercises
                 .Where(exercise => exercise.Difficulty < user.Score)
                 .ToList();
@@ -150,6 +152,7 @@ namespace CodeyBe.Services
                 .. PickNExercisesRouletteWheel(easierExercises, nEasier, user.Score),
                 .. PickNExercisesRouletteWheel(harderExercises, nHarder, user.Score)
             ];
+            selectedExercises = EnrichExercisesList(selectedExercises).ToList();
             return selectedExercises.OrderBy(ex => ex.Difficulty);
         }
 

@@ -4,6 +4,7 @@ class LessonGroup {
   String tips;
   List<int> lessons;
   int order;
+  bool adaptive;
 
   LessonGroup({
     required this.id,
@@ -11,6 +12,7 @@ class LessonGroup {
     required this.tips,
     required this.lessons,
     required this.order,
+    this.adaptive = false,
   });
 
   factory LessonGroup.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class LessonGroup {
       tips: json['tips'],
       lessons: json['lessonIds'].cast<int>(),
       order: json['order'],
+      adaptive: json['adaptive'] ?? false,
     );
   }
 
@@ -30,6 +33,7 @@ class LessonGroup {
       'tips': tips,
       'lessonIds': lessons,
       'order': order,
+      'adaptive': adaptive,
     };
   }
 }

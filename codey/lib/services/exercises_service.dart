@@ -157,11 +157,7 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson) {
-    return _getAllExercisesForLessonById(lesson.id);
-  }
-
-  Future<List<Exercise>> _getAllExercisesForLessonById(int lessonId) {
-    return _exRepo.getExercisesForLesson(lessonId);
+    return _exRepo.getExercisesForLesson(lesson);
   }
 
   @override

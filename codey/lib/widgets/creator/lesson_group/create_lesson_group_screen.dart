@@ -17,10 +17,11 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
   String? name;
   String? tips;
   List<Lesson> lessons = [];
+  bool adaptive = false;
 
   @override
   Widget build(BuildContext context) {
-    bool inputValid = name != null && tips != null && lessons.isNotEmpty;
+    bool inputValid = name != null && tips != null && (adaptive || lessons.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create lesson group"),
@@ -39,54 +40,67 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
               maxLines: 5,
               minLines: 2,
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("Lessons", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
+            Row(
+              children: [
+                const Text("Adaptive:"),
+                Checkbox(
+                  value: adaptive,
+                  onChanged: (newValue) => setState(() => adaptive = newValue!),
+                ),
+              ],
             ),
-            for (var lesson in lessons) ...[
-              ListTile(
-                title: Text(lesson.id.toString()),
-                subtitle: Text(lesson.name),
-                leading: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () => setState(() => lessons.remove(lesson)),
+            if (!adaptive) ...[
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("Lessons",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              for (var lesson in lessons) ...[
+                ListTile(
+                  title: Text(lesson.id.toString()),
+                  subtitle: Text(lesson.name),
+                  leading: IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () => setState(() => lessons.remove(lesson)),
+                  ),
+                ),
+              ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .push(
+                              MaterialPageRoute(
+                                builder: (context) => PickLessonScreen(
+                                  existingLessons: lessons,
+                                ),
+                              ),
+                            )
+                            .then(
+                              (value) => setState(() {
+                                if (value != null) {
+                                  lessons.add(value as Lesson);
+                                }
+                              }),
+                            );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add lesson"),
+                    ),
+                  ],
                 ),
               ),
             ],
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(
-                            MaterialPageRoute(
-                              builder: (context) => PickLessonScreen(
-                                existingLessons: lessons,
-                              ),
-                            ),
-                          )
-                          .then(
-                            (value) => setState(() {
-                              if (value != null) {
-                                lessons.add(value as Lesson);
-                              }
-                            }),
-                          );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Add lesson"),
-                  ),
-                ],
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
@@ -98,6 +112,7 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
                           name: name!,
                           tips: tips!,
                           lessons: lessons.map((e) => e.id).toList(),
+                          adaptive: adaptive,
                         );
                         Navigator.of(context).pop(lgr);
                       }
