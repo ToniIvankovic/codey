@@ -7,6 +7,7 @@ import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
+import 'package:codey/models/entities/exercise_statistics.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/repositories/exercises_repository.dart';
@@ -28,6 +29,7 @@ abstract class ExercisesService {
   Future<Exercise> createExercise(Exercise exercise);
   Future<Exercise> updateExercise(Exercise exercise);
   Future<void> startMockExerciseSession(Exercise exercise);
+  Future<List<ExerciseStatistics>> calculateStatistics(List<Exercise> exercises);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -216,5 +218,22 @@ class ExercisesServiceV1 implements ExercisesService {
     } else {
       throw Exception('Unknown exercise type');
     }
+  }
+
+  @override
+  Future<List<ExerciseStatistics>> calculateStatistics(List<Exercise> exercises) async {
+    final response = await _authenticatedClient.post(
+      Uri.parse("${dotenv.env["API_BASE"]}/exercises/calculate_statistics"),
+      body: json.encode(exercises.map((e) => e.id).toList()),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to calculate statistics');
+    }
+
+    final data = json.decode(response.body);
+    return List<ExerciseStatistics>.from(data.map((e) => ExerciseStatistics.fromJson(e)));
   }
 }

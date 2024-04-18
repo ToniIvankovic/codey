@@ -138,19 +138,24 @@ namespace CodeyBE.API.Controllers
         }
 
         [Authorize(Roles = "CREATOR")]
-        [HttpGet("difficulty/suggested/{exerciseId}", Name = "getSuggestedDifficultyForExercise")]
+        [HttpPost("calculate_statistics", Name = "getSuggestedDifficultyForExercise")]
         [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
-        public async Task<double> GetSuggestedDifficultyForExercise(int exerciseId)
+        public async Task<IEnumerable<Dictionary<string, object?>>> GetSuggestedDifficultyForExercise([FromBody] List<int> exerciseIds)
         {
-            return await _exercisesService.GetSuggestedDifficultyForExerciseAsync(exerciseId);
-        }
+            List<Dictionary<string, object?>> list = [];
+            foreach (var exerciseId in exerciseIds)
+            {
+                var suggested = await _exercisesService.GetSuggestedDifficultyForExerciseAsync(exerciseId);
+                var stats = await _exercisesService.GetAverageScoresForExerciseAsync(exerciseId);
+                list.Add(new Dictionary<string, object?>(){
+                    { "exerciseId", exerciseId },
+                    { "suggestedDifficulty", suggested },
+                    { "averageDifficultyCorrect", stats[true] },
+                    { "averageDifficultyIncorrect", stats[false] }
+                });
 
-        [Authorize(Roles = "CREATOR")]
-        [HttpGet("difficulty/average/{exerciseId}", Name = "getAverageScoresForExercise")]
-        [ProducesResponseType(typeof(Dictionary<bool, double>), (int)HttpStatusCode.OK)]
-        public async Task<Dictionary<bool, double?>> GetAverageScoresForExercise(int exerciseId)
-        {
-            return await _exercisesService.GetAverageScoresForExerciseAsync(exerciseId);
+            }
+            return list;
         }
     }
 }

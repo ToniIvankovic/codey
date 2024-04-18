@@ -17,6 +17,7 @@ class EditExercisesScreen extends StatefulWidget {
 class _EditExercisesScreenState extends State<EditExercisesScreen> {
   List<Exercise> exercises = [];
   int? expandedId;
+  bool loadingStatistics = false;
 
   @override
   void initState() {
@@ -42,7 +43,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
               child: TextButton.icon(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -59,6 +60,45 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                 label: const Text("Add exercise"),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+              child: Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: loadingStatistics
+                        ? null
+                        : () {
+                            setState(() {
+                              loadingStatistics = true;
+                            });
+                            context
+                                .read<ExercisesService>()
+                                .calculateStatistics(exercises)
+                                .then(
+                              (value) {
+                                for (var exercise in exercises) {
+                                  exercise.statistics = value
+                                      .where((element) =>
+                                          element.exerciseId == exercise.id)
+                                      .first;
+                                }
+                                setState(() {
+                                  loadingStatistics = false;
+                                });
+                              },
+                            );
+                          },
+                    icon: const Icon(Icons.calculate),
+                    label: const Text("Calculate statistics"),
+                  ),
+                  if (loadingStatistics)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 18.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              ),
+            ),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -66,12 +106,47 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
               itemBuilder: (context, index) {
                 final exercise = exercises[index];
                 return ListTile(
-                  title: Text('${exercise.id} ${exercise.type}'),
+                  title: Row(
+                    children: [
+                      Text('${exercise.id} ${exercise.type}'),
+                      if (exercise.statistics != null) ...[
+                        Text(
+                          ' -- current difficulty: ${exercise.difficulty} -> suggested: ${exercise.statistics!.suggestedDifficulty}',
+                          style: TextStyle(
+                              color: (exercise.difficulty -
+                                              exercise.statistics!
+                                                  .suggestedDifficulty)
+                                          .abs() <
+                                      1
+                                  ? null
+                                  : Colors.red),
+                        )
+                      ]
+                    ],
+                  ),
                   subtitle: expandedId == exercise.id
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(exercises[index].statement ?? ''),
+                            if (exercise.statistics != null) ...[
+                              Text(
+                                'avg. score correct: ${exercise.statistics!.averageDifficultyCorrect}',
+                                style: exercise.statistics!
+                                            .averageDifficultyCorrect ==
+                                        null
+                                    ? const TextStyle(color: Colors.grey)
+                                    : null,
+                              ),
+                              Text(
+                                'avg. score incorrect: ${exercise.statistics!.averageDifficultyIncorrect}',
+                                style: exercise.statistics!
+                                            .averageDifficultyIncorrect ==
+                                        null
+                                    ? const TextStyle(color: Colors.grey)
+                                    : null,
+                              ),
+                              Text(exercises[index].statement ?? ''),
+                            ]
                           ],
                         )
                       : null,
@@ -81,15 +156,15 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                           expandedId == exercise.id ? null : exercise.id;
                     });
                   },
-                  leading: 
-                  Row(
+                  leading: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // DELETE BUTTON
                       IconButton(
                         icon: const Icon(Icons.clear),
                         onPressed: () {
-                          final exercisesService = context.read<ExercisesService>();
+                          final exercisesService =
+                              context.read<ExercisesService>();
                           //confirm popup window
                           showDialog(
                             context: context,
@@ -128,7 +203,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
                             return CreateExerciseScreen(
                               existingExercise: exercise,
                             );

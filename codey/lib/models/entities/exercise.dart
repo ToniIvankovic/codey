@@ -2,6 +2,7 @@ import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
+import 'package:codey/models/entities/exercise_statistics.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 
 abstract class Exercise {
@@ -11,6 +12,7 @@ abstract class Exercise {
   final String? statement;
   final String? specificTip;
   final String? statementOutput;
+  ExerciseStatistics? statistics;
 
   Exercise({
     required this.id,
@@ -19,6 +21,7 @@ abstract class Exercise {
     this.statement,
     this.specificTip,
     this.statementOutput,
+    this.statistics,
   });
   
   factory Exercise.fromJson(Map<String, dynamic> json) {
