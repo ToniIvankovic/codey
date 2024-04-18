@@ -8,9 +8,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthService {
   Future<String?> get token;
-  Future<void> login(String username, String password);
+  Future<void> login({
+    required String username,
+    required String password,
+  });
   Future<void> logout();
-  Future<void> registerUser(String username, String password, String school);
+  Future<void> registerUser({
+    required String firstName,
+    required String lastName,
+    required DateTime dateOfBirth,
+    required String email,
+    required String password,
+    required String school,
+  });
 }
 
 class AuthService1 implements AuthService {
@@ -24,7 +34,10 @@ class AuthService1 implements AuthService {
   }
 
   @override
-  Future<void> login(String username, String password) async {
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
     final response = await http.post(
       _loginEndpoint,
       body: json.encode({'email': username, 'password': password}),
@@ -45,12 +58,21 @@ class AuthService1 implements AuthService {
   }
 
   @override
-  Future<void> registerUser(
-      String username, String password, String school) async {
+  Future<void> registerUser({
+    required String firstName,
+    required String lastName,
+    required DateTime dateOfBirth,
+    required String email,
+    required String password,
+    required String school,
+  }) async {
     final response = await http.post(
       _registerEndpoint,
       body: json.encode({
-        'email': username,
+        'firstName': firstName,
+        'lastName': lastName,
+        'dateOfBirth': dateOfBirth.toIso8601String(),
+        'email': email,
         'password': password,
         'school': school,
       }),

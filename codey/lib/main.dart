@@ -128,9 +128,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: CircularProgressIndicator(),
             ),
           );
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData || snapshot.data == null) {
+        } else if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data == null) {
           return AuthScreen(
             onLogin: () => setState(() => loggedIn = true),
           );
@@ -146,7 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else if (snapshot.hasError || snapshot.data == null) {
-              return Text('Error: ${snapshot.error}');
+              return Scaffold(
+                body: Center(
+                  child: Text('User error: ${snapshot.error} - restart app'),
+                ),
+              );
             } else {
               final user = snapshot.data!;
               onLogout() {

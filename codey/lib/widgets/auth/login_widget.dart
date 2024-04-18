@@ -48,8 +48,14 @@ class _LoginWidgetState extends State<LoginWidget> {
 
     return Column(
       children: [
-        usernameTextField,
-        passwordTextField,
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: usernameTextField,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: passwordTextField,
+        ),
         if (errorMessage != null)
           Text(
             errorMessage!,
@@ -67,21 +73,22 @@ class _LoginWidgetState extends State<LoginWidget> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () async {
-                try {
-                  setState(() {
-                    waitingResponse = true;
-                  });
-                  await sessionService.login(username, password);
+                setState(() {
+                  waitingResponse = true;
+                });
+                sessionService
+                    .login(username: username, password: password)
+                    .then((value) {
                   widget.onLogin();
                   setState(() {
                     waitingResponse = false;
                   });
-                } catch (e) {
+                }).onError((error, stackTrace) {
                   setState(() {
                     waitingResponse = false;
-                    errorMessage = e.toString();
+                    errorMessage = error.toString();
                   });
-                }
+                });
               },
               child: const Text('Login'),
             ),

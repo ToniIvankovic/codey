@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.DTOs
 {
-    public class UserRegistrationDTO
+    public class UserRegistrationResponseDTO
     {
         public IEnumerable<string>? Message { get; set; }
     }

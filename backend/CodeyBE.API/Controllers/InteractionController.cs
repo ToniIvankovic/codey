@@ -156,9 +156,21 @@ namespace CodeyBE.API.Controllers
         [HttpGet("leaderboard", Name = "getLeaderboardForStudentSelf")]
         [Authorize(Roles = "STUDENT")]
         [ProducesResponseType(typeof(Leaderboard), (int)HttpStatusCode.OK)]
-        public async Task<Leaderboard> GetLeaderboardForStudentSelf()
+        public async Task<IActionResult> GetLeaderboardForStudentSelf()
         {
-            return await interactionService.GetLeaderboardForStudentSelf(User);
+            try
+            {
+
+                return Ok(await interactionService.GetLeaderboardForStudentSelf(User));
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
         [HttpGet("leaderboard/{classId}", Name = "getLeaderboardForClass")]

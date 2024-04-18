@@ -30,7 +30,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         appBar: AppBar(
-          title: const Text('Student Home'),
+          title: const Text('Python Course'),
           actions: [
             if (userForProfile != null) ...[
               Padding(
@@ -56,7 +56,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(userForProfile!.email),
+                child: Text(
+                    '${userForProfile!.firstName} ${userForProfile!.lastName}'),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),

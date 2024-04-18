@@ -26,7 +26,7 @@ namespace CodeyBe.Services
         private readonly UserManager<ApplicationUser> _userManager = userManager;
 
 
-        public async Task<JWTTokenDTO> LoginUser(UserRegistrationInternalDTO userDTO)
+        public async Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO userDTO)
         {
             var user = await _userManager.FindByEmailAsync(userDTO.Email);
             if (user == null)
@@ -43,10 +43,13 @@ namespace CodeyBe.Services
             return tokenGenerator.GenerateToken(claims);
         }
 
-        public async Task<IdentityResult> RegisterStudent(UserRegistrationInternalDTO user)
+        public async Task<IdentityResult> RegisterStudent(UserRegistrationRequestDTO user)
         {
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
                 UserName = user.Email,
                 Email = user.Email,
                 Roles = ["STUDENT"],
@@ -68,10 +71,13 @@ namespace CodeyBe.Services
             return result;
         }
 
-        public async Task<IdentityResult> RegisterCreator(UserRegistrationInternalDTO user)
+        public async Task<IdentityResult> RegisterCreator(UserRegistrationRequestDTO user)
         {
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
                 UserName = user.Email,
                 Email = user.Email,
                 Roles = ["CREATOR"],
@@ -86,11 +92,14 @@ namespace CodeyBe.Services
             return result;
         }
 
-        public async Task<IdentityResult> RegisterTeacher(UserRegistrationInternalDTO user)
+        public async Task<IdentityResult> RegisterTeacher(UserRegistrationRequestDTO user)
         {
 
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
                 UserName = user.Email,
                 Email = user.Email,
                 Roles = ["TEACHER"],

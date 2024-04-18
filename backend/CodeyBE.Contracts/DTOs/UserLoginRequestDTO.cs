@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace CodeyBE.Contracts.DTOs
 {
-    public class UserRegistrationInternalDTO
+    public class UserLoginRequestDTO
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public string? School { get; set; }
     }
 }

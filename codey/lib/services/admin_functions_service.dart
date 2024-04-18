@@ -5,8 +5,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 abstract class AdminFunctionsService {
-  Future<void> registerCreator(String username, String password);
-  Future<void> registerTeacher(String email, String password);
+  Future<void> registerCreator({
+    required String email,
+    required String password,
+  });
+  Future<void> registerTeacher({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    required String school,
+  });
 }
 
 class AdminFunctionsServiceImpl extends AdminFunctionsService {
@@ -14,10 +23,13 @@ class AdminFunctionsServiceImpl extends AdminFunctionsService {
   final http.Client _authenticatedClient;
 
   @override
-  Future<void> registerCreator(String username, String password) async {
+  Future<void> registerCreator({
+    required String email,
+    required String password,
+  }) async {
     final response = await _authenticatedClient.post(
       Uri.parse('${dotenv.env["API_BASE"]}/user/register/creator'),
-      body: json.encode({'email': username, 'password': password}),
+      body: json.encode({'email': email, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -28,10 +40,22 @@ class AdminFunctionsServiceImpl extends AdminFunctionsService {
   }
 
   @override
-  Future<void> registerTeacher(String email, String password) async {
+  Future<void> registerTeacher({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+    required String school,
+  }) async {
     final response = await _authenticatedClient.post(
       Uri.parse('${dotenv.env["API_BASE"]}/user/register/teacher'),
-      body: json.encode({'email': email, 'password': password}),
+      body: json.encode({
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'password': password,
+        'school': school,
+      }),
       headers: {'Content-Type': 'application/json'},
     );
 

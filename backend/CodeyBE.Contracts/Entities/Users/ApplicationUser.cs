@@ -9,6 +9,9 @@ namespace CodeyBE.Contracts.Entities.Users
 {
     public class ApplicationUser : MongoUser
     {
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public int? HighestLessonId { get; set; }
         public int? HighestLessonGroupId { get; set; }
         public int? NextLessonId { get; set; }

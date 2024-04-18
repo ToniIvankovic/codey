@@ -3,7 +3,10 @@ import 'package:codey/services/user_service.dart';
 
 abstract class SessionService {
   Future<void> logout();
-  Future<void> login(String username, String password);
+  Future<void> login({
+    required String username,
+    required String password,
+  });
 }
 
 class SessionService1 implements SessionService {
@@ -19,8 +22,14 @@ class SessionService1 implements SessionService {
   }
 
   @override
-  Future<void> login(String username, String password) async {
-    await _authService.login(username, password);
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
+    await _authService.login(
+      username: username,
+      password: password,
+    );
     await _userService.initializeUser();
   }
 }

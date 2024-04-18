@@ -13,10 +13,10 @@ namespace CodeyBE.Contracts.Services
 {
     public interface IUserService
     {
-        public Task<IdentityResult> RegisterStudent(UserRegistrationInternalDTO user);
-        public Task<IdentityResult> RegisterCreator(UserRegistrationInternalDTO user);
-        public Task<IdentityResult> RegisterTeacher(UserRegistrationInternalDTO user);
-        public Task<JWTTokenDTO> LoginUser(UserRegistrationInternalDTO user);
+        public Task<IdentityResult> RegisterStudent(UserRegistrationRequestDTO user);
+        public Task<IdentityResult> RegisterCreator(UserRegistrationRequestDTO user);
+        public Task<IdentityResult> RegisterTeacher(UserRegistrationRequestDTO user);
+        public Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO user);
         public Task<ApplicationUser?> GetUser(ClaimsPrincipal user);
         public Task<ApplicationUser> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);
         public Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser);

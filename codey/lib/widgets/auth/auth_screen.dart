@@ -17,45 +17,53 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(40, 10, 40, 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(showLogin ? 'Login' : 'Register',
-                  style: Theme.of(context).textTheme.displaySmall),
+      body: SingleChildScrollView(
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(40, 10, 40, 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(showLogin ? 'Login' : 'Register',
+                      style: Theme.of(context).textTheme.displaySmall),
+                ),
+                if (showLogin)
+                  LoginWidget(
+                    onLogin: widget.onLogin,
+                  )
+                else
+                  RegistrationWidget(
+                    onRegistration: () {
+                      setState(() {
+                        showLogin = true;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Registration successful'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showLogin = !showLogin;
+                    });
+                  },
+                  child: Text(showLogin
+                      ? "Don't have an account? Register"
+                      : 'Already have an account? Log in'),
+                ),
+              ],
             ),
-            if (showLogin)
-              LoginWidget(
-                onLogin: widget.onLogin,
-              )
-            else
-              RegistrationWidget(
-                onRegistration: () {
-                  setState(() {
-                    showLogin = true;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Registration successful'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-              ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  showLogin = !showLogin;
-                });
-              },
-              child: Text(showLogin
-                  ? "Don't have an account? Register"
-                  : 'Already have an account? Login'),
-            ),
-          ],
+          ),
         ),
       ),
     );

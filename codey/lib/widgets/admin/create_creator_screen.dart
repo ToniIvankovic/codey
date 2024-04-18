@@ -43,7 +43,7 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
             onPressed: () {
               context
                   .read<AdminFunctionsService>()
-                  .registerCreator(email, password)
+                  .registerCreator(email: email, password: password)
                   .then((value) {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(

@@ -18,18 +18,29 @@ class StudentProfileScreen extends StatefulWidget {
 
 class _StudentProfileScreenState extends State<StudentProfileScreen> {
   Leaderboard? leaderboard;
+  bool leaderboardLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context
+        .read<UserInteractionService>()
+        .getLeaderboardStudent()
+        .then((value) {
+      setState(() {
+        leaderboard = value;
+        leaderboardLoading = false;
+      });
+    }).catchError((onError) {
+      setState(() {
+        leaderboard = null;
+        leaderboardLoading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (leaderboard == null) {
-      context
-          .read<UserInteractionService>()
-          .getLeaderboardStudent()
-          .then((value) {
-        setState(() {
-          leaderboard = value;
-        });
-      });
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -50,23 +61,27 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _generateQuestWidget(quest),
-                        if (quest.isCompleted) const Icon(Icons.check_box)
-                        else const Icon(Icons.check_box_outline_blank),
+                        if (quest.isCompleted)
+                          const Icon(Icons.check_box)
+                        else
+                          const Icon(Icons.check_box_outline_blank),
                       ],
                     ),
                 ],
               ),
             ),
-            const Text("Leaderboard"),
-            if (leaderboard == null)
+            if (leaderboardLoading) ...[
+              const Text("Leaderboard"),
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: CircularProgressIndicator(),
               )
-            else
+            ] else if (leaderboard != null) ...[
+              const Text("Leaderboard"),
               for (var i = 0; i < leaderboard!.students.length; i++)
                 Text(
                     "${i + 1}. ${leaderboard!.students[i].email} ${leaderboard!.students[i].totalXp}"),
+            ]
           ],
         ),
       ),
