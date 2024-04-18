@@ -135,6 +135,10 @@ class _MyHomePageState extends State<MyHomePage> {
             onLogin: () => setState(() => loggedIn = true),
           );
         }
+        onLogout() {
+          context.read<SessionService>().logout();
+          setState(() => loggedIn = false);
+        }
 
         return StreamBuilder<AppUser>(
           stream: context.read<UserService>().userStream,
@@ -146,17 +150,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else if (snapshot.hasError || snapshot.data == null) {
-              return Scaffold(
+              onLogout();
+              return const Scaffold(
                 body: Center(
-                  child: Text('User error: ${snapshot.error} - restart app'),
+                  child: Text('Error: User not found'),
                 ),
               );
             } else {
               final user = snapshot.data!;
-              onLogout() {
-                context.read<SessionService>().logout();
-                setState(() => loggedIn = false);
-              }
 
               if (user.roles.contains("ADMIN")) {
                 return AdminHomePage(
