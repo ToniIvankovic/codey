@@ -1,5 +1,7 @@
-﻿using CodeyBE.Contracts.DTOs;
+﻿using CodeyBe.Services;
+using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
@@ -14,22 +16,22 @@ namespace CodeyBE.API.Controllers
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT,CREATOR")]
     public class ExercisesController(
-        IExercisesService exercisesService, 
+        IExercisesService exercisesService,
         ILogsService loggingService,
         IUserService userService) : ControllerBase
     {
 
         const string version = "v2";
-        private readonly IExercisesService exercisesService = exercisesService;
-        private readonly ILogsService loggingService = loggingService;
-        private readonly IUserService userService = userService;
+        private readonly IExercisesService _exercisesService = exercisesService;
+        private readonly ILogsService _loggingService = loggingService;
+        private readonly IUserService _userService = userService;
 
         [Authorize(Roles = "CREATOR")]
         [HttpGet(Name = "getAllExercises")]
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetAllExercises()
         {
-            return (await exercisesService.GetAllExercisesAsync())
+            return (await _exercisesService.GetAllExercisesAsync())
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }
@@ -39,7 +41,7 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(Exercise), (int)HttpStatusCode.OK)]
         public async Task<Exercise?> GetExerciseByID(int id)
         {
-            return await exercisesService.GetExerciseByIDAsync(id);
+            return await _exercisesService.GetExerciseByIDAsync(id);
         }
 
 
@@ -49,8 +51,8 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
         {
             var user = User;
-            loggingService.RequestedLesson(user, lessonId);
-            return (await exercisesService.GetExercisesForLessonAsync(lessonId))
+            _loggingService.RequestedLesson(user, lessonId);
+            return (await _exercisesService.GetExercisesForLessonAsync(lessonId))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }
@@ -61,10 +63,10 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<object>> GetExercisesForAdaptiveLesson(int lessonId)
         {
             var user = User;
-            loggingService.RequestedLesson(user, lessonId);
-            var appUser = await userService.GetUser(user) 
+            _loggingService.RequestedLesson(user, lessonId);
+            var appUser = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("User not found");
-            return (await exercisesService.GetExercisesForAdaptiveLessonAsync(appUser))
+            return (await _exercisesService.GetExercisesForAdaptiveLessonAsync(appUser))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }
@@ -75,10 +77,12 @@ namespace CodeyBE.API.Controllers
         public async Task<AnswerValidationResultDTO> ValidateAnswer(int exerciseId, [FromBody] Dictionary<string, dynamic> body)
         {
             var answer = body["answer"];
-            AnswerValidationResult result = await exercisesService.ValidateAnswer(exerciseId, answer);
-            var exercise = (await exercisesService.GetExerciseByIDAsync(exerciseId))!;
+            AnswerValidationResult result = await _exercisesService.ValidateAnswer(exerciseId, answer);
+            var exercise = (await _exercisesService.GetExerciseByIDAsync(exerciseId))!;
             //TODO: log the whole exercise
-            loggingService.AnsweredExercise(User, exerciseId, result.CorrectAnswers, result.GottenAnswer, result.IsCorrect);
+            ApplicationUser applicationUser = await _userService.GetUser(User)
+                ?? throw new EntityNotFoundException("User not found");
+            _loggingService.AnsweredExercise(applicationUser, exerciseId, result.CorrectAnswers, result.GottenAnswer, result.IsCorrect);
             return new AnswerValidationResultDTO(result);
         }
 
@@ -89,7 +93,7 @@ namespace CodeyBE.API.Controllers
         {
             try
             {
-                return Ok(await exercisesService.CreateExerciseAsync(exercise));
+                return Ok(await _exercisesService.CreateExerciseAsync(exercise));
             }
             catch (Exception e)
             {
@@ -104,7 +108,7 @@ namespace CodeyBE.API.Controllers
         {
             try
             {
-                return Ok(await exercisesService.UpdateExerciseAsync(id, exercise));
+                return Ok(await _exercisesService.UpdateExerciseAsync(id, exercise));
             }
             catch (NoChangesException)
             {
@@ -124,7 +128,7 @@ namespace CodeyBE.API.Controllers
             try
             {
 
-                await exercisesService.DeleteExerciseAsync(id);
+                await _exercisesService.DeleteExerciseAsync(id);
                 return Ok();
             }
             catch (Exception e)
@@ -133,5 +137,21 @@ namespace CodeyBE.API.Controllers
             }
         }
 
+        [Authorize(Roles = "CREATOR")]
+        [HttpGet("difficulty/suggested/{exerciseId}", Name = "getSuggestedDifficultyForExercise")]
+        [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
+        public async Task<double> GetSuggestedDifficultyForExercise(int exerciseId)
+        {
+            return await _exercisesService.GetSuggestedDifficultyForExerciseAsync(exerciseId);
+        }
+
+        [Authorize(Roles = "CREATOR")]
+        [HttpGet("difficulty/average/{exerciseId}", Name = "getAverageScoresForExercise")]
+        [ProducesResponseType(typeof(Dictionary<bool, double>), (int)HttpStatusCode.OK)]
+        public async Task<Dictionary<bool, double?>> GetAverageScoresForExercise(int exerciseId)
+        {
+            return await _exercisesService.GetAverageScoresForExerciseAsync(exerciseId);
+        }
     }
 }
+

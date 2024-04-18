@@ -1,5 +1,6 @@
 ﻿using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Logs;
 using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
@@ -17,11 +18,13 @@ namespace CodeyBe.Services
     public partial class ExercisesService(
         IExercisesRepository exercisesRepository,
         ILessonsService lessonsService,
-        ILessonGroupsService lessonGroupsService) : IExercisesService
+        ILessonGroupsService lessonGroupsService,
+        ILogsService logsService) : IExercisesService
     {
         private readonly IExercisesRepository _exercisesRepository = exercisesRepository;
         private readonly ILessonsService _lessonsService = lessonsService;
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
+        private readonly ILogsService _logsService = logsService;
 
         public async Task<IEnumerable<Exercise>> GetAllExercisesAsync()
         {
@@ -342,6 +345,86 @@ namespace CodeyBe.Services
             }
 
             return false;
+        }
+
+        public async Task<double> GetSuggestedDifficultyForExerciseAsync(int exerciseId)
+        {
+            Exercise? exercise = await _exercisesRepository.GetByIdAsync(exerciseId)
+                ?? throw new ArgumentException($"Exercise with id {exerciseId} does not exist");
+            Dictionary<bool, List<double>> statistics = await GetStatisticScoresForExerciseAsync(exerciseId);
+            if (statistics[true].Count == 0 && statistics[false].Count == 0)
+            {
+                return exercise.Difficulty;
+            }
+            double difficulty = CalculateSuggestedDifficultyFromStatistics(statistics);
+            return difficulty;
+        }
+        public async Task<Dictionary<bool, double?>> GetAverageScoresForExerciseAsync(int exerciseId)
+        {
+            _ = await _exercisesRepository.GetByIdAsync(exerciseId)
+                ?? throw new ArgumentException($"Exercise with id {exerciseId} does not exist");
+            Dictionary<bool, List<double>> statistics = await GetStatisticScoresForExerciseAsync(exerciseId);
+
+            var dict = new Dictionary<bool, double?>();
+            if (statistics[true].Count == 0)
+            {
+                dict[true] = null;
+            }
+            else
+            {
+                dict[true] = statistics[true].Average();
+            }
+            if (statistics[false].Count == 0)
+            {
+                dict[false] = null;
+            }
+            else
+            {
+                dict[false] = statistics[false].Average();
+            }
+            return dict;
+
+        }
+
+        private async Task<Dictionary<bool, List<double>>> GetStatisticScoresForExerciseAsync(int exerciseId)
+        {
+            List<LogExerciseAnswer> logs = (await _logsService.GetLogExerciseAnswersForExercise(exerciseId)).ToList();
+            Dictionary<bool, List<double>> scores = [];
+            scores[true] = logs.Where(log => log.MarkedCorrect).Select(log => log.StudentScore).ToList();
+            scores[false] = logs.Where(log => !log.MarkedCorrect).Select(log => log.StudentScore).ToList();
+            return scores;
+        }
+
+        private double CalculateSuggestedDifficultyFromStatistics(Dictionary<bool, List<double>> statistics)
+        {
+            const int MAX_DIFFICULTY = 100;
+            List<double> suggestedDifficulties = [];
+            for (int i = 1; i < MAX_DIFFICULTY; i++)
+            {
+                suggestedDifficulties.Add(i);
+            }
+            // Find the first difficulty that has more than 60% correct answers
+            // Bear in mind that incorrectly answered exercises are repeated so usually 50% accuracy is the minimum
+            foreach (double suggestedDifficulty in suggestedDifficulties)
+            {
+                int numCorrect = 0;
+                int numIncorrect = 0;
+                numCorrect += statistics[true]
+                    .Where(s => s >= suggestedDifficulty)
+                    .Count();
+                numIncorrect -= statistics[false]
+                    .Where(s => s >= suggestedDifficulty)
+                    .Count();
+                if (numCorrect / (double)(numCorrect + numIncorrect) > 0.6)
+                {
+                    return suggestedDifficulty;
+                }
+            }
+            // if no difficulty has more than 50% correct answers, return the maximum score that ever tried to solve it
+            return new List<double>(){
+                statistics[true].Max(),
+                statistics[false].Min()
+            }.Max();
         }
     }
 }

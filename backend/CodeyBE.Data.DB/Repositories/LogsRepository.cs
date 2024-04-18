@@ -20,5 +20,12 @@ namespace CodeyBE.Data.DB.Repositories
         {
             _collection.InsertOneAsync(log);
         }
+
+        public async Task<IEnumerable<LogExerciseAnswer>> GetAllLogExerciseAnswers()
+        {
+            return (await _collection.Find(log => log is LogExerciseAnswer).ToListAsync())
+                .Cast<LogExerciseAnswer>()
+                .ToList();
+        }
     }
 }

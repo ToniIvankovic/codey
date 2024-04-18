@@ -1,4 +1,7 @@
 ﻿using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities.Logs;
+using CodeyBE.Contracts.Entities.Users;
+using CodeyBE.Contracts.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +15,8 @@ namespace CodeyBE.Contracts.Services
     {
         void RequestedLesson(ClaimsPrincipal user, int lessonId);
         void RequestedExercise(int exerciseId);
-        void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<dynamic> correctAnswers, dynamic givenAnswer, bool correct);
+        void AnsweredExercise(ApplicationUser applicationUser, int exerciseId, IEnumerable<dynamic> correctAnswers, dynamic givenAnswer, bool correct);
         void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report);
-
+        Task<IEnumerable<LogExerciseAnswer>> GetLogExerciseAnswersForExercise(int exerciseId);
     }
 }

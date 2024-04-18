@@ -1,5 +1,7 @@
 ﻿using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Logs;
+using CodeyBE.Contracts.Entities.Users;
+using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using System.Security.Claims;
@@ -10,15 +12,21 @@ namespace CodeyBe.Services
     {
         private readonly ILogsRepository _logsRepository = logsRepository;
 
-        public void AnsweredExercise(ClaimsPrincipal user, int exerciseId, IEnumerable<dynamic> correctAnswer, dynamic givenAnswer, bool correct)
+        public void AnsweredExercise(
+            ApplicationUser applicationUser, 
+            int exerciseId, 
+            IEnumerable<dynamic> correctAnswer, 
+            dynamic givenAnswer, 
+            bool correct)
         {
             _logsRepository.SaveLogAsync(
                 new LogExerciseAnswer(
-                    userId: user.Claims.First(c => c.Type == ClaimTypes.Email).Value,
+                    userId: applicationUser.Email,
                     exerciseId,
                     correctAnswer,
                     givenAnswer,
-                    correct
+                    correct,
+                    applicationUser.Score
             ));
         }
 
@@ -44,6 +52,13 @@ namespace CodeyBe.Services
                     report
                     ));
 
+        }
+
+        public async Task<IEnumerable<LogExerciseAnswer>> GetLogExerciseAnswersForExercise(int exerciseId)
+        {
+            return (await _logsRepository.GetAllLogExerciseAnswers())
+                .Where(l => l.ExerciseId == exerciseId)
+                .ToList();
         }
     }
 }

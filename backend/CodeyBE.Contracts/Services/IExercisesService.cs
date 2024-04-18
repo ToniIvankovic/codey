@@ -35,5 +35,7 @@ namespace CodeyBE.Contracts.Services
         public Task<Exercise> UpdateExerciseAsync(int id, ExerciseCreationDTO exercise);
         public Task DeleteExerciseAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForAdaptiveLessonAsync(ApplicationUser user);
+        public Task<double> GetSuggestedDifficultyForExerciseAsync(int exerciseId);
+        public Task<Dictionary<bool, double?>> GetAverageScoresForExerciseAsync(int exerciseId);
     }
 }

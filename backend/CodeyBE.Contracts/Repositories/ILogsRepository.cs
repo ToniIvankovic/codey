@@ -10,5 +10,6 @@ namespace CodeyBE.Contracts.Repositories
     public interface ILogsRepository : IRepository<LogBasic>
     {
         public void SaveLogAsync(LogBasic log);
+        public Task<IEnumerable<LogExerciseAnswer>> GetAllLogExerciseAnswers();
     }
 }
