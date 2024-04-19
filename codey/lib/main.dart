@@ -22,8 +22,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
-  // String mode = 'prod';
-  String mode = 'dev';
+  String mode = 'prod';
+  // String mode = 'dev';
   String env = '$mode.env';
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -89,14 +89,70 @@ Future main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  final colorScheme1 = const ColorScheme(
+    background: Color(0xffffecd1),
+    primary: Color(0xff15616d),
+    secondary: Color(0xffff7d00),
+    surface: Color(0xffff7d00),
+    error: Color(0xff78290f),
+    inversePrimary: Color(0xffffecd1),
+    onBackground: Color(0xff001524),
+    onPrimary: Color(0xffffecd1),
+    onSecondary: Color(0xffffecd1),
+    onSurface: Color(0xff001524),
+    onError: Color(0xffffecd1),
+    brightness: Brightness.light,
+  );
+
+  final colorScheme2 = const ColorScheme(
+    background: Color(0xffeaac8b),
+    primary: Color(0xff355070),
+    secondary: Color(0xffb56576),
+    surface: Color(0xff6d597a),
+    error: Color(0xffe56b6f),
+    inversePrimary: Color(0xffffecd1),
+    onBackground: Color(0xff355070),
+    onPrimary: Color(0xffeaac8b),
+    onSecondary: Color(0xffeaac8b),
+    onSurface: Color(0xffeaac8b),
+    onError: Color(0xffeaac8b),
+    brightness: Brightness.light,
+  );
+  final colorScheme3 = const ColorScheme(
+    background: Color(0xffffffff),
+    primary: Color(0xffff9f1c),
+    secondary: Color(0xff2ec4b6),
+    surface: Color(0xffcbf3f0),
+    error: Color(0xffe56b6f),
+    inversePrimary: Color(0xffffecd1),
+    onBackground: Color(0xffff9f1c),
+    onPrimary: Color(0xff000000),
+    onSecondary: Color(0xffff9f1c),
+    onSurface: Color(0xffff9f1c),
+    onError: Color(0xff000000),
+    brightness: Brightness.light,
+  );
+  final colorScheme4 = const ColorScheme(
+    background: Color(0xffffffff),
+    primary: Color(0xff389c9a),
+    secondary: Color(0xfffedb71),
+    surface: Color(0xfff8f8f8),
+    error: Color(0xffe56b6f),
+    inversePrimary: Color(0xffcbf3f0), //TODO
+    onBackground: Color(0xff1d1d1d),
+    onPrimary: Color(0xfff8f8f8),
+    onSecondary: Color(0xff1d1d1d),
+    onSurface: Color(0xff1d1d1d),
+    onError: Color(0xff1d1d1d),
+    brightness: Brightness.light,
+  );
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Codey',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 37, 9, 198)),
+        colorScheme: colorScheme4,
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
@@ -125,7 +181,12 @@ class _MyHomePageState extends State<MyHomePage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: Column(
+                children: [
+                  Text("Loading... (1)"),
+                  CircularProgressIndicator(),
+                ],
+              ),
             ),
           );
         } else if (snapshot.hasError ||
@@ -144,9 +205,18 @@ class _MyHomePageState extends State<MyHomePage> {
           stream: context.read<UserService>().userStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
+              return Scaffold(
                 body: Center(
-                  child: CircularProgressIndicator(),
+                  child: Column(
+                    children: [
+                      const Text("Loading... (2)"),
+                      const CircularProgressIndicator(),
+                      ElevatedButton(
+                        onPressed: () => onLogout(),
+                        child: const Text("Logout"),
+                      )
+                    ],
+                  ),
                 ),
               );
             } else if (snapshot.hasError || snapshot.data == null) {
@@ -177,7 +247,9 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               if (user.roles.contains("STUDENT")) {
                 return StudentHomeScreen(
+                  key: ValueKey(user),
                   onLogoutSuper: onLogout,
+                  user: user,
                 );
               }
               return const Scaffold(

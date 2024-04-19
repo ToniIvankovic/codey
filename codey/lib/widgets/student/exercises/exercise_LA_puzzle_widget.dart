@@ -54,15 +54,15 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            constraints: const BoxConstraints(minHeight: 150, maxHeight: 300),
+            constraints: const BoxConstraints(minHeight: 150, maxHeight: 400),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(pieceBorderRadius),
-              color: const Color.fromARGB(50, 200, 200, 200),
+              // borderRadius: BorderRadius.circular(pieceBorderRadius),
+              color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
             ),
             child: DottedBorder(
               color: Colors.grey,
               strokeWidth: 2,
-              dashPattern: const [6, 3],
+              dashPattern: const [6, 6],
               child: Row(
                 children: [
                   Expanded(
@@ -94,10 +94,15 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                 key: ValueKey(entryTextToDisplay),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(0.5),
                     width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(pieceBorderRadius),
+                  color:
+                      Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -134,18 +139,9 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                 child: Opacity(
                   opacity: answerParts
                           .any((piece) => piece.key == ValueKey(entry.key))
-                      ? 0.15
+                      ? 0.1
                       : 1.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(pieceBorderRadius),
-                      color: answerParts
-                              .any((piece) => piece.key == ValueKey(entry.key))
-                          ? Colors.grey
-                          : Colors.transparent,
-                    ),
-                    child: codePiece,
-                  ),
+                  child: codePiece,
                 ),
               );
               return detectorInOptions;

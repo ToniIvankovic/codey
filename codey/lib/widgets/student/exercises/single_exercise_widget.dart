@@ -146,8 +146,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       button = ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: isCorrectResponse == true
-              ? const Color.fromARGB(255, 123, 224, 127)
-              : Colors.red,
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.error,
         ),
         onPressed: () {
           setState(() {
@@ -157,9 +157,16 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             repeatCount++;
           });
         },
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Text('NEXT'),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Text(
+            'NEXT',
+            style: TextStyle(
+              color: isCorrectResponse == true
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onError,
+            ),
+          ),
         ),
       );
     }
@@ -203,30 +210,35 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
         padding: const EdgeInsets.all(20.0),
         child: DottedBorder(
           borderType: BorderType.RRect,
-          dashPattern: const [6, 3],
-          child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: constraints.maxWidth,
-              minWidth: constraints.maxWidth,
-            ),
-            child: Text(
-              (exercise! as dynamic).statementCode!,
-              style: const TextStyle(
-            fontFamily: 'courier new',
-            fontSize: 20.0,
-              ),
-              softWrap: true, // Added line
-            ),
-          ),
-            );
-          },
-        ),
+          dashPattern: const [9, 6],
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth,
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Text(
+                        (exercise! as dynamic).statementCode!,
+                        style: const TextStyle(
+                          fontFamily: 'courier new',
+                          fontSize: 20.0,
+                        ),
+                        softWrap: true,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       );

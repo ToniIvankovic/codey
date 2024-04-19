@@ -1,18 +1,18 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
-import 'package:codey/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'lesson_groups/lesson_groups_list_widget.dart';
 import 'student_profile_screen.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   final VoidCallback onLogoutSuper;
+  final AppUser user;
 
   const StudentHomeScreen({
     super.key,
     required this.onLogoutSuper,
+    required this.user,
   });
 
   @override
@@ -20,58 +20,58 @@ class StudentHomeScreen extends StatefulWidget {
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
-  AppUser? userForProfile;
-
   @override
   Widget build(BuildContext context) {
-    Stream<AppUser?> user$ = context.read<UserService>().userStream;
-
     try {
       return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          titleTextStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
+          actionsIconTheme:
+              IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
           title: const Text('Python Course'),
           actions: [
-            if (userForProfile != null) ...[
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    //fire emoji
-                    Icon(
-                      Icons.whatshot,
-                      color: userForProfile!.didLessonToday
-                          ? Colors.red
-                          : Colors.grey,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  //fire emoji
+                  Icon(
+                    Icons.whatshot,
+                    color: widget.user.didLessonToday
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.5),
+                  ),
+                  Text(
+                    widget.user.streak.toString(),
+                    style: TextStyle(
+                      color: widget.user.didLessonToday
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.5),
                     ),
-                    Text(
-                      userForProfile!.streak.toString(),
-                      style: TextStyle(
-                          color: userForProfile!.didLessonToday
-                              ? Colors.red
-                              : Colors.grey),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                    '${userForProfile!.firstName} ${userForProfile!.lastName}'),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: IconButton(
+                icon: const Icon(Icons.person),
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StudentProfileScreen(
+                              user: widget.user,
+                            ))),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: IconButton(
-                  icon: const Icon(Icons.person),
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => StudentProfileScreen(
-                                user: userForProfile!,
-                              ))),
-                ),
-              ),
-            ],
+            ),
             //profile
             IconButton(
               icon: const Icon(Icons.logout),
@@ -79,47 +79,30 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             ),
           ],
         ),
-        body: StreamBuilder(
-          stream: user$,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const CircularProgressIndicator();
-            }
-            AppUser user = snapshot.data!;
-            //cannot call setState in build method
-            if (userForProfile != user) {
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                setState(() {
-                  userForProfile = snapshot.data!;
-                });
-              });
-            }
-
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: LessonGroupsListView(
-                              key: ValueKey(user),
-                              user: user,
-                            ),
-                          ),
-                        ],
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: LessonGroupsListView(
+                          key: ValueKey(widget.user),
+                          user: widget.user,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       );
     } on UnauthenticatedException catch (e) {

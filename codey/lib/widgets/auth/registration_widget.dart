@@ -1,7 +1,6 @@
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationWidget extends StatefulWidget {

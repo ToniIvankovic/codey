@@ -9,21 +9,23 @@ class ListItem {
   ListItem({
     required this.lessonGroup,
     required this.clickable,
+    required this.finished,
     this.isExpanded = false,
   });
 
   final LessonGroup lessonGroup;
   final bool clickable;
   bool isExpanded;
+  bool finished;
 }
 
 class LessonGroupsListView extends StatefulWidget {
   final AppUser user;
 
   const LessonGroupsListView({
-    Key? key,
+    super.key,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<LessonGroupsListView> createState() => _LessonGroupsListViewState();
@@ -49,6 +51,15 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                               lessonGroup.id == widget.user.nextLessonGroupId)
                           .first
                           .order),
+                  finished: widget.user.highestLessonGroupId == null
+                      ? false
+                      : item.order <=
+                          (lessonGroups
+                              .where((lessonGroup) =>
+                                  lessonGroup.id ==
+                                  widget.user.highestLessonGroupId)
+                              .first
+                              .order),
                   isExpanded: false,
                 ),
               )
@@ -84,6 +95,14 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                       maxWidth: tileSize),
                   child: ElevatedButton(
                     style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        group.clickable
+                            ? Theme.of(context).colorScheme.secondary
+                            : Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.2),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40.0),
@@ -103,6 +122,14 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                         : null,
                     child: Text(
                       group.lessonGroup.name,
+                      style: TextStyle(
+                        color: group.clickable
+                            ? Theme.of(context).colorScheme.onSecondary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSecondary
+                                .withOpacity(0.3),
+                      ),
                       overflow: TextOverflow.clip,
                       textAlign: TextAlign.center,
                     ),
@@ -121,11 +148,14 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                 (i + 1) * (tileSize + 2 * paddingVertical) -
                 paddingVertical,
             child: _FloatingWindow(
+              key: ValueKey(data![i].finished),
               isVisible: () => data![i].isExpanded,
               onVisibleChange: (newValue) => setState(() {
                 data![i].isExpanded = newValue;
               }),
               lessonGroup: data![i].lessonGroup,
+              lessonGroupFinished: data![i].finished,
+              user: widget.user,
             ),
           ),
         ],
@@ -137,13 +167,17 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
 class _FloatingWindow extends StatefulWidget {
   final bool Function() isVisible;
   final LessonGroup lessonGroup;
+  final bool lessonGroupFinished;
   final void Function(bool) onVisibleChange;
+  final AppUser user;
 
   const _FloatingWindow({
     Key? key,
     required this.isVisible,
     required this.lessonGroup,
+    required this.lessonGroupFinished,
     required this.onVisibleChange,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -175,7 +209,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
           width: 2.5 * 125.0,
           height: 150,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -202,17 +236,22 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        //TODO: show tips
                         TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LessonsScreen(
-                                  lessonGroup: widget.lessonGroup,
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: true
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LessonsScreen(
+                                        lessonGroup: widget.lessonGroup,
+                                        lessonGroupFinished:
+                                            widget.lessonGroupFinished,
+                                      ),
+                                    ),
+                                  );
+                                },
                           icon: const Icon(Icons.lightbulb),
                           label: const Text('Learn'),
                         ),
@@ -222,7 +261,10 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => LessonsScreen(
+                                  key: ValueKey(widget.lessonGroupFinished),
                                   lessonGroup: widget.lessonGroup,
+                                  lessonGroupFinished:
+                                      widget.lessonGroupFinished,
                                 ),
                               ),
                             );

@@ -42,42 +42,53 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
       padding: const EdgeInsets.all(20.0),
       child: DottedBorder(
         borderType: BorderType.RRect,
-        dashPattern: const [6, 3],
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            children: [
-              for (var i = 0; i < codeParts.length; i++) ...[
-                Text(
-                  codeParts[i],
-                  style: const TextStyle(
-                    fontFamily: 'courier new',
-                    fontSize: 20.0,
-                  ),
-                ),
-                if (i < gaps)
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minWidth: widget.exercise.defaultGapLengths[i] * 20,
-                        maxWidth:
-                            widget.exercise.defaultGapLengths[i] * 20 * 2.5),
-                    child: IntrinsicWidth(
-                      stepWidth: 20.0,
-                      child: TextField(
-                        controller: controllers[i],
-                        onChanged: (value) {
-                          var answer = controllers.map((e) => e.text).toList();
-                          widget.onAnswerSelected(answer);
-                        },
+        dashPattern: const [6, 6],
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (var i = 0; i < codeParts.length; i++) ...[
+                      Text(
+                        codeParts[i],
                         style: const TextStyle(
                           fontFamily: 'courier new',
                           fontSize: 20.0,
                         ),
                       ),
-                    ),
-                  )
-              ]
-            ],
+                      if (i < gaps)
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minWidth: widget.exercise.defaultGapLengths[i] * 20,
+                              maxWidth:
+                                  widget.exercise.defaultGapLengths[i] * 20 * 2.5),
+                          child: IntrinsicWidth(
+                            stepWidth: 20.0,
+                            child: TextField(
+                              controller: controllers[i],
+                              onChanged: (value) {
+                                var answer = controllers.map((e) => e.text).toList();
+                                widget.onAnswerSelected(answer);
+                              },
+                              style: const TextStyle(
+                                fontFamily: 'courier new',
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ),
+                        )
+                    ]
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

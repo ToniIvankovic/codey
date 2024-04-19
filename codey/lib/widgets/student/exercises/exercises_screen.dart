@@ -31,11 +31,13 @@ class ExercisesScreen extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         appBar: AppBar(
+          titleTextStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
           title: Text('Lesson: ${lesson.name}'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: Center(
           child: FutureBuilder<void>(
             future: startSessionFuture,

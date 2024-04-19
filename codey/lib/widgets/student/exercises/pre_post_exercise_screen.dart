@@ -29,10 +29,12 @@ class _PrePostExerciseScreenState extends State<PrePostExerciseScreen> {
     final exercisesService = context.read<ExercisesService>();
 
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
+          titleTextStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
           title: Text(widget.lesson.name),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: completedLesson == false
             ? _PreLessonReport(
@@ -64,9 +66,13 @@ class _PreLessonReport extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(lesson.specificTips ?? "No tips"),
-          TextButton(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Text(lesson.specificTips ?? "No tips for this lesson, good luck!"),
+          ),
+          TextButton.icon(
             onPressed: () {
               Navigator.push(
                 context,
@@ -84,7 +90,8 @@ class _PreLessonReport extends StatelessWidget {
                 ),
               );
             },
-            child: const Text('Start Lesson'),
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('Start Lesson'),
           ),
         ],
       ),
@@ -110,7 +117,7 @@ class _PostLessonReport extends StatelessWidget {
               "You got ${endReport.correctAnswers} out of ${endReport.totalAnswers} correct!"),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context, true);
             },
             child: const Text('Finish'),
           ),
