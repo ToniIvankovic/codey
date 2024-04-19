@@ -56,11 +56,14 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
           child: Container(
             constraints: const BoxConstraints(minHeight: 150, maxHeight: 400),
             decoration: BoxDecoration(
-              // borderRadius: BorderRadius.circular(pieceBorderRadius),
+              borderRadius: BorderRadius.circular(10.0),
               color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
             ),
             child: DottedBorder(
-              color: Colors.grey,
+              borderType: BorderType.RRect,
+              color:
+                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+              radius: const Radius.circular(10.0),
               strokeWidth: 2,
               dashPattern: const [6, 6],
               child: Row(

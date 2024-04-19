@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/models/entities/end_of_lesson_response.dart';
 import 'package:codey/models/entities/end_report.dart';
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
@@ -20,7 +21,7 @@ abstract class ExercisesService {
   Exercise? getNextExercise();
   Exercise? get currentExercise;
   bool get sessionActive;
-  void endSession(bool completed);
+  Future<int?> endSession(bool completed);
   Future<bool> checkAnswer(Exercise exercise, dynamic answer);
   EndReport? getEndReport();
   Future<List<Exercise>> getAllExercisesForLesson(Lesson lesson);
@@ -126,11 +127,11 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  void endSession(bool completed) async {
+  Future<int?> endSession(bool completed) async {
     _sessionExercises = null;
     if (!completed) {
       _endReport = null;
-      return;
+      return null;
     }
 
     if (_endReport == null) throw Exception('End report is null');
@@ -145,11 +146,12 @@ class ExercisesServiceV1 implements ExercisesService {
     if (response.statusCode != 200) {
       //TODO: handle end of course
       print(response.body);
-      return;
+      return null;
     }
 
-    AppUser user = AppUser.fromJson(json.decode(response.body));
-    _userService.updateUser(user);
+    EndOfLessonResponse endResponse = EndOfLessonResponse.fromJson(json.decode(response.body));
+    _userService.updateUser(endResponse.appUser);
+    return endResponse.awardedXP;
   }
 
   @override

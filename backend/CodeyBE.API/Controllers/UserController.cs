@@ -98,9 +98,13 @@ namespace CodeyBE.API.Controllers
         {
             try
             {
-                ApplicationUser? applicationUser = await userService.EndLessonAsync(User, lessonReport);
-                var dto = await ProduceUserDataDTO(applicationUser);
-                return new OkObjectResult(dto);
+                int awardedXp = await userService.EndLessonAsync(User, lessonReport);
+                var dto = await ProduceUserDataDTO((await userService.GetUser(User))!);
+                return new OkObjectResult(new EndOfLessonDTO
+                {
+                    User = dto,
+                    AwardedXP = awardedXp,
+                });
             }
             catch (EntityNotFoundException e)
             {

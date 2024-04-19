@@ -40,13 +40,15 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
     var gaps = codeParts.length - 1;
     Widget codeArea = Padding(
       padding: const EdgeInsets.all(20.0),
-      child: DottedBorder(
-        borderType: BorderType.RRect,
-        dashPattern: const [6, 6],
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: DottedBorder(
+          borderType: BorderType.RRect,
+          dashPattern: const [6, 6],
+          radius: const Radius.circular(10.0),
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: SizedBox(
@@ -66,15 +68,18 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
                       if (i < gaps)
                         ConstrainedBox(
                           constraints: BoxConstraints(
-                              minWidth: widget.exercise.defaultGapLengths[i] * 20,
-                              maxWidth:
-                                  widget.exercise.defaultGapLengths[i] * 20 * 2.5),
+                              minWidth:
+                                  widget.exercise.defaultGapLengths[i] * 20,
+                              maxWidth: widget.exercise.defaultGapLengths[i] *
+                                  20 *
+                                  2.5),
                           child: IntrinsicWidth(
                             stepWidth: 20.0,
                             child: TextField(
                               controller: controllers[i],
                               onChanged: (value) {
-                                var answer = controllers.map((e) => e.text).toList();
+                                var answer =
+                                    controllers.map((e) => e.text).toList();
                                 widget.onAnswerSelected(answer);
                               },
                               style: const TextStyle(

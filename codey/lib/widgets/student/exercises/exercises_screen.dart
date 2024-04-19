@@ -52,7 +52,14 @@ class ExercisesScreen extends StatelessWidget {
 
               var exercise = exercisesService.getNextExercise();
               if (exercise == null) {
-                return const Text('No exercises');
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                );
               }
 
               return Column(
@@ -61,12 +68,12 @@ class ExercisesScreen extends StatelessWidget {
                   SingleExerciseWidget(
                     key: ValueKey(exercise.id),
                     exercisesService: exercisesService,
-                    onSessionFinished: () => {
-                      exercisesService.endSession(true),
-                      onSessionCompleted(),
+                    onSessionFinished: () async {
+                      onSessionCompleted();
+                      int? awardedXP = await exercisesService.endSession(true);
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pop(context);
-                      })
+                        Navigator.pop(context, awardedXP);
+                      });
                     },
                   ),
                 ],

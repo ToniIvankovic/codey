@@ -26,9 +26,18 @@ class ExerciseMCWidget extends StatefulWidget {
 
 class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
   String? selectedAnswer;
+  late final ExerciseMC exercise;
+  late final List<MapEntry<String, dynamic>> answerOptions;
+  @override
+  void initState() {
+    super.initState();
+    exercise = widget.exercise as ExerciseMC;
+    answerOptions = exercise.answerOptions.entries.toList();
+    answerOptions.shuffle();
+  }
+  
   @override
   Widget build(BuildContext context) {
-    var exercise = widget.exercise as ExerciseMC;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -37,9 +46,9 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
         widget.questionArea,
         GridView.count(
           shrinkWrap: true,
-          crossAxisCount: 3,
-          childAspectRatio: 2, // For square tiles
-          children: exercise.answerOptions.entries.map((option) {
+          crossAxisCount: 1,
+          childAspectRatio: 4, // For square tiles
+          children: answerOptions.map((option) {
             return GestureDetector(
               onTap: () {
                 setState(() {
@@ -52,22 +61,26 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: selectedAnswer == option.key
-                          ? Colors.black
-                          : Colors.grey,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onBackground
+                          .withOpacity(selectedAnswer == option.key ? 1 : 0.5),
                       width: 2,
                     ),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                   child: Center(
-                    child: Text(option.value),
+                    child: Text(
+                      option.value,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ),
             );
           }).toList(),
         ),
-        Text(exercise.correctAnswer,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }

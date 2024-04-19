@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
@@ -51,6 +52,15 @@ class ExercisesRepository1 implements ExercisesRepository {
     final List<dynamic> data = json.decode(response.body);
     final exercises =
         data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
+    for (var exercise in exercises) {
+      if (exercise is ExerciseMC) {
+        exercise.answerOptions.forEach((key, value) {
+          if (value == "error_message") {
+            exercise.answerOptions[key] = "* Dogodit će se greška *";
+          }
+        });
+      }
+    }
     if (!lesson.adaptive) {
       cachedLessonExercises[lesson.id] = exercises;
     }

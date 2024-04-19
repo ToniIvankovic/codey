@@ -43,7 +43,16 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   Widget build(BuildContext context) {
     if (exercise == null) {
       widget.onSessionFinished();
-      return const Text("No exercises");
+      return const Expanded(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ),
+        ),
+      );
     }
 
     ElevatedButton checkNextButton = _buildCheckNextButton();
@@ -208,16 +217,18 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     if ((exercise! as dynamic).statementCode?.isNotEmpty) {
       codeArea = Padding(
         padding: const EdgeInsets.all(20.0),
-        child: DottedBorder(
-          borderType: BorderType.RRect,
-          dashPattern: const [9, 6],
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: DottedBorder(
+            borderType: BorderType.RRect,
+            radius: const Radius.circular(10),
+            dashPattern: const [9, 6],
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -236,9 +247,9 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       );

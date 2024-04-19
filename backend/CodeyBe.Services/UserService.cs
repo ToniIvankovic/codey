@@ -120,7 +120,7 @@ namespace CodeyBe.Services
             return await _userManager.FindByEmailAsync(user.FindFirst(ClaimTypes.Email)?.Value ?? throw new EntityNotFoundException());
         }
 
-        public async Task<ApplicationUser> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport)
+        public async Task<int> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport)
         {
             int XP_SOLVED_OLD = 40;
             int XP_SOLVED_NEW = 100;
@@ -150,16 +150,17 @@ namespace CodeyBe.Services
             {
                 awardedXP = XP_SOLVED_OLD;
             }
-
+            int oldXp = applicationUser.TotalXP;
             applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, awardedXP));
             await HandleQuestProgress(lessonReport, applicationUser, awardedXP, completedLessonGroup);
 
             applicationUser.TotalXP = ApplicationUser.CalculateTotalXP(applicationUser);
+            int totalAwardedXP = applicationUser.TotalXP - oldXp;
 
             await UpdateUserScoreFromLessonReport(lessonReport.AnswersReport, applicationUser);
 
             await UpdateUser(applicationUser);
-            return applicationUser;
+            return totalAwardedXP;
         }
 
         private async Task UpdateUserScoreFromLessonReport(

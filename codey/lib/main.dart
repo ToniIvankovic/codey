@@ -208,9 +208,13 @@ class _MyHomePageState extends State<MyHomePage> {
               return Scaffold(
                 body: Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Loading... (2)"),
-                      const CircularProgressIndicator(),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
                       ElevatedButton(
                         onPressed: () => onLogout(),
                         child: const Text("Logout"),
