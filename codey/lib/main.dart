@@ -137,8 +137,9 @@ class MyApp extends StatelessWidget {
     primary: Color(0xff389c9a),
     secondary: Color(0xfffedb71),
     surface: Color(0xfff8f8f8),
-    error: Color(0xffe56b6f),
-    inversePrimary: Color(0xffcbf3f0), //TODO
+    error: Color.fromARGB(255, 238, 127, 131),
+    errorContainer: Color.fromARGB(255, 238, 172, 174),
+    inversePrimary: Color(0xffcbf3f0),
     onBackground: Color(0xff1d1d1d),
     onPrimary: Color(0xfff8f8f8),
     onSecondary: Color(0xff1d1d1d),

@@ -107,8 +107,9 @@ class _PreLessonReport extends StatelessWidget {
                   ),
                 ),
               ).then(
-                (awardedXP) {
-                  setAwardedXP(awardedXP);
+                (value) {
+                  if (value == null) return;
+                  setAwardedXP(value);
                 },
               );
             },

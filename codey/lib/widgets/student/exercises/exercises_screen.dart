@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
@@ -5,7 +6,7 @@ import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ExercisesScreen extends StatelessWidget {
+class ExercisesScreen extends StatefulWidget {
   final Lesson lesson;
   final LessonGroup lessonGroup;
   final VoidCallback onSessionCompleted;
@@ -18,11 +19,28 @@ class ExercisesScreen extends StatelessWidget {
   });
 
   @override
+  State<ExercisesScreen> createState() => _ExercisesScreenState();
+}
+
+class _ExercisesScreenState extends State<ExercisesScreen> {
+  Exercise? currentExercise;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final exercisesService = context.read<ExercisesService>();
+    exercisesService
+        .startSessionForLesson(widget.lesson, widget.lessonGroup)
+        .then((value) {
+      setState(() {
+        currentExercise = exercisesService.getNextExercise();
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final exercisesService = context.read<ExercisesService>();
-    final Future<void> startSessionFuture =
-        exercisesService.startSessionForLesson(lesson, lessonGroup);
-
     return WillPopScope(
       onWillPop: () async {
         if (exercisesService.sessionActive) {
@@ -34,52 +52,44 @@ class ExercisesScreen extends StatelessWidget {
         appBar: AppBar(
           titleTextStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
-          title: Text('Lesson: ${lesson.name}'),
+          title: Text('Lesson: ${widget.lesson.name}'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         backgroundColor: Theme.of(context).colorScheme.background,
         body: Center(
-          child: FutureBuilder<void>(
-            future: startSessionFuture,
-            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator(
-                  strokeWidth: 5,
-                );
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
-
-              var exercise = exercisesService.getNextExercise();
-              if (exercise == null) {
-                return const Center(
+          child: currentExercise == null
+              ? const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(),
                     ],
                   ),
-                );
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SingleExerciseWidget(
-                    key: ValueKey(exercise.id),
-                    exercisesService: exercisesService,
-                    onSessionFinished: () async {
-                      onSessionCompleted();
-                      int? awardedXP = await exercisesService.endSession(true);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pop(context, awardedXP);
-                      });
-                    },
+                )
+              : Container(
+                  constraints: BoxConstraints(
+                      minHeight:
+                          MediaQuery.of(context).size.height - kToolbarHeight),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: SingleExerciseWidget(
+                          key: ValueKey(currentExercise!.id),
+                          exercisesService: exercisesService,
+                          onSessionFinished: () async {
+                            widget.onSessionCompleted();
+                            int? awardedXP =
+                                await exercisesService.endSession(true);
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              Navigator.pop(context, awardedXP);
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
         ),
       ),
     );

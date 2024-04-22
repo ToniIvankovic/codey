@@ -29,7 +29,9 @@ abstract class ExercisesService {
   Future<Exercise> createExercise(Exercise exercise);
   Future<Exercise> updateExercise(Exercise exercise);
   Future<void> startMockExerciseSession(Exercise exercise);
-  Future<List<ExerciseStatistics>> calculateStatistics(List<Exercise> exercises);
+  Future<List<ExerciseStatistics>> calculateStatistics(
+      List<Exercise> exercises);
+  dynamic getCorrectAnswer(Exercise exercise);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -148,7 +150,8 @@ class ExercisesServiceV1 implements ExercisesService {
       return null;
     }
 
-    EndOfLessonResponse endResponse = EndOfLessonResponse.fromJson(json.decode(response.body));
+    EndOfLessonResponse endResponse =
+        EndOfLessonResponse.fromJson(json.decode(response.body));
     _userService.updateUser(endResponse.appUser);
     return endResponse.awardedXP;
   }
@@ -222,7 +225,8 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   @override
-  Future<List<ExerciseStatistics>> calculateStatistics(List<Exercise> exercises) async {
+  Future<List<ExerciseStatistics>> calculateStatistics(
+      List<Exercise> exercises) async {
     final response = await _authenticatedClient.post(
       Uri.parse("${dotenv.env["API_BASE"]}/exercises/calculate_statistics"),
       body: json.encode(exercises.map((e) => e.id).toList()),
@@ -235,6 +239,22 @@ class ExercisesServiceV1 implements ExercisesService {
     }
 
     final data = json.decode(response.body);
-    return List<ExerciseStatistics>.from(data.map((e) => ExerciseStatistics.fromJson(e)));
+    return List<ExerciseStatistics>.from(
+        data.map((e) => ExerciseStatistics.fromJson(e)));
+  }
+
+  @override
+  dynamic getCorrectAnswer(Exercise exercise) {
+    if (exercise is ExerciseMC) {
+      return exercise.correctAnswer;
+    } else if (exercise is ExerciseSA) {
+      return exercise.correctAnswers?[0];
+    } else if (exercise is ExerciseLA) {
+      return exercise.correctAnswers[0];
+    } else if (exercise is ExerciseSCW) {
+      return exercise.correctAnswers?[0];
+    } else {
+      throw Exception('Unknown exercise type');
+    }
   }
 }

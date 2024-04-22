@@ -77,8 +77,19 @@ class _LessonsScreenState extends State<LessonsScreen> {
         future: lessonsFuture,
         builder: (BuildContext context, AsyncSnapshot<List<Lesson>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(
-              strokeWidth: 5,
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text("Loading user data..."),
+                  ),
+                  CircularProgressIndicator(
+                    strokeWidth: 5,
+                  ),
+                ],
+              ),
             );
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');

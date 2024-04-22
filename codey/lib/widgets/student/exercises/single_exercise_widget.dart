@@ -55,131 +55,196 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       );
     }
 
-    ElevatedButton checkNextButton = _buildCheckNextButton();
     // single exercise, button
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (exercise is ExerciseMC)
-            ExerciseMCWidget(
-              key: ValueKey(exercise!.id + 100 * repeatCount),
-              exercise: exercise!,
-              onAnswerSelected: (answer) {
-                setState(() {
-                  this.answer = answer;
-                  enableCheck = true;
-                });
-              },
-              statementArea: _buildStaticStatementArea(),
-              codeArea: _buildStaticCodeArea(),
-              questionArea: _buildStaticQuestionArea(),
-            ),
-          if (exercise is ExerciseSA)
-            ExerciseSAWidget(
-              key: ValueKey(exercise!.id + 100 * repeatCount),
-              exercise: exercise!,
-              onAnswerSelected: (answer) {
-                setState(() {
-                  this.answer = answer;
-                  enableCheck = true;
-                });
-              },
-              statementArea: _buildStaticStatementArea(),
-              codeArea: _buildStaticCodeArea(),
-              questionArea: _buildStaticQuestionArea(),
-            ),
-          if (exercise is ExerciseLA)
-            ExerciseLAWidget(
-              key: ValueKey(exercise!.id + 100 * repeatCount),
-              exercise: exercise! as ExerciseLA,
-              onAnswerSelected: (answer) {
-                setState(() {
-                  this.answer = answer;
-                  enableCheck = answer.isNotEmpty;
-                });
-              },
-              statementArea: _buildStaticStatementArea(),
-              // questionArea: _buildStaticQuestionArea(),
-            ),
-          if (exercise is ExerciseSCW)
-            ExerciseSCWWidget(
-              key: ValueKey(exercise!.id + 100 * repeatCount),
-              exercise: exercise! as ExerciseSCW,
-              onAnswerSelected: (answer) {
-                setState(() {
-                  this.answer = answer;
-                  enableCheck = answer.isNotEmpty &&
-                      answer.every((element) => element.isNotEmpty);
-                });
-              },
-              statementArea: _buildStaticStatementArea(),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: checkNextButton,
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (exercise is ExerciseMC)
+                ExerciseMCWidget(
+                  key: ValueKey(exercise!.id + 100 * repeatCount),
+                  exercise: exercise!,
+                  onAnswerSelected: (answer) {
+                    setState(() {
+                      this.answer = answer;
+                      enableCheck = true;
+                    });
+                  },
+                  statementArea: _buildStaticStatementArea(),
+                  codeArea: _buildStaticCodeArea(),
+                  questionArea: _buildStaticQuestionArea(),
+                ),
+              if (exercise is ExerciseSA)
+                ExerciseSAWidget(
+                  key: ValueKey(exercise!.id + 100 * repeatCount),
+                  exercise: exercise!,
+                  onAnswerSelected: (answer) {
+                    setState(() {
+                      this.answer = answer;
+                      enableCheck = true;
+                    });
+                  },
+                  statementArea: _buildStaticStatementArea(),
+                  codeArea: _buildStaticCodeArea(),
+                  questionArea: _buildStaticQuestionArea(),
+                ),
+              if (exercise is ExerciseLA)
+                ExerciseLAWidget(
+                  key: ValueKey(exercise!.id + 100 * repeatCount),
+                  exercise: exercise! as ExerciseLA,
+                  onAnswerSelected: (answer) {
+                    setState(() {
+                      this.answer = answer;
+                      enableCheck = answer.isNotEmpty;
+                    });
+                  },
+                  statementArea: _buildStaticStatementArea(),
+                  // questionArea: _buildStaticQuestionArea(),
+                ),
+              if (exercise is ExerciseSCW)
+                ExerciseSCWWidget(
+                  key: ValueKey(exercise!.id + 100 * repeatCount),
+                  exercise: exercise! as ExerciseSCW,
+                  onAnswerSelected: (answer) {
+                    setState(() {
+                      this.answer = answer;
+                      enableCheck = answer.isNotEmpty &&
+                          answer.every((element) => element.isNotEmpty);
+                    });
+                  },
+                  statementArea: _buildStaticStatementArea(),
+                ),
+            ],
           ),
-        ],
+        ),
+        if (isCorrectResponse == null) _buildCheckButton(),
+        if (isCorrectResponse != null) _buildNextButtonArea(),
+      ],
+    );
+  }
+
+  Widget _buildCheckButton() {
+    return Positioned(
+      bottom: 0,
+      child: Container(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width,
+          maxWidth: MediaQuery.of(context).size.width,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: null),
+              onPressed: enableCheck
+                  ? () {
+                      setState(() {
+                        enableCheck = false;
+                      });
+                      widget.exercisesService.checkAnswer(exercise!, answer).then(
+                        (value) {
+                          setState(() {
+                            isCorrectResponse = value;
+                          });
+                        },
+                      );
+                    }
+                  : null,
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text('CHECK'),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  ElevatedButton _buildCheckNextButton() {
-    ElevatedButton button;
-    //If the exercise isn't answered yet, show the check button (active if anything is enterd)
-    if (isCorrectResponse == null) {
-      button = ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: null),
-        onPressed: enableCheck
-            ? () {
-                setState(() {
-                  enableCheck = false;
-                });
-                widget.exercisesService.checkAnswer(exercise!, answer).then(
-                  (value) {
-                    setState(() {
-                      isCorrectResponse = value;
-                    });
-                  },
-                );
-              }
-            : null,
-        child: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Text('CHECK'),
+  Widget _buildNextButtonArea() {
+    var correctAnswer = widget.exercisesService.getCorrectAnswer(exercise!);
+    var textColor = TextStyle(
+      color: isCorrectResponse == true
+          ? Theme.of(context).colorScheme.onSecondary
+          : Theme.of(context).colorScheme.onError,
+    );
+    return Positioned(
+      bottom: 0,
+      child: Container(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width,
+          maxWidth: MediaQuery.of(context).size.width,
         ),
-      );
-    } else {
-      //If the exercise is answered, show the next button
-      button = ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isCorrectResponse == true
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.error,
-        ),
-        onPressed: () {
-          setState(() {
-            exercise = widget.exercisesService.getNextExercise();
-            isCorrectResponse = null;
-            enableCheck = false;
-            repeatCount++;
-          });
-        },
+        color: isCorrectResponse == true
+            ? Theme.of(context).colorScheme.inversePrimary.withOpacity(0.95)
+            : Theme.of(context).colorScheme.errorContainer.withOpacity(0.9),
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Text(
-            'NEXT',
-            style: TextStyle(
-              color: isCorrectResponse == true
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onError,
-            ),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isCorrectResponse == true ? 'Correct!' : 'Incorrect...',
+                style: textColor.copyWith(
+                  fontSize: 20.0,
+                ),
+              ),
+              if (correctAnswer != null) ...[
+                Text(
+                  'Correct answer:',
+                  style: textColor.copyWith(
+                    fontSize: 16.0,
+                  ),
+                ),
+                Text(
+                  correctAnswer,
+                  style: textColor.copyWith(
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isCorrectResponse == true
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.error,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        exercise = widget.exercisesService.getNextExercise();
+                        isCorrectResponse = null;
+                        enableCheck = false;
+                        repeatCount++;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        'NEXT',
+                        style: TextStyle(
+                          color: isCorrectResponse == true
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.onError,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      );
-    }
-    return button;
+      ),
+    );
   }
 
   Widget _buildStaticStatementArea() {
