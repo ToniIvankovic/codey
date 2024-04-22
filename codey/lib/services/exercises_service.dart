@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/end_of_lesson_response.dart';
 import 'package:codey/models/entities/end_report.dart';
 import 'package:codey/models/entities/exercise.dart';

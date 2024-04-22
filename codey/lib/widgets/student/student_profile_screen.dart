@@ -1,12 +1,8 @@
 import 'package:codey/models/entities/app_user.dart';
-import 'package:codey/models/entities/leaderboard.dart';
-import 'package:codey/models/entities/quest.dart';
-import 'package:codey/services/user_interaction_service.dart';
-import 'package:codey/widgets/student/leaderboard_widget.dart';
-import 'package:codey/widgets/student/quests_widget.dart';
-import 'package:codey/widgets/student/streak_widget.dart';
+import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
+import 'package:codey/widgets/student/gamification_widgets/quests_widget.dart';
+import 'package:codey/widgets/student/gamification_widgets/streak_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class StudentProfileScreen extends StatefulWidget {
   final AppUser user;
@@ -20,28 +16,6 @@ class StudentProfileScreen extends StatefulWidget {
 }
 
 class _StudentProfileScreenState extends State<StudentProfileScreen> {
-  Leaderboard? leaderboard;
-  bool leaderboardLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    context
-        .read<UserInteractionService>()
-        .getLeaderboardStudent()
-        .then((value) {
-      setState(() {
-        leaderboard = value;
-        leaderboardLoading = false;
-      });
-    }).catchError((onError) {
-      setState(() {
-        leaderboard = null;
-        leaderboardLoading = false;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +33,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 40.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 60.0, vertical: 40.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -71,26 +46,19 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("XP: ${widget.user.totalXp}", style: const TextStyle(fontSize: 16)),
+                          Text("XP: ${widget.user.totalXp}",
+                              style: const TextStyle(fontSize: 16)),
                         ],
                       ),
                     ),
                   ),
                 ),
                 StreakWidget(user: widget.user),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18.0),
-                  child: QuestsWidget(quests: widget.user.quests),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 18.0),
+                  child: QuestsWidget(),
                 ),
-                if (leaderboardLoading) ...[
-                  const Text("Leaderboard"),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
-                  )
-                ] else if (leaderboard != null) ...[
-                  LeaderboardWidget(leaderboard: leaderboard!),
-                ]
+                const LeaderboardWidget(),
               ],
             ),
           ),

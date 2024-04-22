@@ -1,12 +1,30 @@
 import 'package:codey/models/entities/quest.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class QuestsWidget extends StatelessWidget {
-  final Set<Quest> quests;
+class QuestsWidget extends StatefulWidget {
   const QuestsWidget({
     super.key,
-    required this.quests,
   });
+
+  @override
+  State<QuestsWidget> createState() => _QuestsWidgetState();
+}
+
+class _QuestsWidgetState extends State<QuestsWidget> {
+  Set<Quest>? quests;
+
+  @override
+  void initState() {
+    super.initState();
+    var user$ = context.read<UserService>().userStream;
+    user$.listen((user) {
+      setState(() {
+        quests = user.quests;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +37,20 @@ class QuestsWidget extends StatelessWidget {
             style: TextStyle(fontSize: 18),
           ),
         ),
-        for (var quest in quests)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(child: _generateQuestText(quest)),
-              if (quest.isCompleted)
-                const Icon(Icons.check_box)
-              else
-                const Icon(Icons.check_box_outline_blank),
-            ],
-          ),
+        if (quests == null)
+          const CircularProgressIndicator()
+        else
+          for (var quest in quests!)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: _generateQuestText(quest)),
+                if (quest.isCompleted)
+                  const Icon(Icons.check_box)
+                else
+                  const Icon(Icons.check_box_outline_blank),
+              ],
+            ),
       ],
     );
   }
@@ -44,11 +65,13 @@ class QuestsWidget extends StatelessWidget {
               "Get ${quest.constraint} XP: ",
               overflow: TextOverflow.ellipsis,
             ),
-            Expanded(
+            if (!quest.isCompleted)
+              Expanded(
                 child: Text(
-              "${quest.progress}/${quest.constraint}",
-              textAlign: TextAlign.right,
-            ))
+                  "${quest.progress}/${quest.constraint}",
+                  textAlign: TextAlign.right,
+                ),
+              ),
           ],
         );
       case Quest.questHighAccuracy:

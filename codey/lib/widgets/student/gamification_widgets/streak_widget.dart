@@ -1,4 +1,3 @@
-
 import 'package:codey/models/entities/app_user.dart';
 import 'package:flutter/material.dart';
 
@@ -29,13 +28,13 @@ class StreakWidget extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Icon(Icons.whatshot,
-                  color: user.streak > 0
-                      ? Theme.of(context).colorScheme.secondary
-                      : Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.5)),
+              child: Icon(
+                Icons.whatshot,
+                color: user.streak > 0
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                size: 30.0,
+              ),
             ),
           ],
         ),

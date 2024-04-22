@@ -35,7 +35,7 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
     answerOptions = exercise.answerOptions.entries.toList();
     answerOptions.shuffle();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -65,7 +65,7 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                           .colorScheme
                           .onBackground
                           .withOpacity(selectedAnswer == option.key ? 1 : 0.5),
-                      width: 2,
+                      width: selectedAnswer == option.key ? 3 : 1.5,
                     ),
                     borderRadius: BorderRadius.circular(10),
                     color: Theme.of(context).colorScheme.surface,

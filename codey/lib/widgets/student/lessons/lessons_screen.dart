@@ -4,6 +4,7 @@ import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/student/exercises/pre_post_exercise_screen.dart';
+import 'package:codey/widgets/student/lesson_groups/lesson_group_tips_screen.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,6 @@ class _LessonsScreenState extends State<LessonsScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     lessonGroupFinished = widget.lessonGroupFinished;
   }
@@ -45,9 +45,32 @@ class _LessonsScreenState extends State<LessonsScreen> {
           widget.lessonGroup.name,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
-        backgroundColor: Theme.of(context)
-            .colorScheme
-            .primary, // Set the title of the lessonGroup
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        actionsIconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+        iconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => LessonGroupTipsScreen(
+                      lessonGroup: widget.lessonGroup,
+                      lessonGroupFinished: lessonGroupFinished,
+                      backDisabled: true,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.lightbulb_outline),
+            ),
+          ),
+        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: FutureBuilder<List<Lesson>>(
@@ -78,119 +101,69 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   return const Text('No user data');
                 } else {
                   AppUser user = userSnapshot.data!;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 50.0, vertical: 15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: lessons.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            var lesson = lessons[index];
-                            bool isClickable;
-                            // Lesson group not already solved
-                            if (!lessonGroupFinished) {
-                              isClickable = widget.lessonGroup.lessons
-                                      .indexOf(lesson.id) <=
-                                  widget.lessonGroup.lessons
-                                      .indexOf(user.nextLessonId ?? 0);
-                            } else {
-                              isClickable = true;
-                            }
-                            return DottedBorder(
-                              color: lesson.id == user.nextLessonId &&
-                                      !lessonGroupFinished
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              dashPattern: const [9, 9],
-                              radius: const Radius.circular(50.0),
-                              child: ListTile(
-                                title: Row(
-                                  mainAxisAlignment: MainAxisAlignment
-                                      .spaceBetween, // Align the lesson name and the play button
-                                  children: [
-                                    Text(
-                                      lesson.name,
-                                      style: isClickable
-                                          ? null
-                                          : TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onBackground
-                                                  .withOpacity(0.5),
-                                            ),
-                                    ),
-                                    IconButton(
-                                      onPressed: isClickable
-                                          ? () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PrePostExerciseScreen(
-                                                    lesson: lesson,
-                                                    lessonGroup:
-                                                        widget.lessonGroup,
-                                                  ),
-                                                ),
-                                              ).then(
-                                                (value) {
-                                                  if (value == null) return;
-                                                  if (lessons.last.id ==
-                                                      lesson.id) {
-                                                    setState(() {
-                                                      lessonGroupFinished =
-                                                          true;
-                                                    });
-                                                  }
-                                                },
-                                              );
-                                            }
-                                          : null,
-                                      icon: Icon(
-                                        Icons.play_arrow,
-                                        color: isClickable
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                                .withOpacity(0.1),
+                  return SingleChildScrollView(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight:
+                            MediaQuery.of(context).size.height - kToolbarHeight,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50.0, vertical: 15.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: lessons.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                var lesson = lessons[index];
+                                bool isClickable;
+                                // Lesson group not already solved
+                                if (!lessonGroupFinished) {
+                                  isClickable = widget.lessonGroup.lessons
+                                          .indexOf(lesson.id) <=
+                                      widget.lessonGroup.lessons
+                                          .indexOf(user.nextLessonId ?? 0);
+                                } else {
+                                  isClickable = true;
+                                }
+                                return _generateSingleLessonItem(
+                                  lesson: lesson,
+                                  nextLessonId: user.nextLessonId,
+                                  context: context,
+                                  isClickable: isClickable,
+                                  lastLessonId: lessons.last.id,
+                                );
+                              },
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 50.0),
+                              child: Column(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: lessonGroupFinished
+                                        ? () => Navigator.of(context).pop()
+                                        : null,
+                                    child: const Text("Finish lesson group"),
+                                  ),
+                                  if (!lessonGroupFinished)
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 10.0, horizontal: 30.0),
+                                      child: Text(
+                                        "(Complete all lessons above to continue)",
+                                        overflow: TextOverflow.clip,
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            );
-                          },
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 50.0),
-                          child: Column(
-                            children: [
-                              ElevatedButton(
-                                onPressed: lessonGroupFinished
-                                    ? () => Navigator.of(context).pop()
-                                    : null,
-                                child: const Text("Finish lesson group"),
-                              ),
-                              if (!lessonGroupFinished)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10.0, horizontal: 30.0),
-                                  child: Text(
-                                    "(Complete all lessons above to continue)",
-                                    overflow: TextOverflow.clip,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        )
-                      ],
+                      ),
                     ),
                   );
                 }
@@ -198,6 +171,73 @@ class _LessonsScreenState extends State<LessonsScreen> {
             );
           }
         },
+      ),
+    );
+  }
+
+  DottedBorder _generateSingleLessonItem({
+    required BuildContext context,
+    required Lesson lesson,
+    required int? nextLessonId,
+    required bool isClickable,
+    required int lastLessonId,
+  }) {
+    return DottedBorder(
+      color: lesson.id == nextLessonId && !lessonGroupFinished
+          ? Theme.of(context).colorScheme.primary
+          : Colors.transparent,
+      dashPattern: const [9, 9],
+      radius: const Radius.circular(50.0),
+      child: ListTile(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                lesson.name,
+                style: isClickable
+                    ? null
+                    : TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onBackground
+                            .withOpacity(0.5),
+                      ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            IconButton(
+              onPressed: isClickable
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PrePostExerciseScreen(
+                            lesson: lesson,
+                            lessonGroup: widget.lessonGroup,
+                          ),
+                        ),
+                      ).then(
+                        (value) {
+                          if (value == null) return;
+                          if (lastLessonId == lesson.id) {
+                            setState(() {
+                              lessonGroupFinished = true;
+                            });
+                          }
+                        },
+                      );
+                    }
+                  : null,
+              icon: Icon(
+                Icons.play_arrow,
+                color: isClickable
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

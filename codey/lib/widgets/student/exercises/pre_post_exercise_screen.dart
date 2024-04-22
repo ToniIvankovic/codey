@@ -1,11 +1,10 @@
 import 'package:codey/models/entities/end_report.dart';
-import 'package:codey/models/entities/leaderboard.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
-import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/widgets/student/exercises/exercises_screen.dart';
-import 'package:codey/widgets/student/leaderboard_widget.dart';
+import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
+import 'package:codey/widgets/student/gamification_widgets/quests_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,25 +39,28 @@ class _PrePostExerciseScreenState extends State<PrePostExerciseScreen> {
         title: Text(widget.lesson.name),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      body: completedLesson == false
-          ? _PreLessonReport(
-              lesson: widget.lesson,
-              lessonGroup: widget.lessonGroup,
-              postLessonCallback: () {
-                setState(() {
-                  completedLesson = true;
-                });
-              },
-              setAwardedXP: (int xp) {
-                setState(() {
-                  awardedXP = xp;
-                });
-              },
-            )
-          : _PostLessonReport(
-              endReport: exercisesService.getEndReport()!,
-              awardedXP: awardedXP,
-            ),
+      body: Container(
+        constraints: const BoxConstraints(minWidth: 500.0),
+        child: completedLesson == false
+            ? _PreLessonReport(
+                lesson: widget.lesson,
+                lessonGroup: widget.lessonGroup,
+                postLessonCallback: () {
+                  setState(() {
+                    completedLesson = true;
+                  });
+                },
+                setAwardedXP: (int xp) {
+                  setState(() {
+                    awardedXP = xp;
+                  });
+                },
+              )
+            : _PostLessonReport(
+                endReport: exercisesService.getEndReport()!,
+                awardedXP: awardedXP,
+              ),
+      ),
     );
   }
 }
@@ -119,7 +121,7 @@ class _PreLessonReport extends StatelessWidget {
   }
 }
 
-class _PostLessonReport extends StatefulWidget {
+class _PostLessonReport extends StatelessWidget {
   const _PostLessonReport({
     required this.endReport,
     required this.awardedXP,
@@ -127,37 +129,6 @@ class _PostLessonReport extends StatefulWidget {
 
   final EndReport endReport;
   final int? awardedXP;
-
-  @override
-  State<_PostLessonReport> createState() => _PostLessonReportState();
-}
-
-class _PostLessonReportState extends State<_PostLessonReport> {
-  Leaderboard? leaderboard;
-  bool leaderboardLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    leaderboardLoading = true;
-    context
-        .read<UserInteractionService>()
-        .getLeaderboardStudent()
-        .then((value) {
-      setState(() {
-        leaderboard = value;
-        leaderboardLoading = false;
-      });
-    }).catchError(
-      (error) {
-        //User not in class
-        setState(() {
-          leaderboard = null;
-          leaderboardLoading = false;
-        });
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,54 +141,72 @@ class _PostLessonReportState extends State<_PostLessonReport> {
             child: Text("Lesson completed!", style: TextStyle(fontSize: 18)),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 100.0),
+            padding: const EdgeInsets.symmetric(horizontal: 50.0),
             child: Column(
               children: [
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Correct / Total:"),
-                        Text(
-                            "${widget.endReport.correctAnswers}/${widget.endReport.totalAnswers}"),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Accuracy:"),
-                        Text(" ${(widget.endReport.accuracy * 100).toInt()}%"),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Time taken:"),
-                        Text(
-                          " ${widget.endReport.duration.inMinutes}:${(widget.endReport.duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("XP achieved:"),
-                        widget.awardedXP != null
-                            ? Text(widget.awardedXP.toString())
-                            : const CircularProgressIndicator(),
-                      ],
-                    ),
-                    if (leaderboardLoading) ...[
-                      const Text("Leaderboard:"),
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                              child: Text(
+                            "Correct / Total:",
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          Text(
+                              "${endReport.correctAnswers}/${endReport.totalAnswers}"),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                              child: Text(
+                            "Accuracy:",
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          Text(" ${(endReport.accuracy * 100).toInt()}%"),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                              child: Text(
+                            "Time taken:",
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          Text(
+                            " ${endReport.duration.inMinutes}:${(endReport.duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                              child: Text(
+                            "XP achieved:",
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                          awardedXP != null
+                              ? Text(awardedXP.toString())
+                              : const CircularProgressIndicator(),
+                        ],
                       ),
                     ],
-                    if (leaderboard != null)
-                      LeaderboardWidget(leaderboard: leaderboard!),
-                  ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  child: LeaderboardWidget(),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  child: QuestsWidget(),
                 ),
               ],
             ),
