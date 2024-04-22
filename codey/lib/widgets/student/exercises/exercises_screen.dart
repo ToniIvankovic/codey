@@ -52,7 +52,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         appBar: AppBar(
           titleTextStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
-          title: Text('Lesson: ${widget.lesson.name}'),
+          title: Text('Lekcija: ${widget.lesson.name}'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         backgroundColor: Theme.of(context).colorScheme.background,

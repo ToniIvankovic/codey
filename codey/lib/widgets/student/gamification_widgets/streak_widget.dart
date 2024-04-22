@@ -22,8 +22,8 @@ class StreakWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 children: [
-                  Text("Current: ${user.streak}"),
-                  Text("Highest: ${user.highestStreak}"),
+                  Text("Trenutni: ${user.streak}"),
+                  Text("Najveći: ${user.highestStreak}"),
                 ],
               ),
             ),

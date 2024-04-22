@@ -88,7 +88,7 @@ class _PreLessonReport extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Text(
-                lesson.specificTips ?? "No tips for this lesson, good luck!"),
+                lesson.specificTips ?? "Nema pomoći za ovu lekciju, sretno!"),
           ),
           TextButton.icon(
             onPressed: () {
@@ -114,7 +114,7 @@ class _PreLessonReport extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.play_arrow),
-            label: const Text('Start Lesson'),
+            label: const Text('Započni lekciju'),
           ),
         ],
       ),
@@ -139,7 +139,7 @@ class _PostLessonReport extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.all(18.0),
-            child: Text("Lesson completed!", style: TextStyle(fontSize: 18)),
+            child: Text("Lekcija završena!", style: TextStyle(fontSize: 18)),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),
@@ -154,7 +154,7 @@ class _PostLessonReport extends StatelessWidget {
                         children: [
                           const Expanded(
                               child: Text(
-                            "Correct / Total:",
+                            "Točno / Ukupno:",
                             overflow: TextOverflow.ellipsis,
                           )),
                           Text(
@@ -166,7 +166,7 @@ class _PostLessonReport extends StatelessWidget {
                         children: [
                           const Expanded(
                               child: Text(
-                            "Accuracy:",
+                            "Preciznost:",
                             overflow: TextOverflow.ellipsis,
                           )),
                           Text(" ${(endReport.accuracy * 100).toInt()}%"),
@@ -177,7 +177,7 @@ class _PostLessonReport extends StatelessWidget {
                         children: [
                           const Expanded(
                               child: Text(
-                            "Time taken:",
+                            "Vrijeme proteklo:",
                             overflow: TextOverflow.ellipsis,
                           )),
                           Text(
@@ -190,7 +190,7 @@ class _PostLessonReport extends StatelessWidget {
                         children: [
                           const Expanded(
                               child: Text(
-                            "XP achieved:",
+                            "XP zarađeno:",
                             overflow: TextOverflow.ellipsis,
                           )),
                           awardedXP != null
@@ -218,7 +218,7 @@ class _PostLessonReport extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context, true);
               },
-              child: const Text('Finish'),
+              child: const Text('Završi lekciju'),
             ),
           ),
         ],

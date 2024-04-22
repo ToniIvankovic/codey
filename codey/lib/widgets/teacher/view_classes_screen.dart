@@ -31,7 +31,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View Classes'),
+        title: const Text('Pregled razreda'),
       ),
       body: Center(
         child: Column(
@@ -39,7 +39,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Classes'),
+            const Text('Razredi'),
             ListView.builder(
               shrinkWrap: true,
               itemCount: _classes.length,
@@ -54,18 +54,18 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Confirmation'),
+                            title: const Text('Potvrda'),
                             content: Text(
-                                'Are you sure you want to delete the class ${localClass.name}?'),
+                                'Želite li sigurno izbrisati razred ${localClass.name}?'),
                             actions: <Widget>[
                               TextButton(
-                                child: const Text('Cancel'),
+                                child: const Text('Odustani'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: const Text('Delete'),
+                                child: const Text('Izbriši'),
                                 onPressed: () {
                                   final userInteractionService =
                                       context.read<UserInteractionService>();
@@ -81,15 +81,15 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
-                                          content: Text('No changes were made'),
+                                          content: Text('Nema promjena'),
                                         ),
                                       );
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('Failed to delete class'),
+                                        SnackBar(
+                                          content: Text(
+                                              'Neuspjelo brisanje razreda (${error.toString()})'),
                                         ),
                                       );
                                     }

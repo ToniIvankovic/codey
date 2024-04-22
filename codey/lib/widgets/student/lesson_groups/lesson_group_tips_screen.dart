@@ -41,7 +41,7 @@ class LessonGroupTipsScreen extends StatelessWidget {
                             lessonGroupFinished: lessonGroupFinished),
                       ),
                     ),
-                    child: const Text('Go to lessons'),
+                    child: const Text('Idi na lekcije'),
                   ),
                 ),
               ],

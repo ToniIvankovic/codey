@@ -83,7 +83,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                 children: [
                   Padding(
                     padding: EdgeInsets.all(10.0),
-                    child: Text("Loading user data..."),
+                    child: Text("Učitavanje podataka o korisniku..."),
                   ),
                   CircularProgressIndicator(
                     strokeWidth: 5,
@@ -92,9 +92,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Text('Pogreška: ${snapshot.error}');
           } else if (snapshot.data == null) {
-            return const Text('No data');
+            return const Text('Nema podataka');
           } else {
             var lessons = snapshot.data!;
 
@@ -107,9 +107,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     strokeWidth: 5,
                   );
                 } else if (userSnapshot.hasError) {
-                  return Text('Error: ${userSnapshot.error}');
+                  return Text('Pogreška: ${userSnapshot.error}');
                 } else if (userSnapshot.data == null) {
-                  return const Text('No user data');
+                  return const Text('Nema podataka o korisniku');
                 } else {
                   AppUser user = userSnapshot.data!;
                   return SingleChildScrollView(
@@ -157,14 +157,14 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                     onPressed: lessonGroupFinished
                                         ? () => Navigator.of(context).pop()
                                         : null,
-                                    child: const Text("Finish lesson group"),
+                                    child: const Text("Dovrši cjelinu"),
                                   ),
                                   if (!lessonGroupFinished)
                                     const Padding(
                                       padding: EdgeInsets.symmetric(
                                           vertical: 10.0, horizontal: 30.0),
                                       child: Text(
-                                        "(Complete all lessons above to continue)",
+                                        "(Dovrši sve lekcije iznad za nastavak)",
                                         overflow: TextOverflow.clip,
                                         textAlign: TextAlign.center,
                                       ),

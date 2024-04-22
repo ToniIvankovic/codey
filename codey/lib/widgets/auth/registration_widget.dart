@@ -54,7 +54,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       validator: (value) =>
-          (value ?? "").isEmpty ? 'Please enter your first name' : null,
+          (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
     );
     final lastNameField = TextFormField(
       decoration: const InputDecoration(
@@ -68,7 +68,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       validator: (value) =>
-          (value ?? "").isEmpty ? 'Please enter your last name' : null,
+          (value ?? "").isEmpty ? 'Molimo unesite prezime' : null,
     );
 
     DateTime? dateOfBirth;
@@ -168,7 +168,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final emailField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Email *',
+        labelText: 'E-mail *',
       ),
       onChanged: (value) {
         setState(() {
@@ -177,7 +177,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       validator: (value) =>
-          (value ?? "").isEmpty ? 'Please enter your email' : null,
+          (value ?? "").isEmpty ? 'Molimo unesite e-mail' : null,
     );
 
     final passwordField = TextFormField(
@@ -192,7 +192,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       validator: (value) =>
-          (value ?? "").isEmpty ? 'Please enter a password' : null,
+          (value ?? "").isEmpty ? 'Molimo unesite lozinku' : null,
     );
 
     final confirmPasswordField = TextFormField(
@@ -208,10 +208,10 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         },
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please repeat password';
+            return 'Molimo ponoite lozinku';
           }
           if (value != password) {
-            return 'Passwords do not match';
+            return 'Lozinke se ne podudaraju';
           }
           return null;
         });

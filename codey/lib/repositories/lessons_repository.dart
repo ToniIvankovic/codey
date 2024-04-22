@@ -195,7 +195,7 @@ class LessonsRepository1 implements LessonsRepository {
         .put(Uri.parse('${dotenv.env["API_BASE"]}/lessons/$id'),
             body: json.encode({
               'name': name,
-              'specificTips': tips ?? "",
+              'specificTips': tips ?? "", //TODO: maybe leave null?
               'exercises': exerciseIds,
             }),
             headers: {'Content-Type': 'application/json'});

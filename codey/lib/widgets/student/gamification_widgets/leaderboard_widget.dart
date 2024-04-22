@@ -53,7 +53,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, 10.0),
               child: Text(
-                "Leaderboard",
+                "Ljestvica poretka",
                 style: TextStyle(fontSize: 18),
               ),
             ),
@@ -65,7 +65,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
             else if (!leaderboardLoading && leaderboard == null)
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text("No leaderboard"),
+                child: Text("Nema ljestvice poretka"),
               )
             else
               for (var i = 0; i < leaderboard!.students.length; i++)

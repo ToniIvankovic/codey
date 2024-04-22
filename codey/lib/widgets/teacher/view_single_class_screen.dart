@@ -24,7 +24,7 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Class ${classData.name}'),
+        title: Text('Razred ${classData.name}'),
       ),
       body: Center(
         child: Padding(
@@ -33,9 +33,9 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Class ID: ${classData.id}'),
-              Text('Name: ${classData.name}'),
-              const Text('Students:'),
+              Text('ID razreda: ${classData.id}'),
+              Text('Naziv razreda: ${classData.name}'),
+              const Text('Učenici:'),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: classData.studentEmails.length,
@@ -71,13 +71,13 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                         if (error is NoChangesException) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('No changes made'),
+                              content: Text('Nema promjena'),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Failed to edit class: $error'),
+                              content: Text('Neuspjelo uređivanje razreda: $error'),
                             ),
                           );
                         }
@@ -85,7 +85,7 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                     );
                   },
                   icon: const Icon(Icons.edit),
-                  label: const Text('Edit Class')),
+                  label: const Text('Uredi razred')),
             ],
           ),
         ),

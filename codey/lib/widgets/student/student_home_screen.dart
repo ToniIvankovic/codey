@@ -30,7 +30,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
           actionsIconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-          title: const Text('Python Course'),
+          title: const Text('Python'),
           actions: [
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -81,21 +81,21 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: const Text('Log out'),
-                      content: const Text('Are you sure you want to log out?'),
+                      title: const Text('Odjava'),
+                      content: const Text('Sigurno se želiš odjaviti?'),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Cancel'),
+                          child: const Text('Odustani'),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                             widget.onLogoutSuper();
                           },
-                          child: const Text('Log out'),
+                          child: const Text('Odjavi se'),
                         ),
                       ],
                     );
@@ -133,7 +133,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     } on UnauthenticatedException catch (e) {
       //TODO Does this ever run?
       widget.onLogoutSuper();
-      return Text('Error: $e');
+      return Text('Greška: $e');
     }
   }
 }

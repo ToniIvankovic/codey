@@ -26,7 +26,7 @@ class ExerciseLAWritingWidget extends StatelessWidget {
         // questionArea,
         TextField(
           decoration: const InputDecoration(
-            labelText: 'Answer',
+            labelText: 'Odgovor',
           ),
           maxLines: null,
           minLines: 5,

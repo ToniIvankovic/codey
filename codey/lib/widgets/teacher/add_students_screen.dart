@@ -45,7 +45,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
     );
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Students'),
+        title: const Text('Dodaj učenike'),
       ),
       body: Center(
         child: Column(
@@ -56,7 +56,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Search for students',
+                  labelText: 'Traži učenike',
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -94,7 +94,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                     child: student.classId == null
                         ? Text(student.email)
                         : Text(
-                            "${student.email} (already in a class ${student.classId})"),
+                            "${student.email} (već u razredu ${student.classId})"),
                   ),
                 ],
               ),
@@ -120,7 +120,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                     child: student.classId == null
                         ? Text(student.email)
                         : Text(
-                            "${student.email} (already in a class ${student.classId})"),
+                            "${student.email} (već u razredu ${student.classId})"),
                   ),
                 ],
               ),
@@ -128,7 +128,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
               onPressed: () {
                 Navigator.pop(context, selectedStudents);
               },
-              child: const Text('Add selected students'),
+              child: const Text('Dodaj označene učenike'),
             ),
           ],
         ),

@@ -32,7 +32,7 @@ class TeacherHomePage extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text("Manage Classes"),
+                child: const Text("Upravljaj razredima"),
               ),
             ),
             Padding(
@@ -41,7 +41,7 @@ class TeacherHomePage extends StatelessWidget {
                 onPressed: () {
                   onLogoutSuper();
                 },
-                child: const Text('Logout'),
+                child: const Text('Odjava'),
               ),
             ),
           ],
@@ -58,7 +58,7 @@ class ManageClassesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Classes'),
+        title: const Text('Upravljaj razredima'),
       ),
       body: Center(
         child: Column(
@@ -75,7 +75,7 @@ class ManageClassesScreen extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text("View Classes"),
+                child: const Text("Pregled razreda"),
               ),
             ),
             Padding(
@@ -94,12 +94,12 @@ class ManageClassesScreen extends StatelessWidget {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Created class $className"),
+                        content: Text("Stvoren razred $className"),
                       ),
                     );
                   });
                 },
-                child: const Text("Create Class"),
+                child: const Text("Stvori razred"),
               ),
             ),
           ],

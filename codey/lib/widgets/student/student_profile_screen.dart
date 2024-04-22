@@ -20,7 +20,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Achievements'),
+        title: const Text('Postignuća'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         titleTextStyle: TextStyle(
             color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),

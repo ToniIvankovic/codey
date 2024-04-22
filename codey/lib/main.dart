@@ -184,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
             body: Center(
               child: Column(
                 children: [
-                  Text("Loading... (1)"),
+                  Text("Učitavanje... (1)"),
                   CircularProgressIndicator(),
                 ],
               ),
@@ -211,14 +211,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Loading... (2)"),
+                      const Text("Učitavanje podataka o korisniku..."),
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: CircularProgressIndicator(),
                       ),
                       ElevatedButton(
                         onPressed: () => onLogout(),
-                        child: const Text("Logout"),
+                        child: const Text("Odjava"),
                       )
                     ],
                   ),
@@ -228,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onLogout();
               return const Scaffold(
                 body: Center(
-                  child: Text('Error: User not found'),
+                  child: Text('Greška: korisnik nije pronađen'),
                 ),
               );
             } else {
@@ -258,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               }
               return const Scaffold(
-                  body: Center(child: Text('Error: User has no roles')));
+                  body: Center(child: Text('Greška: Korisnik nema uloga')));
             }
           },
         );

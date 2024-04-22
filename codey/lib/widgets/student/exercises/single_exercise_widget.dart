@@ -156,7 +156,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                   : null,
               child: const Padding(
                 padding: EdgeInsets.all(10.0),
-                child: Text('CHECK'),
+                child: Text('PROVJERA'),
               ),
             ),
           ),
@@ -189,14 +189,14 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isCorrectResponse == true ? 'Correct!' : 'Incorrect...',
+                isCorrectResponse == true ? 'Točno!' : 'Netočno...',
                 style: textColor.copyWith(
                   fontSize: 20.0,
                 ),
               ),
               if (correctAnswer != null) ...[
                 Text(
-                  'Correct answer:',
+                  'Točan odgovor:',
                   style: textColor.copyWith(
                     fontSize: 16.0,
                   ),
@@ -229,7 +229,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        'NEXT',
+                        'DALJE',
                         style: TextStyle(
                           color: isCorrectResponse == true
                               ? Theme.of(context).colorScheme.onPrimary

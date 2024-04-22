@@ -29,7 +29,7 @@ class ExerciseSAWidget extends StatelessWidget {
         questionArea,
         TextField(
           decoration: const InputDecoration(
-            labelText: 'Answer',
+            labelText: 'Odgovor',
           ),
           maxLines: 1,
           onChanged: (value) => onAnswerSelected(value),

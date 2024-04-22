@@ -58,7 +58,7 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
                       writingMode = !writingMode;
                     });
                   },
-                  child: Text(writingMode ? 'Puzzle mode' : 'Writing mode'),
+                  child: Text(writingMode ? 'Slagalica mode' : 'Pisanje mode'),
                 ),
               ),
             ],

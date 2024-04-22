@@ -21,7 +21,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
     var userInteractionService = context.read<UserInteractionService>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Class'),
+        title: const Text('Stvori razred'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -35,7 +35,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Class Name',
+                      labelText: 'Naziv razreda',
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -43,12 +43,12 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                       });
                     },
                     validator: (value) =>
-                        value?.isEmpty ?? false ? "Enter a class name" : null,
+                        value?.isEmpty ?? false ? "Unesite ime razreda" : null,
                   ),
                 ),
-                if (students.isEmpty) const Text("No students selected"),
+                if (students.isEmpty) const Text("Nema odabranih učenika"),
                 if (students.isNotEmpty) ...[
-                  const Text("Students:"),
+                  const Text("Učenici:"),
                   for (var student in students)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -65,7 +65,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                             child: student.classId == null
                                 ? Text(student.email)
                                 : Text(
-                                    "${student.email} (already in a class ${student.classId})"),
+                                    "${student.email} (već u razredu ${student.classId})"),
                           ),
                         ],
                       ),
@@ -90,7 +90,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                       });
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text("Add Students")),
+                    label: const Text("Dodaj učenike")),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
@@ -111,7 +111,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                         );
                       });
                     },
-                    child: const Text("Create Class"),
+                    child: const Text("Stvori razred"),
                   ),
                 ),
               ],

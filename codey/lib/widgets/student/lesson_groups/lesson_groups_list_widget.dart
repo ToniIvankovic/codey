@@ -251,7 +251,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                             );
                           },
                           icon: const Icon(Icons.lightbulb),
-                          label: const Text('Learn'),
+                          label: const Text('Nauči'),
                         ),
                         IconButton.filled(
                           onPressed: () {

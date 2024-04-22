@@ -33,7 +33,7 @@ class _QuestsWidgetState extends State<QuestsWidget> {
         const Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 10.0),
           child: Text(
-            "Quests:",
+            "Ciljevi:",
             style: TextStyle(fontSize: 18),
           ),
         ),
@@ -62,7 +62,7 @@ class _QuestsWidgetState extends State<QuestsWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Get ${quest.constraint} XP: ",
+              "Osvoji ${quest.constraint} XP: ",
               overflow: TextOverflow.ellipsis,
             ),
             if (!quest.isCompleted)
@@ -76,22 +76,22 @@ class _QuestsWidgetState extends State<QuestsWidget> {
         );
       case Quest.questHighAccuracy:
         return Text(
-          "High accuracy (>${quest.constraint}%): ${quest.progress}/${quest.nLessons}",
+          "Visoka preciznost (>${quest.constraint}%): ${quest.progress}/${quest.nLessons}",
           overflow: TextOverflow.ellipsis,
         );
       case Quest.questHighSpeed:
         return Text(
-          "High speed (<${quest.constraint}s): ${quest.progress}/${quest.nLessons}",
+          "Velika brzina (<${quest.constraint}s): ${quest.progress}/${quest.nLessons}",
           overflow: TextOverflow.ellipsis,
         );
       case Quest.questCompleteLessonGroup:
         return const Text(
-          "Complete a lesson group",
+          "Dovrši cjelinu",
           overflow: TextOverflow.ellipsis,
         );
       default:
         return const Text(
-          "Unknown quest",
+          "Nepoznat cilj",
           overflow: TextOverflow.ellipsis,
         );
     }

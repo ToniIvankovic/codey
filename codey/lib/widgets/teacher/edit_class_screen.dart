@@ -38,7 +38,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Class'),
+        title: const Text('Uredi razred'),
       ),
       body: Center(
         child: Padding(
@@ -49,9 +49,9 @@ class _EditClassScreenState extends State<EditClassScreen> {
             children: [
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Ime'),
               ),
-              const Text('Students'),
+              const Text('Učenici'),
               //TODO: consider making the same as in class creation (first the checked, then the unchecked)
               ListView.builder(
                 shrinkWrap: true,
@@ -87,7 +87,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
                     Navigator.of(context).pop(updatedClass);
                   });
                 },
-                child: const Text('Save'),
+                child: const Text('Spremi'),
               ),
             ],
           ),

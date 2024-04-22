@@ -58,8 +58,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     });
                   },
                   child: Text(showLogin
-                      ? "Don't have an account? Register"
-                      : 'Already have an account? Log in'),
+                      ? "Nemaš račun? Registriraj se"
+                      : "Već imaš račun? Prijavi se"),
                 ),
               ],
             ),
