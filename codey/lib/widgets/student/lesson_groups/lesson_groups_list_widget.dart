@@ -236,22 +236,19 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        //TODO: show tips
                         TextButton.icon(
-                          onPressed: true
-                              ? null
-                              : () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LessonsScreen(
-                                        lessonGroup: widget.lessonGroup,
-                                        lessonGroupFinished:
-                                            widget.lessonGroupFinished,
-                                      ),
-                                    ),
-                                  );
-                                },
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LessonGroupTipsScreen(
+                                  lessonGroup: widget.lessonGroup,
+                                  lessonGroupFinished:
+                                      widget.lessonGroupFinished,
+                                ),
+                              ),
+                            );
+                          },
                           icon: const Icon(Icons.lightbulb),
                           label: const Text('Learn'),
                         ),
@@ -285,6 +282,53 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LessonGroupTipsScreen extends StatelessWidget {
+  final LessonGroup lessonGroup;
+  final bool lessonGroupFinished;
+
+  const LessonGroupTipsScreen({
+    Key? key,
+    required this.lessonGroup,
+    required this.lessonGroupFinished,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(lessonGroup.name),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(lessonGroup.tips),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 50.0),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LessonsScreen(
+                            lessonGroup: lessonGroup,
+                            lessonGroupFinished: lessonGroupFinished),
+                      ),
+                    ),
+                    child: const Text('Go to lessons'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

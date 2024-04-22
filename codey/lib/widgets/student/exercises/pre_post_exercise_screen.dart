@@ -5,6 +5,7 @@ import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/widgets/student/exercises/exercises_screen.dart';
+import 'package:codey/widgets/student/leaderboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -207,23 +208,15 @@ class _PostLessonReportState extends State<_PostLessonReport> {
                             : const CircularProgressIndicator(),
                       ],
                     ),
-                    if (leaderboardLoading || leaderboard != null)
+                    if (leaderboardLoading) ...[
                       const Text("Leaderboard:"),
-                    if (leaderboard != null)
-                      for (var i = 0; i < leaderboard!.students.length; i++)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                                "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}"),
-                            Text("${leaderboard!.students[i].totalXp} XP"),
-                          ],
-                        ),
-                    if (leaderboardLoading)
                       const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: CircularProgressIndicator(),
                       ),
+                    ],
+                    if (leaderboard != null)
+                      LeaderboardWidget(leaderboard: leaderboard!),
                   ],
                 ),
               ],

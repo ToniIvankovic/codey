@@ -36,7 +36,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  //fire emoji
                   Icon(
                     Icons.whatshot,
                     color: widget.user.didLessonToday
@@ -61,9 +60,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: IconButton(
-                icon: const Icon(Icons.person),
+                //chest icon
+                icon: const Icon(Icons.military_tech),
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -75,7 +75,33 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             //profile
             IconButton(
               icon: const Icon(Icons.logout),
-              onPressed: widget.onLogoutSuper,
+              //alert dialog
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Log out'),
+                      content: const Text('Are you sure you want to log out?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            widget.onLogoutSuper();
+                          },
+                          child: const Text('Log out'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
@@ -86,8 +112,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
