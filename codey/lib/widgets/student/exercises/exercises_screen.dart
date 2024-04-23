@@ -26,7 +26,6 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Exercise? currentExercise;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     final exercisesService = context.read<ExercisesService>();
     exercisesService

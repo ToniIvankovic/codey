@@ -146,7 +146,6 @@ class ExercisesServiceV1 implements ExercisesService {
     );
     if (response.statusCode != 200) {
       //TODO: handle end of course
-      print(response.body);
       return null;
     }
 

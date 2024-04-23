@@ -22,9 +22,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
-  String mode = 'prod';
-  // String mode = 'dev';
-  String env = '$mode.env';
+  bool isProd = const String.fromEnvironment("ENV") == "prod";
+  String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
     MultiProvider(
