@@ -1,0 +1,35 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Flutter
+      run: |
+        git clone https://github.com/flutter/flutter.git --depth 1 -b stable
+        echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+
+    - name: Build Flutter web app
+      run: |
+        cd codey
+        flutter pub get
+        flutter build web --dart-define ENV="prod"
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
+    - name: Sync output to S3
+      run: |
+        aws s3 sync ./build/web s3://codey-fe
