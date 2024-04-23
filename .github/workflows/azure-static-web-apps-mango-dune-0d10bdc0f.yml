@@ -19,6 +19,17 @@ jobs:
         with:
           submodules: true
           lfs: false
+
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 -b stable
+          echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+
+      - name: Build Flutter web app
+        run: |
+          flutter pub get
+          flutter build web
+          
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
