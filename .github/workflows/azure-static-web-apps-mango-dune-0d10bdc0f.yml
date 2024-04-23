@@ -29,7 +29,7 @@ jobs:
         run: |
           cd codey
           flutter pub get
-          flutter build web
+          flutter build web --dart-define ENV="prod"
 
       - name: Build And Deploy
         id: builddeploy
