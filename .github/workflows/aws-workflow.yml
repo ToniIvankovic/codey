@@ -34,7 +34,10 @@ jobs:
       run: |
         aws s3 sync ./codey/build/web s3://codey-fe
 
-    
+  invalidate-cloudfront:
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Invalidate Cloudfront Cache
       uses: chetan/invalidate-cloudfront-action@master
       env:
