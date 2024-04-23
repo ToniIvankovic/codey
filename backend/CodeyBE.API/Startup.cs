@@ -27,16 +27,27 @@ namespace CodeyBE.API
                 app.UseDeveloperExceptionPage();
             }
             app.UseRouting();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireCors();
             });
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            //TODO: be more specific!
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    });
+            });
+
             // Configure the MongoDB context
             services.AddScoped<IMongoDbContext>(provider =>
             {
