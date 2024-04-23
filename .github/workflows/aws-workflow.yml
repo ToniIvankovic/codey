@@ -1,4 +1,4 @@
-name: Flutter CI/CD
+name: AWS CI/CD
 
 on:
   push:
@@ -32,4 +32,4 @@ jobs:
 
     - name: Sync output to S3
       run: |
-        aws s3 sync ./build/web s3://codey-fe
+        aws s3 sync ./codey/build/web s3://codey-fe
