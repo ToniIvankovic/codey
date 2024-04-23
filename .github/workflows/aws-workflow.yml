@@ -33,3 +33,13 @@ jobs:
     - name: Sync output to S3
       run: |
         aws s3 sync ./codey/build/web s3://codey-fe
+
+    
+    - name: Invalidate Cloudfront Cache
+      uses: chetan/invalidate-cloudfront-action@master
+      env:
+        AWS_ACCESS_KEY_ID:      ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION:             $eu-central-1
+        DISTRIBUTION:           ${{ vars.AWS_CF_DISTRIBUTION_ID_WEB }}
+        PATHS: '/*'
