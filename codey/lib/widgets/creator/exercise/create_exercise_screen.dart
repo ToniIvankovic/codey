@@ -315,13 +315,13 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                                   exercisesService
                                       .updateExercise(exercise)
                                       .then((value) {
-                                    Navigator.of(context).pop(value);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Changes saved'),
                                         duration: Duration(seconds: 1),
                                       ),
                                     );
+                                    Navigator.of(context).pop(value);
                                   }).catchError((error) {
                                     if (error is NoChangesException) {
                                       ScaffoldMessenger.of(context)

@@ -117,8 +117,20 @@ class _EditSingleLessonGroupScreenState
                                 .read<LessonGroupsService>()
                                 .updateLessonGroup(lessonGroup)
                                 .then((value) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Lesson group updated"),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
                               Navigator.pop(context, value);
                             }).catchError((error) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: $error'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
                               Navigator.pop(context, null);
                             });
                           },

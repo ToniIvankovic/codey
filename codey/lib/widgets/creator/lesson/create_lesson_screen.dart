@@ -84,14 +84,22 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
             // CREATE LESSON BUTTON
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(
-                  context,
-                  context.read<LessonsService>().createLesson(
-                        name!,
-                        specificTips,
-                        exercises.map((e) => e.id).toList(),
-                      ),
-                );
+                context
+                    .read<LessonsService>()
+                    .createLesson(
+                      name!,
+                      specificTips,
+                      exercises.map((e) => e.id).toList(),
+                    )
+                    .then((value) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Lesson created successfully'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                  Navigator.pop(context, value);
+                });
               },
               child: const Text('Create'),
             ),

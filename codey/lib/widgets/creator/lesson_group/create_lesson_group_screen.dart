@@ -21,7 +21,8 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
 
   @override
   Widget build(BuildContext context) {
-    bool inputValid = name != null && tips != null && (adaptive || lessons.isNotEmpty);
+    bool inputValid =
+        name != null && tips != null && (adaptive || lessons.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create lesson group"),
@@ -108,13 +109,24 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
                     ? () {
                         final lessonGroupsService =
                             context.read<LessonGroupsService>();
-                        final lgr = lessonGroupsService.createLessonGroup(
+                        lessonGroupsService
+                            .createLessonGroup(
                           name: name!,
                           tips: tips!,
                           lessons: lessons.map((e) => e.id).toList(),
                           adaptive: adaptive,
+                        )
+                            .then(
+                          (value) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Lesson group created"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                            Navigator.of(context).pop(value);
+                          },
                         );
-                        Navigator.of(context).pop(lgr);
                       }
                     : null,
                 child: const Text("Create"),
