@@ -65,7 +65,10 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                       final exercise = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PickExerciseScreen(exercises: exercises,),
+                          builder: (context) => PickExerciseScreen(
+                            key: ValueKey(exercises),
+                            exercises: exercises,
+                          ),
                         ),
                       );
                       if (exercise != null) {
@@ -84,10 +87,10 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                 Navigator.pop(
                   context,
                   context.read<LessonsService>().createLesson(
-                    name!,
-                    specificTips,
-                    exercises.map((e) => e.id).toList(),
-                  ),
+                        name!,
+                        specificTips,
+                        exercises.map((e) => e.id).toList(),
+                      ),
                 );
               },
               child: const Text('Create'),

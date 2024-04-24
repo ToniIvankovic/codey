@@ -263,21 +263,21 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                               exercisesService.getNextExercise();
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                    builder: (context) => Scaffold(
-                                          appBar: AppBar(
-                                            title:
-                                                const Text('Preview exercise'),
-                                          ),
-                                          body: SingleExerciseWidget(
-                                              exercisesService:
-                                                  exercisesService,
-                                              onSessionFinished: () {
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                  Navigator.pop(context);
-                                                });
-                                              }),
-                                        )),
+                                  builder: (context) => Scaffold(
+                                    appBar: AppBar(
+                                      title: const Text('Preview exercise'),
+                                    ),
+                                    body: SingleExerciseWidget(
+                                      exercisesService: exercisesService,
+                                      onSessionFinished: () {
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
                               );
                             },
                             child: const Text("Preview exercise")),
@@ -296,7 +296,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                                           Navigator.of(context).pop(value));
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Exercise created successfully'),
+                                      content:
+                                          Text('Exercise created successfully'),
                                     ),
                                   );
                                 }

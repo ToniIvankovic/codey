@@ -295,7 +295,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                         .push(
                       MaterialPageRoute(
                         builder: (context) =>
-                            PickExerciseScreen(exercises: exercisesLocal),
+                            PickExerciseScreen(exercises: exercisesEdited),
                       ),
                     )
                         .then((value) {
