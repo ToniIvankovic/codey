@@ -11,7 +11,7 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
-  String username = '';
+  String email = '';
   String password = '';
   String? errorMessage;
   bool waitingResponse = false;
@@ -20,14 +20,14 @@ class _LoginWidgetState extends State<LoginWidget> {
   Widget build(BuildContext context) {
     SessionService sessionService = context.read<SessionService>();
 
-    TextField usernameTextField = TextField(
+    TextField emailTextField = TextField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Username',
+        labelText: 'E-mail',
       ),
       onChanged: (value) {
         setState(() {
-          username = value;
+          email = value;
           errorMessage = null;
         });
       },
@@ -36,7 +36,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     TextField passwordTextField = TextField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Password',
+        labelText: 'Lozinka',
       ),
       onChanged: (value) {
         setState(() {
@@ -50,7 +50,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: usernameTextField,
+          child: emailTextField,
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -77,7 +77,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   waitingResponse = true;
                 });
                 sessionService
-                    .login(username: username, password: password)
+                    .login(username: email, password: password)
                     .then((value) {
                   widget.onLogin();
                   setState(() {
@@ -90,7 +90,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   });
                 });
               },
-              child: const Text('Login'),
+              child: const Text('Prijava'),
             ),
           ),
       ],

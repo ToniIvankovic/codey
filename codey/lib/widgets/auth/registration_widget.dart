@@ -45,7 +45,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final firstNameField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'First Name *',
+        labelText: 'Ime *',
       ),
       onChanged: (value) {
         setState(() {
@@ -59,7 +59,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final lastNameField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Last Name *',
+        labelText: 'Prezime *',
       ),
       onChanged: (value) {
         setState(() {
@@ -86,7 +86,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               maxLength: 2,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Day',
+                labelText: 'D',
                 counterText: "",
               ),
               onChanged: (value) {
@@ -97,7 +97,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your day of birth';
+                  return 'Molimo unesite dan rođenja';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Molimo unesite ispravan dan';
+                }
+                var intValue = int.parse(value);
+                if (intValue < 1 || intValue > 31) {
+                  return 'Molimo unesite ispravan dan';
                 }
                 return null;
               },
@@ -112,7 +119,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               maxLength: 2,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Month',
+                labelText: 'M',
                 counterText: "",
               ),
               onChanged: (value) {
@@ -123,14 +130,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your day of birth';
+                  return 'Molimo unesite mjesec rođenja';
                 }
                 if (int.tryParse(value) == null) {
-                  return 'Please enter a valid month';
+                  return 'Molimo unesite ispravan mjesec';
                 }
                 var intValue = int.parse(value);
                 if (intValue < 1 || intValue > 12) {
-                  return 'Please enter a valid month';
+                  return 'Molimo unesite ispravan mjesec';
                 }
                 return null;
               },
@@ -144,7 +151,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               maxLength: 4,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Year',
+                labelText: 'Godina',
                 counterText: "",
               ),
               onChanged: (value) {
@@ -155,7 +162,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your day of birth';
+                  return 'Molimo unesite godinu rođenja';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Molimo unesite ispravnu godinu';
+                }
+                var intValue = int.parse(value);
+                if (intValue < 1900 || intValue > DateTime.now().year) {
+                  return 'Molimo unesite ispravnu godinu';
                 }
                 return null;
               },
@@ -183,7 +197,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final passwordField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Password *',
+        labelText: 'Lozika *',
       ),
       onChanged: (value) {
         setState(() {
@@ -198,7 +212,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final confirmPasswordField = TextFormField(
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
-          labelText: 'Confirm Password *',
+          labelText: 'Ponovljena lozinka *',
         ),
         onChanged: (value) {
           setState(() {
@@ -236,12 +250,12 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                 },
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  labelText: 'School *',
+                  labelText: 'Škola *',
                   errorText: state.errorText,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a school';
+                    return 'Molimo odaberite školu';
                   }
                   return null;
                 },
@@ -266,7 +280,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           ),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
-            child: Text("Date of Birth *"),
+            child: Text("Datum rođenja *"),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),

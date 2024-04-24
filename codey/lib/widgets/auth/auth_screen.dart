@@ -30,7 +30,7 @@ class _AuthScreenState extends State<AuthScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(showLogin ? 'Login' : 'Register',
+                  child: Text(showLogin ? 'Prijava' : 'Registracija',
                       style: Theme.of(context).textTheme.displaySmall),
                 ),
                 if (showLogin)
