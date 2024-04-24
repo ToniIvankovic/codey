@@ -32,6 +32,7 @@ abstract class ExercisesService {
   Future<List<ExerciseStatistics>> calculateStatistics(
       List<Exercise> exercises);
   dynamic getCorrectAnswer(Exercise exercise);
+  double get sessionProgress;
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -47,10 +48,19 @@ class ExercisesServiceV1 implements ExercisesService {
   List<Exercise>? _sessionExercises;
   Exercise? _currentExercise;
   EndReport? _endReport;
+  int? _totalExercisesInSession;
   bool _isMockInProgress = false;
 
   ExercisesServiceV1(
       this._exRepo, this._authenticatedClient, this._userService);
+
+  @override
+  double get sessionProgress {
+    if (_totalExercisesInSession == null || _endReport == null) {
+      return 0;
+    }
+    return _endReport!.totalAnswers / _totalExercisesInSession!;
+  }
 
   @override
   Exercise? get currentExercise {
@@ -66,6 +76,7 @@ class ExercisesServiceV1 implements ExercisesService {
   Future<void> startSessionForLesson(
       Lesson lesson, LessonGroup lessonGroup) async {
     _sessionExercises = await getAllExercisesForLesson(lesson);
+    _totalExercisesInSession = _sessionExercises!.length;
     _endReport = EndReport(
       lessonId: lesson.id,
       lessonGroupId: lessonGroup.id,
@@ -126,8 +137,10 @@ class ExercisesServiceV1 implements ExercisesService {
     if (correct) {
       _endReport!.correctAnswers++;
     } else {
-      // TODO: indicate that the exercise is repeated
-      _sessionExercises!.add(exercise);
+      var newExercise = Exercise.fromExercise(exercise);
+      newExercise.repeated = true;
+      _sessionExercises!.add(newExercise);
+      _totalExercisesInSession = _totalExercisesInSession! + 1;
     }
     _endReport!.answersReport!.add(MapEntry(exercise.id, correct));
     return correct;
@@ -138,6 +151,7 @@ class ExercisesServiceV1 implements ExercisesService {
     _sessionExercises = null;
     if (!completed) {
       _endReport = null;
+      _totalExercisesInSession = null;
       return null;
     }
 
@@ -201,6 +215,7 @@ class ExercisesServiceV1 implements ExercisesService {
       totalAnswers: 0,
       totalExercises: 1,
     );
+    _totalExercisesInSession = 1;
     _isMockInProgress = true;
   }
 

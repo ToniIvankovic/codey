@@ -58,4 +58,18 @@ class ExerciseSA extends Exercise {
         'correctAnswers': correctAnswers,
         'raisesError': raisesError,
       };
+
+  factory ExerciseSA.fromExercise(ExerciseSA other) {
+    return ExerciseSA(
+      id: other.id,
+      difficulty: other.difficulty,
+      statement: other.statement,
+      statementCode: other.statementCode,
+      statementOutput: other.statementOutput,
+      specificTip: other.specificTip,
+      question: (other).question,
+      correctAnswers: (other).correctAnswers,
+      raisesError: (other).raisesError,
+    );
+  }
 }

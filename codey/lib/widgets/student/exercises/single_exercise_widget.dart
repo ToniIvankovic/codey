@@ -6,6 +6,7 @@ import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:provider/provider.dart';
 
 import 'exercise_LA_widget.dart';
 import 'exercise_MC_widget.dart';
@@ -17,10 +18,12 @@ class SingleExerciseWidget extends StatefulWidget {
     Key? key,
     required this.exercisesService,
     required this.onSessionFinished,
+    this.onNextExercise,
   }) : super(key: key);
 
   final ExercisesService exercisesService;
   final VoidCallback onSessionFinished;
+  final VoidCallback? onNextExercise;
 
   @override
   State<SingleExerciseWidget> createState() => _SingleExerciseWidgetState();
@@ -61,67 +64,101 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           child: Container(
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
+              maxWidth: MediaQuery.of(context).size.width,
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (exercise is ExerciseMC)
-                    ExerciseMCWidget(
-                      key: ValueKey(exercise!.id + 100 * repeatCount),
-                      exercise: exercise!,
-                      onAnswerSelected: (answer) {
-                        setState(() {
-                          this.answer = answer;
-                          enableCheck = true;
-                        });
-                      },
-                      statementArea: _buildStaticStatementArea(),
-                      codeArea: _buildStaticCodeArea(),
-                      questionArea: _buildStaticQuestionArea(),
-                    )
-                  else if (exercise is ExerciseSA)
-                    ExerciseSAWidget(
-                      key: ValueKey(exercise!.id + 100 * repeatCount),
-                      exercise: exercise!,
-                      onAnswerSelected: (answer) {
-                        setState(() {
-                          this.answer = answer;
-                          enableCheck = true;
-                        });
-                      },
-                      statementArea: _buildStaticStatementArea(),
-                      codeArea: _buildStaticCodeArea(),
-                      questionArea: _buildStaticQuestionArea(),
-                    )
-                  else if (exercise is ExerciseLA)
-                    ExerciseLAWidget(
-                      key: ValueKey(exercise!.id + 100 * repeatCount),
-                      exercise: exercise! as ExerciseLA,
-                      onAnswerSelected: (answer) {
-                        setState(() {
-                          this.answer = answer;
-                          enableCheck = answer.isNotEmpty;
-                        });
-                      },
-                      statementArea: _buildStaticStatementArea(),
-                      // questionArea: _buildStaticQuestionArea(),
-                    )
-                  else if (exercise is ExerciseSCW)
-                    ExerciseSCWWidget(
-                      key: ValueKey(exercise!.id + 100 * repeatCount),
-                      exercise: exercise! as ExerciseSCW,
-                      onAnswerSelected: (answer) {
-                        setState(() {
-                          this.answer = answer;
-                          enableCheck = answer.isNotEmpty &&
-                              answer.every((element) => element.isNotEmpty);
-                        });
-                      },
-                      statementArea: _buildStaticStatementArea(),
-                    ),
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value: context
+                                    .read<ExercisesService>()
+                                    .sessionProgress,
+                                borderRadius: BorderRadius.circular(10),
+                                minHeight: 20,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      if (exercise?.repeated == true)
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.refresh,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            const Text(
+                              'Pogrešno odgovoreno',
+                            ),
+                          ],
+                        ),
+                      if (exercise is ExerciseMC)
+                        ExerciseMCWidget(
+                          key: ValueKey(exercise!.id + 100 * repeatCount),
+                          exercise: exercise!,
+                          onAnswerSelected: (answer) {
+                            setState(() {
+                              this.answer = answer;
+                              enableCheck = true;
+                            });
+                          },
+                          statementArea: _buildStaticStatementArea(),
+                          codeArea: _buildStaticCodeArea(),
+                          questionArea: _buildStaticQuestionArea(),
+                        )
+                      else if (exercise is ExerciseSA)
+                        ExerciseSAWidget(
+                          key: ValueKey(exercise!.id + 100 * repeatCount),
+                          exercise: exercise!,
+                          onAnswerSelected: (answer) {
+                            setState(() {
+                              this.answer = answer;
+                              enableCheck = true;
+                            });
+                          },
+                          statementArea: _buildStaticStatementArea(),
+                          codeArea: _buildStaticCodeArea(),
+                          questionArea: _buildStaticQuestionArea(),
+                        )
+                      else if (exercise is ExerciseLA)
+                        ExerciseLAWidget(
+                          key: ValueKey(exercise!.id + 100 * repeatCount),
+                          exercise: exercise! as ExerciseLA,
+                          onAnswerSelected: (answer) {
+                            setState(() {
+                              this.answer = answer;
+                              enableCheck = answer.isNotEmpty;
+                            });
+                          },
+                          statementArea: _buildStaticStatementArea(),
+                          // questionArea: _buildStaticQuestionArea(),
+                        )
+                      else if (exercise is ExerciseSCW)
+                        ExerciseSCWWidget(
+                          key: ValueKey(exercise!.id + 100 * repeatCount),
+                          exercise: exercise! as ExerciseSCW,
+                          onAnswerSelected: (answer) {
+                            setState(() {
+                              this.answer = answer;
+                              enableCheck = answer.isNotEmpty &&
+                                  answer.every((element) => element.isNotEmpty);
+                            });
+                          },
+                          statementArea: _buildStaticStatementArea(),
+                        ),
+                    ],
+                  ),
                   if (isCorrectResponse == null) _buildCheckButton(),
                 ],
               ),
@@ -231,6 +268,9 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                         isCorrectResponse = null;
                         enableCheck = false;
                         repeatCount++;
+                        if (widget.onNextExercise != null) {
+                          widget.onNextExercise!();
+                        }
                       });
                     },
                     child: Padding(
@@ -255,9 +295,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   }
 
   Widget _buildStaticStatementArea() {
-    Widget statementArea = Text(
-        '${exercise!.statement} ',
-        style: const TextStyle(fontSize: 20.0));
+    Widget statementArea =
+        Text('${exercise!.statement} ', style: const TextStyle(fontSize: 20.0));
     return statementArea;
   }
 

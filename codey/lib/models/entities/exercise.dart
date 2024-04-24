@@ -13,6 +13,7 @@ abstract class Exercise {
   final String? specificTip;
   final String? statementOutput;
   ExerciseStatistics? statistics;
+  bool? repeated = false;
 
   Exercise({
     required this.id,
@@ -23,7 +24,7 @@ abstract class Exercise {
     this.statementOutput,
     this.statistics,
   });
-  
+
   factory Exercise.fromJson(Map<String, dynamic> json) {
     switch (json['type']) {
       case 'MC':
@@ -36,6 +37,20 @@ abstract class Exercise {
         return ExerciseSCW.fromJson(json);
       default:
         throw Exception('Invalid exercise type');
+    }
+  }
+
+  factory Exercise.fromExercise(Exercise other) {
+    if (other.type == ExerciseType.MC) {
+      return ExerciseMC.fromExercise(other as ExerciseMC);
+    } else if (other.type == ExerciseType.SA) {
+      return ExerciseSA.fromExercise(other as ExerciseSA);
+    } else if (other.type == ExerciseType.LA) {
+      return ExerciseLA.fromExercise(other as ExerciseLA);
+    } else if (other.type == ExerciseType.SCW) {
+      return ExerciseSCW.fromExercise(other as ExerciseSCW);
+    } else {
+      throw Exception('Invalid exercise type');
     }
   }
 

@@ -67,8 +67,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                 )
               : Container(
                   constraints: BoxConstraints(
-                      minHeight:
-                          MediaQuery.of(context).size.height - kToolbarHeight),
+                    minHeight:
+                        MediaQuery.of(context).size.height - kToolbarHeight,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [

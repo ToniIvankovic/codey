@@ -71,4 +71,18 @@ class ExerciseMC extends Exercise {
 
     return json;
   }
+
+  factory ExerciseMC.fromExercise(ExerciseMC other) {
+    return ExerciseMC(
+      id: other.id,
+      difficulty: other.difficulty,
+      statement: other.statement,
+      statementCode: other.statementCode,
+      question: other.question,
+      specificTip: other.specificTip,
+      statementOutput: other.statementOutput,
+      answerOptions: other.answerOptions,
+      correctAnswer: other.correctAnswer,
+    );
+  }
 }

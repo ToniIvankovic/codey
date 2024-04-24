@@ -57,4 +57,17 @@ class ExerciseSCW extends Exercise {
         'statementOutput': statementOutput,
         'correctAnswers': correctAnswers,
       };
+
+  factory ExerciseSCW.fromExercise(ExerciseSCW other) {
+    return ExerciseSCW(
+      id: other.id,
+      difficulty: other.difficulty,
+      statement: other.statement,
+      statementCode: other.statementCode,
+      specificTip: other.specificTip,
+      defaultGapLengths: other.defaultGapLengths,
+      statementOutput: other.statementOutput,
+      correctAnswers: other.correctAnswers,
+    );
+  }
 }

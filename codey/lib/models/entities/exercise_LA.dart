@@ -50,4 +50,16 @@ class ExerciseLA extends Exercise {
         'answerOptions': answerOptions,
         'correctAnswers': correctAnswers,
       };
+
+  factory ExerciseLA.fromExercise(ExerciseLA other) {
+    return ExerciseLA(
+      id: other.id,
+      difficulty: other.difficulty,
+      statement: other.statement,
+      statementOutput: other.statementOutput,
+      specificTip: other.specificTip,
+      answerOptions: (other).answerOptions,
+      correctAnswers: (other).correctAnswers,
+    );
+  }
 }
