@@ -89,9 +89,11 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
+    const int mcDelay = 30;
     if (_isMockInProgress) {
       return _mockCheckAnswer(exercise, answer);
     }
+
     bool correct;
     final request = _authenticatedClient.post(
       _exerciseAnswerValidationEndpoint(exercise),
@@ -101,6 +103,10 @@ class ExercisesServiceV1 implements ExercisesService {
       },
     );
     if (exercise is ExerciseMC) {
+      await Future.delayed(
+        const Duration(milliseconds: mcDelay),
+        () {},
+      );
       correct = exercise.correctAnswer == answer;
     } else if (exercise is ExerciseSA ||
         exercise is ExerciseLA ||
@@ -245,7 +251,7 @@ class ExercisesServiceV1 implements ExercisesService {
   @override
   dynamic getCorrectAnswer(Exercise exercise) {
     if (exercise is ExerciseMC) {
-      return exercise.correctAnswer;
+      return exercise.answerOptions[exercise.correctAnswer];
     } else if (exercise is ExerciseSA) {
       return exercise.correctAnswers?[0];
     } else if (exercise is ExerciseLA) {

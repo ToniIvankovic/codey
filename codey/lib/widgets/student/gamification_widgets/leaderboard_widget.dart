@@ -60,7 +60,12 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
             if (leaderboardLoading)
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                  ],
+                ),
               )
             else if (!leaderboardLoading && leaderboard == null)
               const Padding(

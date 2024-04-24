@@ -30,6 +30,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   bool? isCorrectResponse;
   dynamic answer;
   bool enableCheck = false;
+  bool waitingForResponse = false;
   Exercise? exercise;
   int repeatCount = 0;
 
@@ -43,14 +44,12 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   Widget build(BuildContext context) {
     if (exercise == null) {
       widget.onSessionFinished();
-      return const Expanded(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-            ],
-          ),
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+          ],
         ),
       );
     }
@@ -58,106 +57,114 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     // single exercise, button
     return Stack(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (exercise is ExerciseMC)
-                ExerciseMCWidget(
-                  key: ValueKey(exercise!.id + 100 * repeatCount),
-                  exercise: exercise!,
-                  onAnswerSelected: (answer) {
-                    setState(() {
-                      this.answer = answer;
-                      enableCheck = true;
-                    });
-                  },
-                  statementArea: _buildStaticStatementArea(),
-                  codeArea: _buildStaticCodeArea(),
-                  questionArea: _buildStaticQuestionArea(),
-                ),
-              if (exercise is ExerciseSA)
-                ExerciseSAWidget(
-                  key: ValueKey(exercise!.id + 100 * repeatCount),
-                  exercise: exercise!,
-                  onAnswerSelected: (answer) {
-                    setState(() {
-                      this.answer = answer;
-                      enableCheck = true;
-                    });
-                  },
-                  statementArea: _buildStaticStatementArea(),
-                  codeArea: _buildStaticCodeArea(),
-                  questionArea: _buildStaticQuestionArea(),
-                ),
-              if (exercise is ExerciseLA)
-                ExerciseLAWidget(
-                  key: ValueKey(exercise!.id + 100 * repeatCount),
-                  exercise: exercise! as ExerciseLA,
-                  onAnswerSelected: (answer) {
-                    setState(() {
-                      this.answer = answer;
-                      enableCheck = answer.isNotEmpty;
-                    });
-                  },
-                  statementArea: _buildStaticStatementArea(),
-                  // questionArea: _buildStaticQuestionArea(),
-                ),
-              if (exercise is ExerciseSCW)
-                ExerciseSCWWidget(
-                  key: ValueKey(exercise!.id + 100 * repeatCount),
-                  exercise: exercise! as ExerciseSCW,
-                  onAnswerSelected: (answer) {
-                    setState(() {
-                      this.answer = answer;
-                      enableCheck = answer.isNotEmpty &&
-                          answer.every((element) => element.isNotEmpty);
-                    });
-                  },
-                  statementArea: _buildStaticStatementArea(),
-                ),
-            ],
+        SingleChildScrollView(
+          child: Container(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (exercise is ExerciseMC)
+                    ExerciseMCWidget(
+                      key: ValueKey(exercise!.id + 100 * repeatCount),
+                      exercise: exercise!,
+                      onAnswerSelected: (answer) {
+                        setState(() {
+                          this.answer = answer;
+                          enableCheck = true;
+                        });
+                      },
+                      statementArea: _buildStaticStatementArea(),
+                      codeArea: _buildStaticCodeArea(),
+                      questionArea: _buildStaticQuestionArea(),
+                    )
+                  else if (exercise is ExerciseSA)
+                    ExerciseSAWidget(
+                      key: ValueKey(exercise!.id + 100 * repeatCount),
+                      exercise: exercise!,
+                      onAnswerSelected: (answer) {
+                        setState(() {
+                          this.answer = answer;
+                          enableCheck = true;
+                        });
+                      },
+                      statementArea: _buildStaticStatementArea(),
+                      codeArea: _buildStaticCodeArea(),
+                      questionArea: _buildStaticQuestionArea(),
+                    )
+                  else if (exercise is ExerciseLA)
+                    ExerciseLAWidget(
+                      key: ValueKey(exercise!.id + 100 * repeatCount),
+                      exercise: exercise! as ExerciseLA,
+                      onAnswerSelected: (answer) {
+                        setState(() {
+                          this.answer = answer;
+                          enableCheck = answer.isNotEmpty;
+                        });
+                      },
+                      statementArea: _buildStaticStatementArea(),
+                      // questionArea: _buildStaticQuestionArea(),
+                    )
+                  else if (exercise is ExerciseSCW)
+                    ExerciseSCWWidget(
+                      key: ValueKey(exercise!.id + 100 * repeatCount),
+                      exercise: exercise! as ExerciseSCW,
+                      onAnswerSelected: (answer) {
+                        setState(() {
+                          this.answer = answer;
+                          enableCheck = answer.isNotEmpty &&
+                              answer.every((element) => element.isNotEmpty);
+                        });
+                      },
+                      statementArea: _buildStaticStatementArea(),
+                    ),
+                  if (isCorrectResponse == null) _buildCheckButton(),
+                ],
+              ),
+            ),
           ),
         ),
-        if (isCorrectResponse == null) _buildCheckButton(),
         if (isCorrectResponse != null) _buildNextButtonArea(),
       ],
     );
   }
 
   Widget _buildCheckButton() {
-    return Positioned(
-      bottom: 0,
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width,
-          maxWidth: MediaQuery.of(context).size.width,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: null),
-              onPressed: enableCheck
-                  ? () {
-                      setState(() {
-                        enableCheck = false;
-                      });
-                      widget.exercisesService.checkAnswer(exercise!, answer).then(
-                        (value) {
-                          setState(() {
-                            isCorrectResponse = value;
-                          });
-                        },
-                      );
-                    }
-                  : null,
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text('PROVJERA'),
-              ),
+    Widget content = waitingForResponse
+        ? const CircularProgressIndicator() //TODO: provjeri jel radi
+        : const Text('PROVJERA');
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width,
+        maxWidth: MediaQuery.of(context).size.width,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: null),
+            onPressed: enableCheck
+                ? () {
+                    setState(() {
+                      enableCheck = false;
+                    });
+                    widget.exercisesService.checkAnswer(exercise!, answer).then(
+                      (value) {
+                        setState(() {
+                          isCorrectResponse = value;
+                        });
+                      },
+                    );
+                  }
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: content,
             ),
           ),
         ),
@@ -183,7 +190,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             ? Theme.of(context).colorScheme.inversePrimary.withOpacity(0.95)
             : Theme.of(context).colorScheme.errorContainer.withOpacity(0.9),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +201,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                   fontSize: 20.0,
                 ),
               ),
-              if (correctAnswer != null) ...[
+              if (isCorrectResponse != true) ...[
                 Text(
                   'Točan odgovor:',
                   style: textColor.copyWith(
@@ -249,8 +256,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
 
   Widget _buildStaticStatementArea() {
     Widget statementArea = Text(
-        '${exercise!.statement} '
-        '(${exercise!.id}, difficulty: ${exercise!.difficulty})',
+        '${exercise!.statement} ',
         style: const TextStyle(fontSize: 20.0));
     return statementArea;
   }

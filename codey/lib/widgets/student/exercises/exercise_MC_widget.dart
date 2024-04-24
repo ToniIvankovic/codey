@@ -44,33 +44,31 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
         widget.statementArea,
         widget.codeArea,
         widget.questionArea,
-        GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 1,
-          childAspectRatio: 4, // For square tiles
-          children: answerOptions.map((option) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedAnswer = option.key;
-                });
-                widget.onAnswerSelected(selectedAnswer!);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onBackground
-                          .withOpacity(selectedAnswer == option.key ? 1 : 0.5),
-                      width: selectedAnswer == option.key ? 3 : 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).colorScheme.surface,
+        for (var option in answerOptions)
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedAnswer = option.key;
+              });
+              widget.onAnswerSelected(selectedAnswer!);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(selectedAnswer == option.key ? 1 : 0.5),
+                    width: selectedAnswer == option.key ? 3 : 1.5,
                   ),
-                  child: Center(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(25.0),
                     child: Text(
                       option.value,
                       style: const TextStyle(fontSize: 16),
@@ -78,9 +76,8 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                   ),
                 ),
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          ),
       ],
     );
   }
