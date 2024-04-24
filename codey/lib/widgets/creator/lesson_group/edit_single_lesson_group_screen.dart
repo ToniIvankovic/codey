@@ -61,74 +61,70 @@ class _EditSingleLessonGroupScreenState
       appBar: AppBar(
         title: Text('Edit lesson group ${widget.lessonGroup.id}'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: nameRow,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: tipsRow,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Row(
-                  children: [
-                    const Text("Adaptive:"),
-                    Checkbox(
-                      value: adaptive,
-                      onChanged: (value) => setState(() {
-                        adaptive = value!;
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-
-              if (!adaptive)
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: lessonsRow,
+                  child: nameRow,
                 ),
-              // COMMIT CHANGES TO BE
-              ElevatedButton(
-                  onPressed: madeEdits
-                      ? null
-                      : () {
-                          final lessonGroup = LessonGroup(
-                            id: widget.lessonGroup.id,
-                            name: nameEdited ?? widget.lessonGroup.name,
-                            tips: tipsEdited ?? widget.lessonGroup.tips,
-                            lessons: lessonsEdited == null
-                                ? widget.lessonGroup.lessons
-                                : lessonsEdited!.map((e) => e.id).toList(),
-                            order: widget.lessonGroup.order,
-                            adaptive: adaptive,
-                          );
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: tipsRow,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Row(
+                    children: [
+                      const Text("Adaptive:"),
+                      Checkbox(
+                        value: adaptive,
+                        onChanged: (value) => setState(() {
+                          adaptive = value!;
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
 
-                          // Save changes on BE
-                          context
-                              .read<LessonGroupsService>()
-                              .updateLessonGroup(lessonGroup);
+                if (!adaptive)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: lessonsRow,
+                  ),
+                // COMMIT CHANGES TO BE
+                ElevatedButton(
+                    onPressed: madeEdits
+                        ? null
+                        : () {
+                            final lessonGroup = LessonGroup(
+                              id: widget.lessonGroup.id,
+                              name: nameEdited ?? widget.lessonGroup.name,
+                              tips: tipsEdited ?? widget.lessonGroup.tips,
+                              lessons: lessonsEdited == null
+                                  ? widget.lessonGroup.lessons
+                                  : lessonsEdited!.map((e) => e.id).toList(),
+                              order: widget.lessonGroup.order,
+                              adaptive: adaptive,
+                            );
 
-                          //Save changes on FE
-                          widget.lessonGroup.name =
-                              nameEditedCommit ?? widget.lessonGroup.name;
-                          widget.lessonGroup.tips =
-                              tipsEditedCommit ?? widget.lessonGroup.tips;
-                          widget.lessonGroup.lessons = lessonsEditedCommit ==
-                                  null
-                              ? widget.lessonGroup.lessons
-                              : lessonsEditedCommit!.map((e) => e.id).toList();
-                          Navigator.pop(context);
-                        },
-                  child: const Text('Save'))
-            ],
+                            // Save changes on BE
+                            context
+                                .read<LessonGroupsService>()
+                                .updateLessonGroup(lessonGroup)
+                                .then((value) {
+                              Navigator.pop(context, value);
+                            }).catchError((error) {
+                              Navigator.pop(context, null);
+                            });
+                          },
+                    child: const Text('Save'))
+              ],
+            ),
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:codey/models/entities/lesson_group.dart';
+import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
@@ -115,8 +116,6 @@ class LessonsRepository1 implements LessonsRepository {
       }
     }
 
-    lessons.sort(
-        (a, b) => lessonIds.indexOf(a.id).compareTo(lessonIds.indexOf(b.id)));
     return lessons;
   }
 
@@ -204,6 +203,8 @@ class LessonsRepository1 implements LessonsRepository {
       switch (response.statusCode) {
         case 401:
           throw UnauthenticatedException('Unauthorized update of lesson');
+        case 204:
+          throw NoChangesException("No changes made");
         default:
           throw Exception(
               'Failed to update lesson, Error ${response.statusCode}');

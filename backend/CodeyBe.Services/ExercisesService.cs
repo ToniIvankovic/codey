@@ -197,7 +197,6 @@ namespace CodeyBe.Services
                  }
                  return exercise;
              });
-            exercises = exercises.OrderBy(exercise => exercise.PrivateId);
             return exercises;
         }
 

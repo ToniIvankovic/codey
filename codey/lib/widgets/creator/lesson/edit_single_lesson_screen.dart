@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/widgets/creator/exercise/pick_exercise_screen.dart';
@@ -61,34 +62,58 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
       appBar: AppBar(
         title: const Text('Edit lesson'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            nameRow,
-            specificTipsRow,
-            exercisesRow,
-            ElevatedButton(
-              onPressed: madeChanges && !editInProgress
-                  ? () {
-                      context
-                          .read<LessonsService>()
-                          .updateLesson(
-                            widget.lesson.id,
-                            nameLocal,
-                            specificTipsLocal,
-                            exercisesLocal.map((e) => e.id).toList(),
-                          )
-                          .then((value) => Navigator.pop(context, value));
-                    }
-                  : null,
-              child: const Text('Save'),
-            ),
-            if (editInProgress)
-              const Text("Please save or cancel changes first")
-            else if (!madeChanges)
-              const Text("No changes made"),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              nameRow,
+              specificTipsRow,
+              exercisesRow,
+              ElevatedButton(
+                onPressed: madeChanges && !editInProgress
+                    ? () {
+                        context
+                            .read<LessonsService>()
+                            .updateLesson(
+                              widget.lesson.id,
+                              nameLocal,
+                              specificTipsLocal,
+                              exercisesLocal.map((e) => e.id).toList(),
+                            )
+                            .then((value) {
+                          Navigator.pop(context, value);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Lesson updated successfully"),
+                            ),
+                          );
+                        }).catchError((error) {
+                          if (error is NoChangesException) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("No changes made"),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Failed to update lesson"),
+                              ),
+                            );
+                          }
+                          Navigator.pop(context, null);
+                        });
+                      }
+                    : null,
+                child: const Text('Save'),
+              ),
+              if (editInProgress)
+                const Text("Please save or cancel changes first")
+              else if (!madeChanges)
+                const Text("No changes made"),
+            ],
+          ),
         ),
       ),
     );
@@ -162,11 +187,12 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
         if (specificTipsEditable) ...[
           Expanded(
             child: TextFormField(
+              minLines: 1,
+              maxLines: 5,
               decoration: const InputDecoration(
                 hintText: "Specific tips",
               ),
               initialValue: specificTipsLocal,
-              maxLength: 100,
               onChanged: (String value) {
                 specificTipsEdited = value;
               },
@@ -212,44 +238,56 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
             children: [
               const Text("Exercises: "),
               if (exercisesEditable) ...[
-                ListView.builder(
+                ReorderableListView(
                   shrinkWrap: true,
-                  itemCount: exercisesEdited.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                          "${exercisesEdited[index].id} (${exercisesEdited[index].type})"),
-                      subtitle: expandedExerciseId == exercisesEdited[index].id
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercisesEdited[index].statement.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            )
-                          : null,
-                      onTap: () {
-                        setState(() {
-                          if (expandedExerciseId == exercisesEdited[index].id) {
-                            expandedExerciseId = null;
-                          } else {
-                            expandedExerciseId = exercisesEdited[index].id;
-                          }
-                        });
-                      },
-                      leading: IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
+                  onReorder: (int oldIndex, int newIndex) {
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      final Exercise item = exercisesEdited.removeAt(oldIndex);
+                      exercisesEdited.insert(newIndex, item);
+                    });
+                  },
+                  children: [
+                    for (int index = 0; index < exercisesEdited.length; index++)
+                      ListTile(
+                        key: ValueKey(exercisesEdited[index].id),
+                        title: Text(
+                            "${exercisesEdited[index].id} (${exercisesEdited[index].type})"),
+                        subtitle: expandedExerciseId ==
+                                exercisesEdited[index].id
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exercisesEdited[index].statement.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              )
+                            : null,
+                        onTap: () {
                           setState(() {
-                            exercisesEdited.removeAt(index);
+                            if (expandedExerciseId ==
+                                exercisesEdited[index].id) {
+                              expandedExerciseId = null;
+                            } else {
+                              expandedExerciseId = exercisesEdited[index].id;
+                            }
                           });
                         },
+                        leading: IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              exercisesEdited.removeAt(index);
+                            });
+                          },
+                        ),
                       ),
-                    );
-                  },
+                  ],
                 ),
                 TextButton.icon(
                   onPressed: () {
@@ -273,6 +311,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                 ),
               ] else
                 ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: exercisesLocal.length,
                   itemBuilder: (context, index) {

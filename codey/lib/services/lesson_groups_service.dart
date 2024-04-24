@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 abstract class LessonGroupsService {
   Future<List<LessonGroup>> getAllLessonGroups();
-  void updateLessonGroup(LessonGroup lessonGroup);
+  Future<LessonGroup> updateLessonGroup(LessonGroup lessonGroup);
   void reorderLessonGroups(List<LessonGroup> list);
   Future<LessonGroup> createLessonGroup({
     required String name,
@@ -37,7 +37,7 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
   }
 
   @override
-  void updateLessonGroup(LessonGroup lessonGroup) async {
+  Future<LessonGroup> updateLessonGroup(LessonGroup lessonGroup) async {
     _lessonGroupsRepository.invalidateCache();
     var response = await _authenticatedClient.put(_apiUriSingleLG(lessonGroup),
         headers: <String, String>{
@@ -53,6 +53,7 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
       throw Exception('Failed to update lesson group: ${lessonGroup.id}, '
           'Error ${response.statusCode}');
     }
+    return LessonGroup.fromJson(jsonDecode(response.body));
   }
 
   @override

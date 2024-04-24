@@ -35,14 +35,20 @@ namespace CodeyBE.Data.DB.Repositories
             return (await GetByIdAsync(nextId))!;
         }
 
-        public async Task<Lesson> UpdateAsync(int id, LessonCreationDTO lesson)
+        public async Task<Lesson> UpdateAsync(int id, LessonCreationDTO lessonCreationDTO)
         {
+            // Unset the array field
+            await _collection.UpdateOneAsync(
+                lesson => lesson.PrivateId == id,
+                Builders<Lesson>.Update.Unset(lesson => lesson.Exercises)
+            );
+
             UpdateResult updateResult = await _collection.UpdateOneAsync(
                                 lesson => lesson.PrivateId == id,
                                 Builders<Lesson>.Update
-                                .Set(lesson => lesson.Name, lesson.Name)
-                                .Set(lesson => lesson.SpecificTips, lesson.SpecificTips)
-                                .Set(lesson => lesson.Exercises, lesson.Exercises)
+                                .Set(lesson => lesson.Name, lessonCreationDTO.Name)
+                                .Set(lesson => lesson.SpecificTips, lessonCreationDTO.SpecificTips)
+                                .Set(lesson => lesson.Exercises, lessonCreationDTO.Exercises)
                                 );
             if (!updateResult.IsAcknowledged)
             {

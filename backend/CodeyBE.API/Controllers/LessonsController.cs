@@ -71,6 +71,10 @@ namespace CodeyBE.API.Controllers
             {
                 return NotFound(e.Message);
             }
+            catch (NoChangesException)
+            {
+                return NoContent();
+            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);

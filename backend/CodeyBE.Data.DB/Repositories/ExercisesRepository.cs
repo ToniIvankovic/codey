@@ -33,6 +33,7 @@ namespace CodeyBE.Data.DB.Repositories
             return _collection
                 .Find(exercise => ids.Contains(exercise.PrivateId))
                 .ToList()
+                .OrderBy(ex => ids.ToList().IndexOf(ex.PrivateId))
                 .Select(ex => IExercisesRepository.MapToSpecificExerciseType(ex));
         }
 

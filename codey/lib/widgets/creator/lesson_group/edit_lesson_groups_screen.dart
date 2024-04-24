@@ -76,16 +76,35 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                       onPressed: () {
                         Navigator.of(context)
                             .push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    EditSingleLessonGroupScreen(
-                                  lessonGroup: lessonGroup,
-                                ),
-                              ),
-                            )
+                          MaterialPageRoute(
+                            builder: (context) => EditSingleLessonGroupScreen(
+                              lessonGroup: lessonGroup,
+                            ),
+                          ),
+                        )
                             .then(
-                              (value) => setState(() {}),
+                          (value) {
+                            if (value == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("No changes made"),
+                                ),
+                              );
+                              return;
+                            }
+                            setState(() {
+                              lessonGroupsLocal![lessonGroupsLocal!.indexWhere(
+                                      (element) =>
+                                          element.id == lessonGroup.id)] =
+                                  value as LessonGroup;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Lesson group updated"),
+                              ),
                             );
+                          },
+                        );
                       }),
                   IconButton(
                     icon: const Icon(Icons.clear),
