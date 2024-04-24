@@ -95,6 +95,7 @@ class ManageClassesScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("Stvoren razred $className"),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   });

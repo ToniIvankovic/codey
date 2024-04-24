@@ -82,6 +82,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                                           .showSnackBar(
                                         const SnackBar(
                                           content: Text('Nema promjena'),
+                                          duration: Duration(seconds: 2),
                                         ),
                                       );
                                     } else {
@@ -90,6 +91,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                                         SnackBar(
                                           content: Text(
                                               'Neuspjelo brisanje razreda (${error.toString()})'),
+                                          duration: const Duration(seconds: 3),
                                         ),
                                       );
                                     }

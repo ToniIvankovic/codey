@@ -1,6 +1,6 @@
 # codey
 
-A new Flutter project.
+Diplomski rad - Toni Ivanković
 
 ## Getting Started
 

@@ -120,12 +120,14 @@ class _CreateTeacherScreenState extends State<CreateTeacherScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Teacher created successfully'),
+                    duration: Duration(seconds: 1),
                   ),
                 );
               }).catchError((error) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error: $error'),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               });

@@ -72,12 +72,15 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Nema promjena'),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Neuspjelo uređivanje razreda: $error'),
+                              content:
+                                  Text('Neuspjelo uređivanje razreda: $error'),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         }

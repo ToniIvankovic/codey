@@ -86,6 +86,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("Lesson updated successfully"),
+                              duration: Duration(seconds: 1),
                             ),
                           );
                         }).catchError((error) {
@@ -93,12 +94,15 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("No changes made"),
+                                duration: Duration(seconds: 2),
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Failed to update lesson"),
+                              SnackBar(
+                                content:
+                                    Text("Failed to update lesson - $error"),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }

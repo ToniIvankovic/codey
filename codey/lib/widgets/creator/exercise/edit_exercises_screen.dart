@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +44,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
               child: TextButton.icon(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -61,7 +63,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
               child: Row(
                 children: [
                   TextButton.icon(
@@ -215,6 +218,34 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                               });
                             }
                           });
+                        },
+                      ),
+                      // VIEW EXERCISE BUTTON
+                      IconButton(
+                        icon: const Icon(Icons.remove_red_eye),
+                        onPressed: () {
+                          final exercisesService =
+                              context.read<ExercisesService>();
+                          exercisesService.startMockExerciseSession(exercise);
+                          exercisesService.getNextExercise();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => Scaffold(
+                                appBar: AppBar(
+                                  title: const Text('Preview exercise'),
+                                ),
+                                body: SingleExerciseWidget(
+                                  exercisesService: exercisesService,
+                                  onSessionFinished: () {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      Navigator.pop(context);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],

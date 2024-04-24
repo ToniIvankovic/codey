@@ -88,6 +88,7 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("No changes made"),
+                                  duration: Duration(seconds: 2),
                                 ),
                               );
                               return;
@@ -101,6 +102,7 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("Lesson group updated"),
+                                duration: Duration(seconds: 1),
                               ),
                             );
                           },

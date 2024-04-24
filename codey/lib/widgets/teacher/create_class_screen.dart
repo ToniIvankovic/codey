@@ -106,7 +106,8 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                           .catchError((error) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(error.toString()),
+                            content: Text("Error: ${error.toString()}"),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       });

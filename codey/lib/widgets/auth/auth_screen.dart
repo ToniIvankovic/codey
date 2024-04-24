@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Registration successful'),
+                          content: Text('Uspješna registracija! Sada se možete prijaviti.'),
                           duration: Duration(seconds: 2),
                         ),
                       );

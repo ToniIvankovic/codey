@@ -3,7 +3,6 @@ import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
-import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';

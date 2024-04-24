@@ -49,12 +49,14 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Creator created successfully'),
+                    duration: Duration(seconds: 1),
                   ),
                 );
               }).catchError((error) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error: $error'),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               });
