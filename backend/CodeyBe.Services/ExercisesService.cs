@@ -257,7 +257,7 @@ namespace CodeyBe.Services
                 castAnswer = answer.EnumerateArray()
                     .Select(element => element.GetString())
                     .ToList();
-                correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<object>)d).Cast<string>().ToList()).ToList();
+                correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<string>)d).Cast<string>().ToList()).ToList();
                 correct = ValidateAnswerSCW((IEnumerable<IEnumerable<string>>)correctAnswers, castAnswer);
             }
             else
