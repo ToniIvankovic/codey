@@ -29,6 +29,7 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
           exercises.removeWhere((element) =>
               widget.exercises!.map((ex) => ex.id).contains(element.id));
         }
+        exercises.sort((a, b) => -a.id.compareTo(b.id));
       });
     });
   }
@@ -54,7 +55,7 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
                   })).then((value) {
                     if (value != null) {
                       setState(() {
-                        exercises.add(value as Exercise);
+                        exercises.insert(0, value as Exercise);
                       });
                     }
                   });

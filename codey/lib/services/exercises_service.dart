@@ -12,8 +12,11 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/user_service.dart';
+import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 abstract class ExercisesService {
   Future<void> startSessionForLesson(Lesson lesson, LessonGroup lessonGroup);
@@ -33,6 +36,7 @@ abstract class ExercisesService {
       List<Exercise> exercises);
   dynamic getCorrectAnswer(Exercise exercise);
   double get sessionProgress;
+  Widget generateExercisePreviewButton(BuildContext context, Exercise exercise);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -276,5 +280,34 @@ class ExercisesServiceV1 implements ExercisesService {
     } else {
       throw Exception('Unknown exercise type');
     }
+  }
+
+  Widget generateExercisePreviewButton(
+      BuildContext context, Exercise exercise) {
+    return IconButton(
+      icon: const Icon(Icons.remove_red_eye),
+      onPressed: () {
+        final exercisesService = context.read<ExercisesService>();
+        exercisesService.startMockExerciseSession(exercise);
+        exercisesService.getNextExercise();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(
+                title: Text('Preview exercise ${exercise.id}'),
+              ),
+              body: SingleExerciseWidget(
+                exercisesService: exercisesService,
+                onSessionFinished: () {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

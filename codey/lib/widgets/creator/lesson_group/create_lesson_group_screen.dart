@@ -22,7 +22,7 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
   @override
   Widget build(BuildContext context) {
     bool inputValid =
-        name != null && tips != null && (adaptive || lessons.isNotEmpty);
+        name != null && tips != null && tips!.isNotEmpty && (adaptive || lessons.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create lesson group"),

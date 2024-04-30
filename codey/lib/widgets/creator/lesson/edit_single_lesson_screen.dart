@@ -160,7 +160,9 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
             ),
           ),
         ] else
-          Text(nameLocal),
+          Expanded(
+            child: Text(nameLocal),
+          ),
       ],
     );
   }
@@ -183,6 +185,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                 onPressed: () {
                   setState(() {
                     specificTipsEditable = !specificTipsEditable;
+                    specificTipsEdited = specificTipsLocal;
                   });
                 },
                 icon: const Icon(Icons.edit),
@@ -203,7 +206,10 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
             ),
           ),
         ] else
-          Text(specificTipsLocal ?? ""),
+          Expanded(
+              child: Text(
+            specificTipsLocal ?? "",
+          )),
       ],
     );
   }
@@ -282,13 +288,22 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                             }
                           });
                         },
-                        leading: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              exercisesEdited.removeAt(index);
-                            });
-                          },
+                        leading: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  exercisesEdited.removeAt(index);
+                                });
+                              },
+                            ),
+                            context
+                                .read<ExercisesService>()
+                                .generateExercisePreviewButton(
+                                    context, exercisesLocal[index]),
+                          ],
                         ),
                       ),
                   ],
@@ -343,6 +358,10 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                           }
                         });
                       },
+                      leading: context
+                          .read<ExercisesService>()
+                          .generateExercisePreviewButton(
+                              context, exercisesLocal[index]),
                     );
                   },
                 ),

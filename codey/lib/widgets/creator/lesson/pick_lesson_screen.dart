@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/widgets/creator/lesson/create_lesson_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,19 +40,38 @@ class _PickLessonScreenState extends State<PickLessonScreen> {
                   lessons.removeWhere((lesson) => widget.existingLessons
                       .map((lesson) => lesson.id)
                       .contains(lesson.id));
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: lessons.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text(
-                              "${lessons[index].name} (${lessons[index].id})"),
-                          onTap: () {
-                            Navigator.pop(context, lessons[index]);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextButton.icon(
+                          onPressed: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const CreateLessonScreen();
+                            })).then((value) {
+                              if (value != null) {
+                                setState(() {
+                                  lessons.insert(0, value as Lesson);
+                                });
+                              }
+                            });
                           },
-                        );
-                      },
-                    ),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add new lesson')),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: lessons.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Text(
+                                "${lessons[index].name} (${lessons[index].id})"),
+                            onTap: () {
+                              Navigator.pop(context, lessons[index]);
+                            },
+                          );
+                        },
+                      ),
+                    ],
                   );
                 })
           ],
