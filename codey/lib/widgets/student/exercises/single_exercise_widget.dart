@@ -295,9 +295,11 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   }
 
   Widget _buildStaticStatementArea() {
-    Widget statementArea =
-        Text('${exercise!.statement} ', style: const TextStyle(fontSize: 20.0));
-    return statementArea;
+    if (exercise!.statement == null) {
+      return const SizedBox.shrink();
+    }
+    return Text('${exercise!.statement} ',
+        style: const TextStyle(fontSize: 20.0));
   }
 
   Widget _buildStaticQuestionArea() {
@@ -306,14 +308,11 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           "Question area is only available for MC and SA exercises");
     }
 
-    Widget questionArea;
-    if ((exercise! as dynamic).question?.isEmpty == false) {
-      questionArea = Text((exercise! as dynamic).question!,
-          style: const TextStyle(fontSize: 20.0));
-    } else {
-      questionArea = const SizedBox.shrink();
+    if ((exercise! as dynamic).question?.isEmpty) {
+      return const SizedBox.shrink();
     }
-    return questionArea;
+    return Text((exercise! as dynamic).question!,
+        style: const TextStyle(fontSize: 20.0));
   }
 
   Widget _buildStaticCodeArea() {
@@ -323,49 +322,47 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       throw Exception(
           "Code area is only available for MC, SA and SCW exercises");
     }
-    Widget codeArea;
-    if ((exercise! as dynamic).statementCode?.isNotEmpty) {
-      codeArea = Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: DottedBorder(
-            borderType: BorderType.RRect,
-            radius: const Radius.circular(10),
-            dashPattern: const [9, 6],
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth,
-                        minWidth: constraints.maxWidth,
+
+    if ((exercise! as dynamic).statementCode?.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: DottedBorder(
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(10),
+          dashPattern: const [9, 6],
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth,
+                      minWidth: constraints.maxWidth,
+                    ),
+                    child: Text(
+                      (exercise! as dynamic).statementCode!,
+                      style: const TextStyle(
+                        fontFamily: 'courier new',
+                        fontSize: 20.0,
                       ),
-                      child: Text(
-                        (exercise! as dynamic).statementCode!,
-                        style: const TextStyle(
-                          fontFamily: 'courier new',
-                          fontSize: 20.0,
-                        ),
-                        softWrap: true,
-                      ),
+                      softWrap: true,
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
-      );
-    } else {
-      codeArea = const SizedBox.shrink();
-    }
-    return codeArea;
+      ),
+    );
   }
 }
