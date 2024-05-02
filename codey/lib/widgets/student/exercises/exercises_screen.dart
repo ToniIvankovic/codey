@@ -2,6 +2,7 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/widgets/student/exercises/post_lesson_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +10,11 @@ import 'package:provider/provider.dart';
 class ExercisesScreen extends StatefulWidget {
   final Lesson lesson;
   final LessonGroup lessonGroup;
-  final VoidCallback onSessionCompleted;
 
   const ExercisesScreen({
     super.key,
     required this.lesson,
     required this.lessonGroup,
-    required this.onSessionCompleted,
   });
 
   @override
@@ -78,11 +77,16 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           key: ValueKey(currentExercise!.id),
                           exercisesService: exercisesService,
                           onSessionFinished: () async {
-                            widget.onSessionCompleted();
                             int? awardedXP =
                                 await exercisesService.endSession(true);
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              Navigator.pop(context, awardedXP);
+                              Navigator.pushReplacement(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return PostLessonScreen(
+                                  endReport: exercisesService.getEndReport()!,
+                                  awardedXP: awardedXP,
+                                );
+                              }));
                             });
                           },
                         ),

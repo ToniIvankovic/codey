@@ -3,7 +3,7 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/student/exercises/pre_post_exercise_screen.dart';
+import 'package:codey/widgets/student/exercises/pre_lesson_screen.dart';
 import 'package:codey/widgets/student/lesson_groups/lesson_group_tips_screen.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -56,17 +56,19 @@ class _LessonsScreenState extends State<LessonsScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: IconButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => LessonGroupTipsScreen(
-                      lessonGroup: widget.lessonGroup,
-                      lessonGroupFinished: lessonGroupFinished,
-                      backDisabled: true,
-                    ),
-                  ),
-                );
-              },
+              onPressed: widget.lessonGroup.tips.isNotEmpty
+                  ? () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => LessonGroupTipsScreen(
+                            lessonGroup: widget.lessonGroup,
+                            lessonGroupFinished: lessonGroupFinished,
+                            backDisabled: true,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
               icon: const Icon(Icons.lightbulb_outline),
             ),
           ),
@@ -223,7 +225,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PrePostExerciseScreen(
+                          builder: (context) => PreLessonScreen(
                             lesson: lesson,
                             lessonGroup: widget.lessonGroup,
                           ),
