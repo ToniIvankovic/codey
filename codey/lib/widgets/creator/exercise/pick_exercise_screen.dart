@@ -1,8 +1,4 @@
 import 'package:codey/models/entities/exercise.dart';
-import 'package:codey/models/entities/exercise_LA.dart';
-import 'package:codey/models/entities/exercise_MC.dart';
-import 'package:codey/models/entities/exercise_SA.dart';
-import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
@@ -36,6 +32,7 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var exercisesService = context.read<ExercisesService>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pick exercise'),
@@ -95,8 +92,10 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
                         );
                       },
                     ),
-                    title: Text(
-                        "${exercise.type.toString()} (${exercise.id}) - ${_formExerciseTitle(exercise)}"),
+                    title: Text(exercisesService
+                        .getExerciseDescriptionString(exercise)[0]),
+                    subtitle: Text(exercisesService
+                        .getExerciseDescriptionString(exercise)[1]),
                     onTap: () => Navigator.pop(context, exercise),
                   ),
               ],
@@ -105,19 +104,5 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
         ),
       ),
     );
-  }
-
-  String _formExerciseTitle(Exercise exercise) {
-    if (exercise is ExerciseMC) {
-      return '${exercise.statement ?? ''} ${exercise.statementCode ?? ''} ${exercise.statementOutput ?? ''} ${exercise.question ?? ''} (${exercise.answerOptions.values.join(', ')})';
-    } else if (exercise is ExerciseSA) {
-      return '${exercise.statement ?? ''} ${exercise.statementCode ?? ''} ${exercise.statementOutput ?? ''} ${exercise.question ?? ''}';
-    } else if (exercise is ExerciseLA) {
-      return '${exercise.statement ?? ''} ${exercise.statementOutput ?? ''} (${exercise.answerOptions?.values.join(",") ?? ''})';
-    } else if (exercise is ExerciseSCW) {
-      return '${exercise.statement ?? ''} ${exercise.statementCode} ${exercise.statementOutput ?? ''}';
-    } else {
-      throw Exception('Unknown exercise type');
-    }
   }
 }

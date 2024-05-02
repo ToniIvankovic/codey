@@ -17,18 +17,21 @@ class EditLessonsScreen extends StatefulWidget {
 
 class _EditLessonsScreenState extends State<EditLessonsScreen> {
   List<Lesson> lessonsLocal = [];
-  List<Lesson> lessonsToDelete = [];
   int? expandedId;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    LessonsService lessonsService = context.read<LessonsService>();
+    lessonsService.getAllLessons().then((value) => setState(() {
+          lessonsLocal = List.of(value);
+          lessonsLocal.sort((a, b) => -a.id.compareTo(b.id));
+        }));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (lessonsLocal.isEmpty) {
-      LessonsService lessonsService = context.read<LessonsService>();
-      lessonsService.getAllLessons().then((value) => setState(() {
-            lessonsLocal = List.of(value);
-          }));
-    }
-    final bool madeChanges = lessonsToDelete.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit lessons'),
@@ -37,57 +40,6 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                for (Lesson lesson in lessonsLocal)
-                  ListTile(
-                    title: Text('${lesson.name} (${lesson.id})'),
-                    subtitle: expandedId == lesson.id
-                        ? Text("Exercises: ${lesson.exerciseIds.join(", ")}")
-                        : null,
-                    leading: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              lessonsLocal.remove(lesson);
-                              lessonsToDelete.add(lesson);
-                              lessonsToDelete
-                                  .sort((a, b) => a.id.compareTo(b.id));
-                            });
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditSingleLessonScreen(lesson),
-                                ))
-                                .then(
-                                  (value) => {
-                                    setState(() {
-                                      lessonsLocal.clear();
-                                      lessonsToDelete.clear();
-                                    }),
-                                  },
-                                );
-                          },
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      setState(() {
-                        expandedId = expandedId == lesson.id ? null : lesson.id;
-                      });
-                    },
-                  ),
-              ],
-            ),
             Row(
               children: [
                 Padding(
@@ -105,7 +57,7 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
                             .then((value) {
                           if (value != null) {
                             setState(() {
-                              lessonsLocal.add(value);
+                              lessonsLocal.insert(0, value);
                             });
                           }
                         });
@@ -117,23 +69,88 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
                 ),
               ],
             ),
-            if (lessonsToDelete.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Lessons to delete: "
-                    "${lessonsToDelete.map((e) => e.id.toString()).toList().join(", ")}"),
-              ),
-            // COMMIT CHANGES TO BE
-            ElevatedButton(
-              onPressed: madeChanges
-                  ? () {
-                      for (Lesson lesson in lessonsToDelete) {
-                        context.read<LessonsService>().deleteLesson(lesson);
-                      }
-                      Navigator.of(context).pop();
-                    }
-                  : null,
-              child: const Text('Delete'),
+            ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                for (Lesson lesson in lessonsLocal)
+                  ListTile(
+                    title: Text('${lesson.name} (${lesson.id})'),
+                    subtitle: expandedId == lesson.id
+                        ? Text("Exercises: ${lesson.exerciseIds.join(", ")}")
+                        : null,
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            //popups a dialog to confirm deletion
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text("Delete lesson"),
+                                  content: Text(
+                                      "Are you sure you want to delete lesson ${lesson.name} (${lesson.id})?"),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        setState(() {
+                                          lessonsLocal.remove(lesson);
+                                          context
+                                              .read<LessonsService>()
+                                              .deleteLesson(lesson);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  'Lesson ${lesson.id} deleted successfully'),
+                                            ),
+                                          );
+                                        });
+                                      },
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  EditSingleLessonScreen(lesson),
+                            ))
+                                .then(
+                              (value) {
+                                if (value == null) return;
+                                setState(() {
+                                  lessonsLocal.insert(0, value);
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      setState(() {
+                        expandedId = expandedId == lesson.id ? null : lesson.id;
+                      });
+                    },
+                  ),
+              ],
             ),
           ],
         ),

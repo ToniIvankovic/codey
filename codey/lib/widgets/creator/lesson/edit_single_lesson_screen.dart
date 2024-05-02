@@ -1,3 +1,4 @@
+
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
@@ -215,6 +216,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
   }
 
   Row _generateExercisesRow() {
+    var exercisesService = context.read<ExercisesService>();
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -263,31 +265,23 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                     for (int index = 0; index < exercisesEdited.length; index++)
                       ListTile(
                         key: ValueKey(exercisesEdited[index].id),
+
                         title: Text(
-                            "${exercisesEdited[index].id} (${exercisesEdited[index].type})"),
-                        subtitle: expandedExerciseId ==
-                                exercisesEdited[index].id
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    exercisesEdited[index].statement.toString(),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              )
-                            : null,
-                        onTap: () {
-                          setState(() {
-                            if (expandedExerciseId ==
-                                exercisesEdited[index].id) {
-                              expandedExerciseId = null;
-                            } else {
-                              expandedExerciseId = exercisesEdited[index].id;
-                            }
-                          });
-                        },
+                            exercisesService.getExerciseDescriptionString(
+                                exercisesEdited[index])[0]),
+                        subtitle: Text(
+                            exercisesService.getExerciseDescriptionString(
+                                exercisesEdited[index])[1]),
+                        // onTap: () {
+                        //   setState(() {
+                        //     // if (expandedExerciseId ==
+                        //     //     exercisesEdited[index].id) {
+                        //     //   expandedExerciseId = null;
+                        //     // } else {
+                        //     //   expandedExerciseId = exercisesEdited[index].id;
+                        //     // }
+                        //   });
+                        // },
                         leading: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -299,10 +293,8 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                                 });
                               },
                             ),
-                            context
-                                .read<ExercisesService>()
-                                .generateExercisePreviewButton(
-                                    context, exercisesLocal[index]),
+                            exercisesService.generateExercisePreviewButton(
+                                context, exercisesLocal[index]),
                           ],
                         ),
                       ),
@@ -335,33 +327,22 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                   itemCount: exercisesLocal.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(
-                          "${exercisesLocal[index].id} (${exercisesLocal[index].type})"),
-                      subtitle: expandedExerciseId == exercisesLocal[index].id
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercisesLocal[index].statement.toString(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            )
-                          : null,
-                      onTap: () {
-                        setState(() {
-                          if (expandedExerciseId == exercisesLocal[index].id) {
-                            expandedExerciseId = null;
-                          } else {
-                            expandedExerciseId = exercisesLocal[index].id;
-                          }
-                        });
-                      },
-                      leading: context
-                          .read<ExercisesService>()
-                          .generateExercisePreviewButton(
-                              context, exercisesLocal[index]),
+                      title: Text(exercisesService.getExerciseDescriptionString(
+                          exercisesLocal[index])[0]),
+                      subtitle: Text(
+                          exercisesService.getExerciseDescriptionString(
+                              exercisesLocal[index])[1]),
+                      // onTap: () {
+                      // setState(() {
+                      //   if (expandedExerciseId == exercisesLocal[index].id) {
+                      //     expandedExerciseId = null;
+                      //   } else {
+                      //     expandedExerciseId = exercisesLocal[index].id;
+                      //   }
+                      // });
+                      // },
+                      leading: exercisesService.generateExercisePreviewButton(
+                          context, exercisesLocal[index]),
                     );
                   },
                 ),

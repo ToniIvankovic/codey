@@ -36,7 +36,7 @@ class _PickLessonScreenState extends State<PickLessonScreen> {
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   }
-                  final lessons = snapshot.data!;
+                  final lessons = snapshot.data!.reversed.toList();
                   lessons.removeWhere((lesson) => widget.existingLessons
                       .map((lesson) => lesson.id)
                       .contains(lesson.id));

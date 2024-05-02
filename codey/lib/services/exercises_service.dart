@@ -36,7 +36,9 @@ abstract class ExercisesService {
       List<Exercise> exercises);
   dynamic getCorrectAnswer(Exercise exercise);
   double get sessionProgress;
-  Widget generateExercisePreviewButton(BuildContext context, Exercise exercise);
+  IconButton generateExercisePreviewButton(
+      BuildContext context, Exercise exercise);
+  List<String> getExerciseDescriptionString(Exercise exercise);
 }
 
 class ExercisesServiceV1 implements ExercisesService {
@@ -282,7 +284,8 @@ class ExercisesServiceV1 implements ExercisesService {
     }
   }
 
-  Widget generateExercisePreviewButton(
+  @override
+  IconButton generateExercisePreviewButton(
       BuildContext context, Exercise exercise) {
     return IconButton(
       icon: const Icon(Icons.remove_red_eye),
@@ -309,5 +312,39 @@ class ExercisesServiceV1 implements ExercisesService {
         );
       },
     );
+  }
+
+  @override
+  List<String> getExerciseDescriptionString(Exercise exercise) {
+    if (exercise is ExerciseMC) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        '${exercise.statement ?? ''} ${exercise.statementCode?.replaceAll("\n", "↵") ?? ''} '
+            '${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''} ${exercise.question ?? ''} '
+            '(${exercise.answerOptions.values.join(', ').replaceAll("\n", "↵")})'
+      ];
+    }
+    if (exercise is ExerciseSA) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        ' - ${exercise.statement ?? ''} ${exercise.statementCode?.replaceAll("\n", "↵") ?? ''} '
+            '${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''} ${exercise.question ?? ''}'
+      ];
+    }
+    if (exercise is ExerciseLA) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        '${exercise.statement ?? ''} ${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''} '
+            '(${exercise.answerOptions?.values.join(",").replaceAll("\n", "↵")})'
+      ];
+    }
+    if (exercise is ExerciseSCW) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        '${exercise.statement ?? ''} ${exercise.statementCode.replaceAll("\n", "↵")} '
+            '${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''}'
+      ];
+    }
+    throw Exception('Unknown exercise type');
   }
 }

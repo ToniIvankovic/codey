@@ -21,8 +21,10 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
 
   @override
   Widget build(BuildContext context) {
-    bool inputValid =
-        name != null && tips != null && tips!.isNotEmpty && (adaptive || lessons.isNotEmpty);
+    bool inputValid = name != null &&
+        tips != null &&
+        tips!.isNotEmpty &&
+        (adaptive || lessons.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create lesson group"),
@@ -64,8 +66,8 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
               ),
               for (var lesson in lessons) ...[
                 ListTile(
-                  title: Text(lesson.id.toString()),
-                  subtitle: Text(lesson.name),
+                  title: Text(lesson.name),
+                  subtitle: Text(lesson.id.toString()),
                   leading: IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () => setState(() => lessons.remove(lesson)),
