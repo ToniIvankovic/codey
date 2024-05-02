@@ -38,6 +38,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         border: OutlineInputBorder(),
         labelText: 'Lozinka',
       ),
+      obscureText: true,
       onChanged: (value) {
         setState(() {
           password = value;

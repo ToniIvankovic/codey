@@ -53,8 +53,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           errorMessage = null;
         });
       },
-      validator: (value) =>
-          (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
+      validator: (value) => (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
     );
     final lastNameField = TextFormField(
       decoration: const InputDecoration(
@@ -199,6 +198,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         border: OutlineInputBorder(),
         labelText: 'Lozika *',
       ),
+      obscureText: true,
       onChanged: (value) {
         setState(() {
           password = value;
@@ -214,6 +214,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           border: OutlineInputBorder(),
           labelText: 'Ponovljena lozinka *',
         ),
+        obscureText: true,
         onChanged: (value) {
           setState(() {
             confirmPassword = value;
