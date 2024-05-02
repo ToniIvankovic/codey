@@ -1,13 +1,7 @@
-import 'package:codey/models/entities/end_report.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
-import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/student/exercises/exercises_screen.dart';
-import 'package:codey/widgets/student/exercises/post_lesson_screen.dart';
-import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
-import 'package:codey/widgets/student/gamification_widgets/quests_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class PreLessonScreen extends StatelessWidget {
   final Lesson lesson;
@@ -21,7 +15,6 @@ class PreLessonScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exercisesService = context.read<ExercisesService>();
     var nextButton = TextButton.icon(
       onPressed: () {
         Navigator.pushReplacement(
