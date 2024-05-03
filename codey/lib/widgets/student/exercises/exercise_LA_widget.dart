@@ -28,6 +28,20 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final statementOutputArea = widget.exercise.statementOutput != null
+        ? Column(
+            children: [
+              const Text(
+                "Ispis:",
+                style: TextStyle(fontSize: 20.0),
+              ),
+              Text(
+                "${widget.exercise.statementOutput}",
+                style: const TextStyle(fontSize: 18.0),
+              ),
+            ],
+          )
+        : const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,14 +50,14 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
             exercise: widget.exercise,
             onAnswerSelected: widget.onAnswerSelected,
             statementArea: widget.statementArea,
-            // questionArea: widget.questionArea
+            statementOutputArea: statementOutputArea,
           )
         else
           ExerciseLAPuzzleWidget(
             exercise: widget.exercise,
             onAnswerSelected: widget.onAnswerSelected,
             statementArea: widget.statementArea,
-            // questionArea: widget.questionArea
+            statementOutputArea: statementOutputArea,
           ),
         if (widget.exercise.answerOptions != null &&
             widget.exercise.answerOptions!.isNotEmpty)
@@ -58,7 +72,7 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
                       writingMode = !writingMode;
                     });
                   },
-                  child: Text(writingMode ? 'Slagalica mode' : 'Pisanje mode'),
+                  child: Text(writingMode ? 'Slagalica' : 'Pisanje'),
                 ),
               ),
             ],

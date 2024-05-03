@@ -10,12 +10,12 @@ class ExerciseLAWritingWidget extends StatelessWidget {
     required this.exercise,
     required this.onAnswerSelected,
     required this.statementArea,
-    // required this.questionArea,
+    required this.statementOutputArea,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
-  // final Widget questionArea;
+  final Widget statementOutputArea;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,7 @@ class ExerciseLAWritingWidget extends StatelessWidget {
           minLines: 5,
           onChanged: (value) => onAnswerSelected(value),
         ),
+        statementOutputArea,
       ],
     );
   }
