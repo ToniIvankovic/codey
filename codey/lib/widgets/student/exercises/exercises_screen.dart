@@ -41,10 +41,38 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     final exercisesService = context.read<ExercisesService>();
     return WillPopScope(
       onWillPop: () async {
-        if (exercisesService.sessionActive) {
-          exercisesService.endSession(false);
-        }
-        return true;
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Izlazak'),
+              content: const Text(
+                  'Želiš li sigurno izići iz lekcije? Riješene vježbe bit će izgubljene.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Ne, ostani u lekciji'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Da, iziđi'),
+                ),
+              ],
+            );
+          },
+        ).then((value) {
+          if (value == true) {
+            if (exercisesService.sessionActive) {
+              exercisesService.endSession(false);
+            }
+            return true;
+          }
+          return false;
+        });
       },
       child: Scaffold(
         appBar: AppBar(
