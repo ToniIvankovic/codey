@@ -136,7 +136,9 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
                               (value) {
                                 if (value == null) return;
                                 setState(() {
-                                  lessonsLocal.insert(0, value);
+                                  lessonsLocal[lessonsLocal.indexWhere(
+                                      (element) =>
+                                          element.id == lesson.id)] = value;
                                 });
                               },
                             );

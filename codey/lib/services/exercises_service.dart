@@ -278,7 +278,7 @@ class ExercisesServiceV1 implements ExercisesService {
     } else if (exercise is ExerciseLA) {
       return exercise.correctAnswers[0];
     } else if (exercise is ExerciseSCW) {
-      return exercise.correctAnswers?[0];
+      return exercise.correctAnswers?.map((e) => e[0]).toList();
     } else {
       throw Exception('Unknown exercise type');
     }

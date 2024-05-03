@@ -211,6 +211,13 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
 
   Widget _buildNextButtonArea() {
     var correctAnswer = widget.exercisesService.getCorrectAnswer(exercise!);
+    if(exercise is ExerciseSCW){
+      var answerWithCode = (exercise as ExerciseSCW).statementCode;
+      for(var answer in correctAnswer){
+        answerWithCode = answerWithCode.replaceFirst("\\gap", answer,);
+      }
+      correctAnswer = answerWithCode;
+    }
     var textColor = TextStyle(
       color: isCorrectResponse == true
           ? Theme.of(context).colorScheme.onSecondary

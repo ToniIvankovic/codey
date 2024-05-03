@@ -31,7 +31,7 @@ class ExerciseSAWidget extends StatelessWidget {
           decoration: const InputDecoration(
             labelText: 'Odgovor',
           ),
-          maxLines: 1,
+          maxLines: null,
           onChanged: (value) => onAnswerSelected(value),
         ),
       ],

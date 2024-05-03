@@ -1,4 +1,3 @@
-
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
@@ -265,23 +264,12 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                     for (int index = 0; index < exercisesEdited.length; index++)
                       ListTile(
                         key: ValueKey(exercisesEdited[index].id),
-
                         title: Text(
                             exercisesService.getExerciseDescriptionString(
                                 exercisesEdited[index])[0]),
                         subtitle: Text(
                             exercisesService.getExerciseDescriptionString(
                                 exercisesEdited[index])[1]),
-                        // onTap: () {
-                        //   setState(() {
-                        //     // if (expandedExerciseId ==
-                        //     //     exercisesEdited[index].id) {
-                        //     //   expandedExerciseId = null;
-                        //     // } else {
-                        //     //   expandedExerciseId = exercisesEdited[index].id;
-                        //     // }
-                        //   });
-                        // },
                         leading: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -294,7 +282,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                               },
                             ),
                             exercisesService.generateExercisePreviewButton(
-                                context, exercisesLocal[index]),
+                                context, exercisesEdited[index]),
                           ],
                         ),
                       ),

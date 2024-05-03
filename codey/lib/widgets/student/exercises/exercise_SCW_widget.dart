@@ -99,17 +99,30 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
       ),
     );
 
-    final statementOutput = Text(
-      "> ${widget.exercise.statementOutput!}",
-      style: const TextStyle(fontSize: 20.0),
-    );
+    final statementOutputArea = widget.exercise.statementOutput != null
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Ispis:",
+                style: TextStyle(fontSize: 20.0),
+              ),
+              Text(
+                widget.exercise.statementOutput!
+                    .replaceAll(" ", "·")
+                    .replaceAll("\t", " ⇥ "),
+                style: const TextStyle(fontSize: 18.0, fontFamily: "courier new"),
+              ),
+            ],
+          )
+        : const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         widget.statementArea,
         codeArea,
-        statementOutput,
+        statementOutputArea,
       ],
     );
   }
