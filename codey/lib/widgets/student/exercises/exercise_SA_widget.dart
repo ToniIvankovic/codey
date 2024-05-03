@@ -21,11 +21,31 @@ class ExerciseSAWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statementOutputArea = exercise.statementOutput != null
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Ispis:",
+                style: TextStyle(fontSize: 20.0),
+              ),
+              Text(
+                exercise.statementOutput!
+                    .replaceAll(" ", "·")
+                    .replaceAll("\t", " ⇥ "),
+                style:
+                    const TextStyle(fontSize: 18.0, fontFamily: "courier new"),
+              ),
+            ],
+          )
+        : const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         statementArea,
         codeArea,
+        statementOutputArea,
         questionArea,
         TextField(
           decoration: const InputDecoration(

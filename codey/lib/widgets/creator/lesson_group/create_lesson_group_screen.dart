@@ -22,9 +22,7 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
   @override
   Widget build(BuildContext context) {
     bool inputValid = name != null &&
-        tips != null &&
-        tips!.isNotEmpty &&
-        (adaptive || lessons.isNotEmpty);
+        (adaptive || tips != null && tips!.isNotEmpty && lessons.isNotEmpty);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create lesson group"),
@@ -114,7 +112,7 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
                         lessonGroupsService
                             .createLessonGroup(
                           name: name!,
-                          tips: tips!,
+                          tips: tips,
                           lessons: lessons.map((e) => e.id).toList(),
                           adaptive: adaptive,
                         )

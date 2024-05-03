@@ -24,7 +24,7 @@ class _EditSingleLessonGroupScreenState
     extends State<EditSingleLessonGroupScreen> {
   List<Lesson> localLessons = [];
   String localName = '';
-  String localTips = '';
+  String? localTips = '';
   bool nameEditable = false;
   bool tipsEditable = false;
   bool lessonsEditable = false;
@@ -221,7 +221,7 @@ class _EditSingleLessonGroupScreenState
                     )
                   // NON-EDITABLE TEXT
                   : Text(
-                      localTips,
+                      localTips ?? '',
                       maxLines: 10,
                       overflow: TextOverflow.ellipsis,
                     ),

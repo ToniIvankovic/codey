@@ -29,7 +29,7 @@ class LessonGroupTipsScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(lessonGroup.tips),
+                Text(lessonGroup.tips!),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 50.0),
                   child: ElevatedButton(

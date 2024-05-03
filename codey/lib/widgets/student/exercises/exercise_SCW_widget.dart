@@ -136,30 +136,33 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
 
       var parts = line.split('\\gap');
       var rowWidgets = <Widget>[];
-      for (var part in parts) {
-        if (part.isNotEmpty) {
-          rowWidgets.add(
-            Text(
-              part,
-              style: const TextStyle(
-                fontFamily: 'courier new',
-                fontSize: 20.0,
-              ),
-            ),
-          );
+      for (int j = 0; j < parts.length; j++) {
+        var part = parts[j];
+        if (part.isEmpty) {
+          continue;
         }
-        if (usedLines < controllers.length) {
+        rowWidgets.add(
+          Text(
+            part,
+            style: const TextStyle(
+              fontFamily: 'courier new',
+              fontSize: 20.0,
+            ),
+          ),
+        );
+
+        if (j < parts.length-1) {
           rowWidgets.add(
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                    minWidth: widget.exercise.defaultGapLengths[usedLines] * 18,
+                    minWidth: widget.exercise.defaultGapLengths[usedLines] * 20,
                     maxWidth: widget.exercise.defaultGapLengths[usedLines] *
-                        18 *
+                        20 *
                         2.5),
                 child: IntrinsicWidth(
-                  stepWidth: 18.0,
+                  stepWidth: 20.0,
                   child: TextField(
                     controller: controllers[usedLines],
                     onChanged: (value) {

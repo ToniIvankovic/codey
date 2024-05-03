@@ -131,7 +131,7 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        lessonGroup.tips,
+                        lessonGroup.tips ?? "NO TIPS",
                         maxLines: 10,
                         overflow: TextOverflow.ellipsis,
                       ),

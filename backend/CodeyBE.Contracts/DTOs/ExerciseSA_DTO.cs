@@ -17,10 +17,12 @@ namespace CodeyBE.Contracts.DTOs
             Question = ex.Question!;
             RaisesError = ex.RaisesError;
             CorrectAnswers = ex.CorrectAnswers;
+            StatementOutput = ex.StatementOutput;
         }
         public string? StatementCode { get; set; }
         public string Question { get; set; }
         public bool? RaisesError { get; set; }
         public List<dynamic>? CorrectAnswers { get; set; }
+        public string? StatementOutput { get; set; }
     }
 }

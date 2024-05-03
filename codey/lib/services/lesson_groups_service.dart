@@ -11,8 +11,8 @@ abstract class LessonGroupsService {
   void reorderLessonGroups(List<LessonGroup> list);
   Future<LessonGroup> createLessonGroup({
     required String name,
-    required String tips,
-    required List<int> lessons,
+    String? tips,
+    List<int>? lessons,
     required bool adaptive,
   });
   Future<void> deleteLessonGroup(int id);
@@ -79,8 +79,8 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
   @override
   Future<LessonGroup> createLessonGroup({
     required String name,
-    required String tips,
-    required List<int> lessons,
+    String? tips,
+    List<int>? lessons,
     required bool adaptive,
   }) async {
     _lessonGroupsRepository.invalidateCache();

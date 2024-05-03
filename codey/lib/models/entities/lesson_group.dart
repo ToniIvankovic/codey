@@ -1,7 +1,7 @@
 class LessonGroup {
   final int id;
   String name;
-  String tips;
+  String? tips;
   List<int> lessons;
   int order;
   bool adaptive;
@@ -9,7 +9,7 @@ class LessonGroup {
   LessonGroup({
     required this.id,
     required this.name,
-    required this.tips,
+    this.tips,
     required this.lessons,
     required this.order,
     this.adaptive = false,

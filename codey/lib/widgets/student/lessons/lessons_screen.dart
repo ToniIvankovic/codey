@@ -56,7 +56,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: IconButton(
-              onPressed: widget.lessonGroup.tips.isNotEmpty
+              onPressed: widget.lessonGroup.tips?.isNotEmpty ?? false
                   ? () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(

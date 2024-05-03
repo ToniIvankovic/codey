@@ -238,21 +238,22 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton.icon(
-                          onPressed: widget.lessonGroup.tips.isNotEmpty
-                              ? () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          LessonGroupTipsScreen(
-                                        lessonGroup: widget.lessonGroup,
-                                        lessonGroupFinished:
-                                            widget.lessonGroupFinished,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              : null,
+                          onPressed:
+                              widget.lessonGroup.tips?.isNotEmpty ?? false
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              LessonGroupTipsScreen(
+                                            lessonGroup: widget.lessonGroup,
+                                            lessonGroupFinished:
+                                                widget.lessonGroupFinished,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  : null,
                           icon: const Icon(Icons.lightbulb),
                           label: const Text('Nauči'),
                         ),
