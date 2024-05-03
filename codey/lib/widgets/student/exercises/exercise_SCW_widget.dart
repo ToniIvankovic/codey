@@ -75,8 +75,6 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
 
   Widget _generateCodeArea() {
     var textLines = widget.exercise.statementCode.split("\n");
-    var codeParts = widget.exercise.statementCode.split('\\gap');
-    var gaps = codeParts.length - 1;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(

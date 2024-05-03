@@ -396,6 +396,14 @@ namespace CodeyBe.Services
 
         private double CalculateSuggestedDifficultyFromStatistics(Dictionary<bool, List<double>> statistics)
         {
+            if (statistics[false].Count == 0)
+            {
+                return statistics[true].Average();
+            }
+            if (statistics[true].Count == 0)
+            {
+                return statistics[false].Max();
+            }
             const int MAX_DIFFICULTY = 100;
             List<double> suggestedDifficulties = [];
             for (int i = 1; i < MAX_DIFFICULTY; i++)
@@ -411,18 +419,23 @@ namespace CodeyBe.Services
                 numCorrect += statistics[true]
                     .Where(s => s >= suggestedDifficulty)
                     .Count();
-                numIncorrect -= statistics[false]
+                numIncorrect += statistics[false]
                     .Where(s => s >= suggestedDifficulty)
                     .Count();
-                if (numCorrect / (double)(numCorrect + numIncorrect) > 0.6)
+                if (numCorrect != 0 && 
+                    numCorrect / (double)(numCorrect + numIncorrect) > 0.6)
                 {
                     return suggestedDifficulty;
+                }
+                if(numCorrect == 0 && numIncorrect == 0)
+                {
+                    break;
                 }
             }
             // if no difficulty has more than 50% correct answers, return the maximum score that ever tried to solve it
             return new List<double>(){
                 statistics[true].Max(),
-                statistics[false].Min()
+                statistics[false].Max()
             }.Max();
         }
     }

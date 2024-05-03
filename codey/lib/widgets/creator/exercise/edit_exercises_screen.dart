@@ -127,7 +127,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                   return ListTile(
                     title: Row(
                       children: [
-                        Text(exercisesService.getExerciseDescriptionString(exercise)[0]),
+                        Text(exercisesService
+                            .getExerciseDescriptionString(exercise)[0]),
                         if (exercise.statistics != null) ...[
                           Text(
                             ' -- current difficulty: ${exercise.difficulty} -> suggested: ${exercise.statistics!.suggestedDifficulty}',
@@ -143,34 +144,31 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                         ]
                       ],
                     ),
-                    subtitle: expandedId == exercise.id
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  exercisesService.getExerciseDescriptionString(exercise)[1]),
-                              if (exercise.statistics != null) ...[
-                                Text(
-                                  'avg. score correct: ${exercise.statistics!.averageDifficultyCorrect}',
-                                  style: exercise.statistics!
-                                              .averageDifficultyCorrect ==
-                                          null
-                                      ? const TextStyle(color: Colors.grey)
-                                      : null,
-                                ),
-                                Text(
-                                  'avg. score incorrect: ${exercise.statistics!.averageDifficultyIncorrect}',
-                                  style: exercise.statistics!
-                                              .averageDifficultyIncorrect ==
-                                          null
-                                      ? const TextStyle(color: Colors.grey)
-                                      : null,
-                                ),
-                                Text(exercises[index].statement ?? ''),
-                              ]
-                            ],
-                          )
-                        : null,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(exercisesService
+                            .getExerciseDescriptionString(exercise)[1]),
+                        if (exercise.statistics != null) ...[
+                          Text(
+                            'avg. score correct: ${exercise.statistics!.averageDifficultyCorrect}',
+                            style:
+                                exercise.statistics!.averageDifficultyCorrect ==
+                                        null
+                                    ? const TextStyle(color: Colors.grey)
+                                    : null,
+                          ),
+                          Text(
+                            'avg. score incorrect: ${exercise.statistics!.averageDifficultyIncorrect}',
+                            style: exercise.statistics!
+                                        .averageDifficultyIncorrect ==
+                                    null
+                                ? const TextStyle(color: Colors.grey)
+                                : null,
+                          ),
+                        ]
+                      ],
+                    ),
                     onTap: () {
                       setState(() {
                         expandedId =

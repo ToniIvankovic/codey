@@ -23,7 +23,7 @@ namespace CodeyBE.API.Controllers
                 audience: _settings.Audience,
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddMinutes(_settings.ValidMinutes),
+                expires: DateTime.UtcNow.AddHours(_settings.ValidHours),
                 signingCredentials: new SigningCredentials(
                     signingKey,
                     SecurityAlgorithms.HmacSha256)

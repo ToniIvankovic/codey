@@ -140,22 +140,30 @@ namespace CodeyBE.API.Controllers
         [Authorize(Roles = "CREATOR")]
         [HttpPost("calculate_statistics", Name = "getSuggestedDifficultyForExercise")]
         [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Dictionary<string, object?>>> GetSuggestedDifficultyForExercise([FromBody] List<int> exerciseIds)
+        public async Task<IActionResult> GetSuggestedDifficultyForExercise([FromBody] List<int> exerciseIds)
         {
             List<Dictionary<string, object?>> list = [];
-            foreach (var exerciseId in exerciseIds)
+            try
             {
-                var suggested = await _exercisesService.GetSuggestedDifficultyForExerciseAsync(exerciseId);
-                var stats = await _exercisesService.GetAverageScoresForExerciseAsync(exerciseId);
-                list.Add(new Dictionary<string, object?>(){
+
+                foreach (var exerciseId in exerciseIds)
+                {
+                    var suggested = await _exercisesService.GetSuggestedDifficultyForExerciseAsync(exerciseId);
+                    var stats = await _exercisesService.GetAverageScoresForExerciseAsync(exerciseId);
+                    list.Add(new Dictionary<string, object?>(){
                     { "exerciseId", exerciseId },
                     { "suggestedDifficulty", suggested },
                     { "averageDifficultyCorrect", stats[true] },
                     { "averageDifficultyIncorrect", stats[false] }
                 });
 
+                }
             }
-            return list;
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            return Ok(list);
         }
     }
 }

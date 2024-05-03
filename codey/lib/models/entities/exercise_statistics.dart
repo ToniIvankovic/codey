@@ -1,6 +1,6 @@
 class ExerciseStatistics {
   int exerciseId;
-  int suggestedDifficulty;
+  double suggestedDifficulty;
   double? averageDifficultyCorrect;
   double? averageDifficultyIncorrect;
 
@@ -14,7 +14,7 @@ class ExerciseStatistics {
   factory ExerciseStatistics.fromJson(Map<String, dynamic> json) {
     return ExerciseStatistics(
       exerciseId: json['exerciseId'],
-      suggestedDifficulty: json['suggestedDifficulty'],
+      suggestedDifficulty: json['suggestedDifficulty'] + 0.0,
       averageDifficultyCorrect:
           double.tryParse(json['averageDifficultyCorrect'].toString()),
       averageDifficultyIncorrect:
