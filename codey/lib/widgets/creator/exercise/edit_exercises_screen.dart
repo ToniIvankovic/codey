@@ -30,7 +30,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
     exercisesService.getAllExercises().then((value) {
       setState(() {
         loadingExercises = false;
-        exercises = value.reversed.toList();
+        exercises = value.toList();
+        exercises.sort((a, b) => -a.id.compareTo(b.id));
       });
     });
   }

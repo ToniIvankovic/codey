@@ -98,7 +98,8 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                     final entryTextToDisplay = entry.value
                         .toString()
                         .replaceAll('\n', '↵')
-                        .replaceAll('\r', '↵');
+                        .replaceAll('\r', '↵')
+                        .replaceAll(' ', '·');
 
                     var codePiece = Container(
                       key: ValueKey(entryTextToDisplay),

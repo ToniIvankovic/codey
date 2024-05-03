@@ -30,14 +30,17 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
   Widget build(BuildContext context) {
     final statementOutputArea = widget.exercise.statementOutput != null
         ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 "Ispis:",
                 style: TextStyle(fontSize: 20.0),
               ),
               Text(
-                "${widget.exercise.statementOutput}",
-                style: const TextStyle(fontSize: 18.0),
+                widget.exercise.statementOutput!
+                    .replaceAll(" ", "·")
+                    .replaceAll("\t", " ⇥ "),
+                style: const TextStyle(fontSize: 18.0, fontFamily: "courier new"),
               ),
             ],
           )

@@ -142,7 +142,7 @@ class _ExerciseCreationSAComponentState
             )
           ],
         ),
-        Row(
+        Wrap(
           children: [
             for (String option in options)
               Padding(
