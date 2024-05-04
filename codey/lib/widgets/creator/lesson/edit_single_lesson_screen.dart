@@ -3,6 +3,7 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/creator/exercise/pick_exercise_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -283,6 +284,27 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                             ),
                             exercisesService.generateExercisePreviewButton(
                                 context, exercisesEdited[index]),
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CreateExerciseScreen(
+                                      existingExercise: exercisesEdited[index],
+                                    ),
+                                  ),
+                                ).then((value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      exercisesEdited[index] =
+                                          value as Exercise;
+                                      exercisesLocal[index] = value;
+                                    });
+                                  }
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ),

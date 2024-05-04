@@ -135,6 +135,7 @@ class ExercisesRepository1 implements ExercisesRepository {
       throw Exception('Failed to update exercise');
     }
 
+    invalidateCache(null);
     final Map<String, dynamic> data = json.decode(response.body);
     return Exercise.fromJson(data);
   }

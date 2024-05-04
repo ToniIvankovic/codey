@@ -1,6 +1,7 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,27 +48,61 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                 ),
               ],
             ),
-            for (var exercise in exercises)
-              ListTile(
-                title: Text(
-                    exercisesService.getExerciseDescriptionString(exercise)[0]),
-                subtitle: Text(
-                    exercisesService.getExerciseDescriptionString(exercise)[1]),
-                leading: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () =>
-                          setState(() => exercises.remove(exercise)),
+            ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    final Exercise item = exercises.removeAt(oldIndex);
+                    exercises.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (var exercise in exercises)
+                    ListTile(
+                      key: ValueKey(exercise),
+                      title: Text(exercisesService
+                          .getExerciseDescriptionString(exercise)[0]),
+                      subtitle: Text(exercisesService
+                          .getExerciseDescriptionString(exercise)[1]),
+                      leading: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () =>
+                                setState(() => exercises.remove(exercise)),
+                          ),
+                          context
+                              .read<ExercisesService>()
+                              .generateExercisePreviewButton(context, exercise),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateExerciseScreen(
+                                    key: ValueKey(exercise),
+                                    existingExercise: exercise,
+                                  ),
+                                ),
+                              ).then((value) {
+                                if (value != null) {
+                                  setState(() {
+                                    exercises[exercises.indexOf(exercise)] =
+                                        value as Exercise;
+                                  });
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    context
-                        .read<ExercisesService>()
-                        .generateExercisePreviewButton(context, exercise),
-                  ],
-                ),
-              ),
-
+                ]),
             // ADD EXERCISES BUTTON
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
