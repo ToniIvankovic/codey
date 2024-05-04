@@ -2,6 +2,7 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/widgets/creator/lesson/edit_single_lesson_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -280,16 +281,47 @@ class _EditSingleLessonGroupScreenState
                   },
                   shrinkWrap: true,
                   children: lessonsEdited!
-                      .map((e) => ListTile(
-                            key: ValueKey(e),
-                            title: Text("${e.name} (${e.id})"),
-                            leading: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  lessonsEdited!.remove(e);
-                                });
-                              },
-                              icon: const Icon(Icons.clear),
+                      .map((lesson) => ListTile(
+                            key: ValueKey(lesson),
+                            title: Text(lesson.name),
+                            subtitle: Text(
+                                "${lesson.id}, ${lesson.exerciseIds.length} exercises"),
+                            leading: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // REMOVE LESSON
+                                IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    setState(() {
+                                      lessonsEdited!.remove(lesson);
+                                    });
+                                  },
+                                ),
+                                // EDIT LESSON
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push<Lesson>(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditSingleLessonScreen(lesson),
+                                      ),
+                                    )
+                                        .then((value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          lessonsEdited![lessonsEdited!
+                                                  .indexWhere((element) =>
+                                                      element.id == value.id)] =
+                                              value;
+                                        });
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           ))
                       .toList(),
@@ -336,7 +368,19 @@ class _EditSingleLessonGroupScreenState
           )
         ] else
           // NON-EDITABLE LIST
-          Text(localLessons.map((e) => e.id.toString()).join(", ")),
+          Expanded(
+            child: Column(
+              children: [
+                for (var lesson in localLessons) ...[
+                  ListTile(
+                    title: Text(lesson.name),
+                    subtitle: Text(
+                        "${lesson.id}, ${lesson.exerciseIds.length} exercises"),
+                  ),
+                ],
+              ],
+            ),
+          ),
       ],
     );
     return lessonsRow;

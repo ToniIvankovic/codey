@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/lesson_groups_service.dart';
+import 'package:codey/widgets/creator/lesson/edit_single_lesson_screen.dart';
 import 'package:codey/widgets/creator/lesson/pick_lesson_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -65,10 +66,36 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
               for (var lesson in lessons) ...[
                 ListTile(
                   title: Text(lesson.name),
-                  subtitle: Text(lesson.id.toString()),
-                  leading: IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => setState(() => lessons.remove(lesson)),
+                  subtitle: Text(
+                      "${lesson.id}, ${lesson.exerciseIds.length} exercises"),
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => setState(() => lessons.remove(lesson)),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .push<Lesson>(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditSingleLessonScreen(lesson),
+                                ),
+                              )
+                              .then(
+                                (value) => setState(() {
+                                  if (value != null) {
+                                    lessons[lessons.indexWhere((element) =>
+                                        element.id == value.id)] = value;
+                                  }
+                                }),
+                              );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
