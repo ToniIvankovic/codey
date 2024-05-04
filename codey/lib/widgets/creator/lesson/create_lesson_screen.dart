@@ -38,6 +38,7 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
             TextField(
               decoration: const InputDecoration(labelText: 'Specific tips'),
               onChanged: (value) => setState(() => specificTips = value),
+              maxLines: null,
             ),
             const Row(
               mainAxisAlignment: MainAxisAlignment.start,
