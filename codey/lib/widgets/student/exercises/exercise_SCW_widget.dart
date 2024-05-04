@@ -138,20 +138,19 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
       var rowWidgets = <Widget>[];
       for (int j = 0; j < parts.length; j++) {
         var part = parts[j];
-        if (part.isEmpty) {
-          continue;
-        }
-        rowWidgets.add(
-          Text(
-            part,
-            style: const TextStyle(
-              fontFamily: 'courier new',
-              fontSize: 20.0,
+        if (part.isNotEmpty) {
+          rowWidgets.add(
+            Text(
+              part,
+              style: const TextStyle(
+                fontFamily: 'courier new',
+                fontSize: 20.0,
+              ),
             ),
-          ),
-        );
+          );
+        }
 
-        if (j < parts.length-1) {
+        if (j < parts.length - 1) {
           rowWidgets.add(
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
