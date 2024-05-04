@@ -114,6 +114,13 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   return const Text('Nema podataka o korisniku');
                 } else {
                   AppUser user = userSnapshot.data!;
+                  if (user.highestLessonGroupId == widget.lessonGroup.id && !lessonGroupFinished) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        lessonGroupFinished = true;
+                      });
+                    });
+                  }
                   return SingleChildScrollView(
                     child: Container(
                       constraints: BoxConstraints(
