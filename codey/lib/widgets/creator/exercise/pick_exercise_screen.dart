@@ -1,4 +1,5 @@
 import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
@@ -14,19 +15,34 @@ class PickExerciseScreen extends StatefulWidget {
 }
 
 class _PickExerciseScreenState extends State<PickExerciseScreen> {
-  List<Exercise> exercises = [];
+  List<Exercise> exercisesAll = [];
+  List<Exercise> exercisesFiltered = [];
+  ExerciseType? selectedType;
+
   @override
   void initState() {
     super.initState();
     context.read<ExercisesService>().getAllExercises().then((value) {
       setState(() {
-        exercises = List.of(value);
+        exercisesAll = List.of(value);
         if (widget.exercises != null) {
-          exercises.removeWhere((element) =>
+          exercisesAll.removeWhere((element) =>
               widget.exercises!.map((ex) => ex.id).contains(element.id));
         }
-        exercises.sort((a, b) => -a.id.compareTo(b.id));
+        exercisesAll.sort((a, b) => -a.id.compareTo(b.id));
+        exercisesFiltered = List.of(exercisesAll);
       });
+    });
+  }
+
+  void filterExercises(ExerciseType? type) {
+    setState(() {
+      if (type == null) {
+        exercisesFiltered = List.of(exercisesAll);
+      } else {
+        exercisesFiltered =
+            exercisesAll.where((element) => element.type == type).toList();
+      }
     });
   }
 
@@ -52,18 +68,50 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
                   })).then((value) {
                     if (value != null) {
                       setState(() {
-                        exercises.insert(0, value as Exercise);
+                        exercisesAll.insert(0, value as Exercise);
+                        filterExercises(null);
                       });
                     }
                   });
                 },
               ),
             ),
+            // filter by type
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text('Filter by type:'),
+                ),
+                for (var type in ExerciseType.values)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (selectedType == type) {
+                            selectedType = null;
+                          } else {
+                            selectedType = type;
+                          }
+                        });
+                        filterExercises(selectedType);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selectedType == type
+                            ? Theme.of(context).colorScheme.secondary
+                            : null,
+                      ),
+                      child: Text(type.toString()),
+                    ),
+                  ),
+              ],
+            ),
             ListView(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: <Widget>[
-                for (var exercise in exercises)
+                for (var exercise in exercisesFiltered)
                   ListTile(
                     leading: IconButton(
                       icon: const Icon(Icons.remove_red_eye),

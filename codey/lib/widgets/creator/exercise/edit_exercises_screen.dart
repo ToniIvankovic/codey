@@ -1,4 +1,5 @@
 import 'package:codey/models/entities/exercise.dart';
+import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ class EditExercisesScreen extends StatefulWidget {
 }
 
 class _EditExercisesScreenState extends State<EditExercisesScreen> {
-  List<Exercise> exercises = [];
+  List<Exercise> exercisesAll = [];
+  List<Exercise> exercisesFiltered = [];
+  ExerciseType? selectedType;
+
   int? expandedId;
   bool loadingStatistics = false;
   late bool loadingExercises;
@@ -30,9 +34,21 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
     exercisesService.getAllExercises().then((value) {
       setState(() {
         loadingExercises = false;
-        exercises = value.toList();
-        exercises.sort((a, b) => -a.id.compareTo(b.id));
+        exercisesAll = value.toList();
+        exercisesAll.sort((a, b) => -a.id.compareTo(b.id));
+        exercisesFiltered = List.of(exercisesAll);
       });
+    });
+  }
+
+  void filterExercises(ExerciseType? type) {
+    setState(() {
+      if (type == null) {
+        exercisesFiltered = List.of(exercisesAll);
+      } else {
+        exercisesFiltered =
+            exercisesAll.where((element) => element.type == type).toList();
+      }
     });
   }
 
@@ -58,7 +74,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                   })).then((value) {
                     if (value != null) {
                       setState(() {
-                        exercises.add(value as Exercise);
+                        exercisesAll.add(value as Exercise);
                       });
                     }
                   });
@@ -81,10 +97,10 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                             });
                             context
                                 .read<ExercisesService>()
-                                .calculateStatistics(exercises)
+                                .calculateStatistics(exercisesAll)
                                 .then(
                               (value) {
-                                for (var exercise in exercises) {
+                                for (var exercise in exercisesAll) {
                                   exercise.statistics = value
                                       .where((element) =>
                                           element.exerciseId == exercise.id)
@@ -117,13 +133,43 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                   ),
                 ],
               )
-            else
+            else ...[
+              Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text('Filter by type:'),
+                  ),
+                  for (var type in ExerciseType.values)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            if (selectedType == type) {
+                              selectedType = null;
+                            } else {
+                              selectedType = type;
+                            }
+                          });
+                          filterExercises(selectedType);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: selectedType == type
+                              ? Theme.of(context).colorScheme.secondary
+                              : null,
+                        ),
+                        child: Text(type.toString()),
+                      ),
+                    ),
+                ],
+              ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: exercises.length,
+                itemCount: exercisesFiltered.length,
                 itemBuilder: (context, index) {
-                  final exercise = exercises[index];
+                  final exercise = exercisesFiltered[index];
                   return ListTile(
                     title: Row(
                       children: [
@@ -205,7 +251,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                                             .deleteExercise(exercise.id)
                                             .then((value) {
                                           setState(() {
-                                            exercises.removeAt(index);
+                                            exercisesAll.removeAt(index);
                                           });
                                         });
                                         Navigator.of(context).pop();
@@ -230,7 +276,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                             })).then((value) {
                               if (value != null) {
                                 setState(() {
-                                  exercises[index] = value as Exercise;
+                                  exercisesAll[index] = value as Exercise;
                                 });
                               }
                             });
@@ -269,6 +315,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                   );
                 },
               ),
+            ]
           ],
         ),
       ),
