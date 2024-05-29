@@ -95,9 +95,9 @@ namespace CodeyBE.API.Controllers
             {
                 return StatusCode(StatusCodes.Status400BadRequest, e.Message);
             }
-            catch (NoChangesException e)
+            catch (NoChangesException)
             {
-                return StatusCode(StatusCodes.Status204NoContent, e.Message);
+                return StatusCode(StatusCodes.Status204NoContent);
             }
             catch (Exception e)
             {
