@@ -26,16 +26,45 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
       appBar: AppBar(
         title: Text('Razred ${classData.name}'),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 50.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('ID razreda: ${classData.id}'),
-              Text('Naziv razreda: ${classData.name}'),
-              const Text('Učenici:'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Naziv razreda: ${classData.name}',
+                      style: const TextStyle(fontSize: 18),
+                      overflow: TextOverflow.fade,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'ID: ${classData.id}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Učenici:',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: classData.studentEmails.length,
@@ -65,25 +94,6 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                         setState(() {
                           classData = value as Class;
                         });
-                      },
-                    ).catchError(
-                      (error) {
-                        if (error is NoChangesException) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Nema promjena'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Neuspjelo uređivanje razreda: $error'),
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
-                        }
                       },
                     );
                   },

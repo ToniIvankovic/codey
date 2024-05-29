@@ -7,8 +7,10 @@ class AddStudentsScreen extends StatefulWidget {
   const AddStudentsScreen({
     super.key,
     required this.preselectedStudents,
+    this.classIdInProgress,
   });
   final List<AppUser> preselectedStudents;
+  final int? classIdInProgress;
 
   @override
   State<AddStudentsScreen> createState() => _AddStudentsScreenState();
@@ -18,10 +20,18 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
   List<AppUser> allQueriedStudents = <AppUser>[];
   List<AppUser> selectedStudents = <AppUser>[];
   String query = "";
+  bool loadingStudents = true;
 
   @override
   void initState() {
     super.initState();
+    fetchStudents();
+  }
+
+  void fetchStudents() {
+    setState(() {
+      loadingStudents = true;
+    });
     var userInteractionService = context.read<UserInteractionService>();
     userInteractionService.getAllUsers().then((value) {
       setState(() {
@@ -29,6 +39,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
         allQueriedStudents.removeWhere((element) => widget.preselectedStudents
             .map((preselectedStudent) => preselectedStudent.email)
             .contains(element.email));
+        loadingStudents = false;
       });
     });
   }
@@ -37,7 +48,7 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
   Widget build(BuildContext context) {
     var userInteractionService = context.read<UserInteractionService>();
 
-    var nonSelectedStudents = List.of(allQueriedStudents);
+    var nonSelectedStudents = List.from(allQueriedStudents);
     nonSelectedStudents.removeWhere(
       (element) => selectedStudents
           .map((selectedStudent) => selectedStudent.email)
@@ -61,12 +72,17 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                 onChanged: (value) {
                   setState(() {
                     query = value;
+                    loadingStudents = true;
                   });
                   userInteractionService.queryUsers(query).then((value) {
                     setState(() {
                       allQueriedStudents = value;
-                      allQueriedStudents.removeWhere((element) =>
-                          widget.preselectedStudents.contains(element));
+                      allQueriedStudents.removeWhere(
+                        (element) => widget.preselectedStudents
+                            .map((e) => e.email)
+                            .contains(element.email),
+                      );
+                      loadingStudents = false;
                     });
                   });
                 },
@@ -91,39 +107,44 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: student.classId == null
-                        ? Text(student.email)
-                        : Text(
-                            "${student.email} (već u razredu ${student.classId})"),
+                    child: student.classId != null &&
+                            student.classId != widget.classIdInProgress
+                        ? Text(
+                            "${student.email} (već u razredu ${student.classId})")
+                        : Text(student.email),
                   ),
                 ],
               ),
-            for (var student in nonSelectedStudents)
-              Row(
-                children: [
-                  Checkbox(
-                    value: selectedStudents.contains(student),
-                    onChanged: (value) {
-                      if (value!) {
-                        setState(() {
-                          selectedStudents.add(student);
-                        });
-                      } else {
-                        setState(() {
-                          selectedStudents.remove(student);
-                        });
-                      }
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: student.classId == null
-                        ? Text(student.email)
-                        : Text(
-                            "${student.email} (već u razredu ${student.classId})"),
-                  ),
-                ],
-              ),
+            if (loadingStudents)
+              const CircularProgressIndicator()
+            else
+              for (var student in nonSelectedStudents)
+                Row(
+                  children: [
+                    Checkbox(
+                      value: selectedStudents.contains(student),
+                      onChanged: (value) {
+                        if (value!) {
+                          setState(() {
+                            selectedStudents.add(student);
+                          });
+                        } else {
+                          setState(() {
+                            selectedStudents.remove(student);
+                          });
+                        }
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: student.classId != null &&
+                              student.classId != widget.classIdInProgress
+                          ? Text(
+                              "${student.email} (već u razredu ${student.classId})")
+                          : Text(student.email),
+                    ),
+                  ],
+                ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, selectedStudents);

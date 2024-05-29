@@ -23,6 +23,7 @@ import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
   bool isProd = const String.fromEnvironment("ENV") == "prod";
+  // isProd = true;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -146,6 +147,21 @@ class MyApp extends StatelessWidget {
     onError: Color(0xff1d1d1d),
     brightness: Brightness.light,
   );
+  final colorScheme4Dark = const ColorScheme(
+    background: Color.fromARGB(255, 40, 48, 47),
+    primary: Color(0xff389c9a),
+    secondary: Color(0xfffedb71),
+    error: Color.fromARGB(255, 238, 127, 131),
+    errorContainer: Color.fromARGB(255, 238, 172, 174),
+    inversePrimary: Color.fromARGB(255, 40, 48, 47),
+    onBackground: Color.fromARGB(255, 177, 211, 209),
+    onPrimary: Color(0xfff8f8f8),
+    onSecondary: Color(0xff1d1d1d),
+    surface: Color.fromARGB(255, 58, 59, 59),
+    onSurface: Color.fromARGB(255, 177, 211, 209),
+    onError: Color(0xff1d1d1d),
+    brightness: Brightness.dark,
+  );
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -155,6 +171,11 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme4,
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        colorScheme: colorScheme4Dark,
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Codey - Python Course'),
     );

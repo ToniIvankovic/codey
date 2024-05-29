@@ -34,6 +34,9 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
                     decoration: const InputDecoration(
                       labelText: 'Naziv razreda',
                     ),
@@ -73,24 +76,25 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                 ],
                 //Add students
                 TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AddStudentsScreen(preselectedStudents: students),
-                        ),
-                      )
-                          .then((value) {
-                        if (value == null) return;
-                        setState(() {
-                          students.addAll((value as List<AppUser>)
-                              .where((element) => !students.contains(element)));
-                        });
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AddStudentsScreen(preselectedStudents: students),
+                      ),
+                    )
+                        .then((value) {
+                      if (value == null) return;
+                      setState(() {
+                        students.addAll((value as List<AppUser>)
+                            .where((element) => !students.contains(element)));
                       });
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Dodaj učenike")),
+                    });
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text("Dodaj učenike"),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(

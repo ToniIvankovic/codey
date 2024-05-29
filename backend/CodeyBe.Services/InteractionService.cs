@@ -26,7 +26,7 @@ namespace CodeyBe.Services
         {
             ApplicationUser? teacher = await _userService.GetUser(userTeacher)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames);
+            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames, null);
             Class @class = new()
             {
                 Name = classCreationDTO.Name,
@@ -41,7 +41,7 @@ namespace CodeyBe.Services
         {
             ApplicationUser? teacher = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames);
+            await CheckStudentListRequirements(teacher, classCreationDTO.StudentUsernames, id);
             Class existingClass = await _classesRepository.GetByIdAsync(id)
                 ?? throw new EntityNotFoundException($"No class found with ID {id}");
             if (existingClass.TeacherUsername != teacher.Email)
@@ -54,7 +54,7 @@ namespace CodeyBe.Services
             return await _classesRepository.UpdateAsync(existingClass.PrivateId, existingClass);
         }
 
-        private async Task CheckStudentListRequirements(ApplicationUser teacher, List<string> StudentUsernames)
+        private async Task CheckStudentListRequirements(ApplicationUser teacher, List<string> StudentUsernames, int? id)
         {
             foreach (string studentUsername in StudentUsernames)
             {
@@ -65,7 +65,7 @@ namespace CodeyBe.Services
                     throw new UnauthorizedAccessException($"Student {studentUsername} does not belong to teacher's school");
                 }
                 var _class = await GetClassForStuedntByTeacher(teacher, studentUsername);
-                if (_class != null)
+                if (_class != null && _class.PrivateId != id)
                 {
                     throw new InvalidDataException($"Student {studentUsername} is already in a class {_class.Name}");
                 }

@@ -1,6 +1,8 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/class.dart';
+import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/user_interaction_service.dart';
+import 'package:codey/widgets/teacher/add_students_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,14 +17,20 @@ class EditClassScreen extends StatefulWidget {
 
 class _EditClassScreenState extends State<EditClassScreen> {
   late TextEditingController _nameController;
-  late List<AppUser> _students;
+  late final List<AppUser> _students = [];
   final List<AppUser> _selectedStudents = [];
+  bool studentsLoading = true;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.classData.name);
-    _students = [];
+    fetchStudents();
+  }
+
+  void fetchStudents() {
+    _students.clear();
+    studentsLoading = true;
     final userInteractionService = context.read<UserInteractionService>();
     userInteractionService.getAllUsers().then((users) {
       setState(() {
@@ -30,6 +38,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
         var existingStudents = _students.where((student) =>
             widget.classData.studentEmails.contains(student.email));
         _selectedStudents.addAll(existingStudents);
+        studentsLoading = false;
       });
     });
   }
@@ -49,29 +58,51 @@ class _EditClassScreenState extends State<EditClassScreen> {
             children: [
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Ime'),
+                decoration: const InputDecoration(labelText: 'Ime razreda'),
               ),
               const Text('Učenici'),
-              //TODO: consider making the same as in class creation (first the checked, then the unchecked)
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: _students.length,
-                itemBuilder: (context, index) {
-                  final student = _students[index];
-                  return CheckboxListTile(
-                    title: Text(student.email),
-                    value: _selectedStudents.contains(student),
-                    onChanged: (value) {
-                      setState(() {
-                        if (value!) {
-                          _selectedStudents.add(student);
-                        } else {
-                          _selectedStudents.remove(student);
-                        }
-                      });
-                    },
-                  );
+              if (studentsLoading)
+                const CircularProgressIndicator()
+              else
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _selectedStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = _students[index];
+                    return ListTile(
+                        title: Text(
+                            "${student.firstName} ${student.lastName} (${student.email})"),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              _selectedStudents.remove(student);
+                            });
+                          },
+                        ));
+                  },
+                ),
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(
+                    MaterialPageRoute(
+                      builder: (context) => AddStudentsScreen(
+                        preselectedStudents: _selectedStudents,
+                        classIdInProgress: widget.classData.id,
+                      ),
+                    ),
+                  )
+                      .then((value) {
+                    if (value == null) return;
+                    setState(() {
+                      _selectedStudents.addAll((value as List<AppUser>).where(
+                          (element) => !_selectedStudents.contains(element)));
+                    });
+                  });
                 },
+                icon: const Icon(Icons.add),
+                label: const Text("Dodaj učenike"),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -85,7 +116,28 @@ class _EditClassScreenState extends State<EditClassScreen> {
                   )
                       .then((updatedClass) {
                     Navigator.of(context).pop(updatedClass);
-                  });
+                  }).catchError(
+                    (error) {
+                      if (error is NoChangesException) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Nema promjena'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.of(context).pop(null);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Neuspjelo uređivanje razreda: $error'),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                        Navigator.of(context).pop(null);
+                      }
+                    },
+                  );
                 },
                 child: const Text('Spremi'),
               ),

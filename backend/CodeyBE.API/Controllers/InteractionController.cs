@@ -142,7 +142,7 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<string>> GetAllSchools()
         {
-            return await Task.FromResult(new List<string> { "Škola 1", "Škola 2", "Škola 3", "Ostali" });
+            return await Task.FromResult(new List<string> { "OŠ Tina Ujevića Zagreb", "Ostali" });
         }
 
         [HttpGet("classes/my", Name = "getClassForStudentSelf")]
