@@ -157,6 +157,17 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                           },
                           statementArea: _buildStaticStatementArea(),
                         ),
+                      if (exercise!.specificTip != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Text(
+                            "**HINT**\n${exercise!.specificTip!}",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   if (isCorrectResponse == null) _buildCheckButton(),
@@ -211,10 +222,13 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
 
   Widget _buildNextButtonArea() {
     var correctAnswer = widget.exercisesService.getCorrectAnswer(exercise!);
-    if(exercise is ExerciseSCW){
+    if (exercise is ExerciseSCW) {
       var answerWithCode = (exercise as ExerciseSCW).statementCode;
-      for(var answer in correctAnswer){
-        answerWithCode = answerWithCode.replaceFirst("\\gap", answer,);
+      for (var answer in correctAnswer) {
+        answerWithCode = answerWithCode.replaceFirst(
+          "\\gap",
+          answer,
+        );
       }
       correctAnswer = answerWithCode;
     }
