@@ -12,11 +12,13 @@ import 'package:provider/provider.dart';
 class LessonsScreen extends StatefulWidget {
   final LessonGroup lessonGroup;
   final bool lessonGroupFinished;
+  final AppUser user;
 
   const LessonsScreen({
     super.key,
     required this.lessonGroup,
     required this.lessonGroupFinished,
+    required this.user,
   });
 
   @override
@@ -64,6 +66,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                             lessonGroup: widget.lessonGroup,
                             lessonGroupFinished: lessonGroupFinished,
                             backDisabled: true,
+                            user: widget.user,
                           ),
                         ),
                       );
@@ -235,6 +238,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                           builder: (context) => PreLessonScreen(
                             lesson: lesson,
                             lessonGroup: widget.lessonGroup,
+                            user: widget.user,
                           ),
                         ),
                       ).then(

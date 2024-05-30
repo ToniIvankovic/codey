@@ -28,6 +28,7 @@ namespace CodeyBE.Contracts.DTOs
         public required int? HighestStreak { get; set; }
         public ISet<Quest>? DailyQuests { get; set; }
         public required double Score { get; set; }
+        public required bool GamificationEnabled { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -57,7 +58,8 @@ namespace CodeyBE.Contracts.DTOs
                     .SelectMany(q => q.Value)
                     .ToHashSet()
                     ?? [],
-                Score = user.Score
+                Score = user.Score,
+                GamificationEnabled = user.GamificationGroup != 1
             };
         }
 

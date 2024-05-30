@@ -23,32 +23,43 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(UserRegistrationResponseDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> RegisterUser([FromBody] Dictionary<string, string> body)
         {
-            var firstName = body["firstName"];
-            var lastName = body["lastName"];
-            var dob = body["dateOfBirth"];
-            var email = body["email"];
-            var password = body["password"];
-            var school = body["school"];
-            var result = await userService.RegisterStudent(new UserRegistrationRequestDTO
+            try
             {
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = DateOnly.Parse(dob),
-                Email = email,
-                Password = password,
-                School = school
-            });
-            if (result.Succeeded)
-            {
-                return Ok(new UserRegistrationResponseDTO
+
+                var firstName = body["firstName"];
+                var lastName = body["lastName"];
+                var dob = body["dateOfBirth"];
+                var email = body["email"];
+                var password = body["password"];
+                var school = body["school"];
+                var result = await userService.RegisterStudent(new UserRegistrationRequestDTO
                 {
-                    Message = ["User created successfully"]
+                    FirstName = firstName,
+                    LastName = lastName,
+                    DateOfBirth = DateOnly.Parse(dob),
+                    Email = email,
+                    Password = password,
+                    School = school
+                });
+                if (result.Succeeded)
+                {
+                    return Ok(new UserRegistrationResponseDTO
+                    {
+                        Message = ["User created successfully"]
+                    });
+                }
+                return StatusCode(400, new UserRegistrationResponseDTO
+                {
+                    Message = result.Errors.Select(error => error.Description)
                 });
             }
-            return StatusCode(400, new UserRegistrationResponseDTO
+            catch (KeyNotFoundException e)
             {
-                Message = result.Errors.Select(error => error.Description)
-            });
+                return StatusCode(400, new UserRegistrationResponseDTO
+                {
+                    Message = [e.Message],
+                });
+            }
         }
 
         [AllowAnonymous]

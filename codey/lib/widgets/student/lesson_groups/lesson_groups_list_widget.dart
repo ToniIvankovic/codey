@@ -249,6 +249,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                                             lessonGroup: widget.lessonGroup,
                                             lessonGroupFinished:
                                                 widget.lessonGroupFinished,
+                                            user: widget.user,
                                           ),
                                         ),
                                       );
@@ -267,6 +268,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                                   lessonGroup: widget.lessonGroup,
                                   lessonGroupFinished:
                                       widget.lessonGroupFinished,
+                                  user: widget.user,
                                 ),
                               ),
                             );

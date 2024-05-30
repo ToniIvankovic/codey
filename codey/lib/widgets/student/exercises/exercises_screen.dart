@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
@@ -10,11 +11,13 @@ import 'package:provider/provider.dart';
 class ExercisesScreen extends StatefulWidget {
   final Lesson lesson;
   final LessonGroup lessonGroup;
+  final AppUser user;
 
   const ExercisesScreen({
     super.key,
     required this.lesson,
     required this.lessonGroup,
+    required this.user,
   });
 
   @override
@@ -113,6 +116,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                 return PostLessonScreen(
                                   endReport: exercisesService.getEndReport()!,
                                   awardedXP: awardedXP,
+                                  gamificationEnabled: widget.user.gamificationEnabled,
                                 );
                               }));
                             });

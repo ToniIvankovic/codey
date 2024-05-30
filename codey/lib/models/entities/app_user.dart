@@ -17,6 +17,7 @@ class AppUser {
   final bool didLessonToday;
   final bool justUpdatedStreak;
   final int highestStreak;
+  final bool gamificationEnabled;
 
   AppUser({
     this.firstName,
@@ -35,6 +36,7 @@ class AppUser {
     required this.didLessonToday,
     required this.justUpdatedStreak,
     required this.highestStreak,
+    required this.gamificationEnabled,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -61,6 +63,7 @@ class AppUser {
       didLessonToday: json['didLessonToday'],
       justUpdatedStreak: json['justUpdatedStreak'],
       highestStreak: json['highestStreak'],
+      gamificationEnabled: json['gamificationEnabled'],
     );
   }
 }

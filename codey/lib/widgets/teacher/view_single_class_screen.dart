@@ -1,5 +1,4 @@
 import 'package:codey/models/entities/class.dart';
-import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/widgets/teacher/edit_class_screen.dart';
 import 'package:flutter/material.dart';
 

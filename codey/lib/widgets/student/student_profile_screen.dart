@@ -1,26 +1,18 @@
 import 'package:codey/models/entities/app_user.dart';
-import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
-import 'package:codey/widgets/student/gamification_widgets/quests_widget.dart';
-import 'package:codey/widgets/student/gamification_widgets/streak_widget.dart';
 import 'package:flutter/material.dart';
 
-class StudentProfileScreen extends StatefulWidget {
+class StudentProfileScreen extends StatelessWidget {
   final AppUser user;
   const StudentProfileScreen({
-    super.key,
+    Key? key,
     required this.user,
-  });
+  }) : super(key: key);
 
-  @override
-  State<StudentProfileScreen> createState() => _StudentProfileScreenState();
-}
-
-class _StudentProfileScreenState extends State<StudentProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Postignuća'),
+        title: const Text('Profil'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         titleTextStyle: TextStyle(
             color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
@@ -38,27 +30,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("XP: ${widget.user.totalXp}",
-                              style: const TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                StreakWidget(user: widget.user),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0),
-                  child: QuestsWidget(),
-                ),
-                const LeaderboardWidget(),
+                Text("Ime: ${user.firstName}", style: const TextStyle(fontSize: 16)),
               ],
             ),
           ),

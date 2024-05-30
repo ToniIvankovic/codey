@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/widgets/student/lessons/lessons_screen.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +7,14 @@ class LessonGroupTipsScreen extends StatelessWidget {
   final LessonGroup lessonGroup;
   final bool lessonGroupFinished;
   final bool? backDisabled;
+  final AppUser user;
 
   const LessonGroupTipsScreen({
     Key? key,
     required this.lessonGroup,
     required this.lessonGroupFinished,
     this.backDisabled,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -37,8 +40,10 @@ class LessonGroupTipsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => LessonsScreen(
-                            lessonGroup: lessonGroup,
-                            lessonGroupFinished: lessonGroupFinished),
+                          lessonGroup: lessonGroup,
+                          lessonGroupFinished: lessonGroupFinished,
+                          user: user,
+                        ),
                       ),
                     ),
                     child: const Text('Idi na lekcije'),

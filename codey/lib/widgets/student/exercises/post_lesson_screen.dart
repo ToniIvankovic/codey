@@ -1,17 +1,21 @@
 import 'package:codey/models/entities/end_report.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
 import 'package:codey/widgets/student/gamification_widgets/quests_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class PostLessonScreen extends StatelessWidget {
   const PostLessonScreen({
     super.key,
     required this.endReport,
     required this.awardedXP,
+    required this.gamificationEnabled,
   });
 
   final EndReport endReport;
   final int? awardedXP;
+  final bool gamificationEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -71,30 +75,33 @@ class PostLessonScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Expanded(
-                                child: Text(
-                              "XP zarađeno:",
-                              overflow: TextOverflow.ellipsis,
-                            )),
-                            awardedXP != null
-                                ? Text(awardedXP.toString())
-                                : const CircularProgressIndicator(),
-                          ],
-                        ),
+                        if (gamificationEnabled)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Expanded(
+                                  child: Text(
+                                "XP zarađeno:",
+                                overflow: TextOverflow.ellipsis,
+                              )),
+                              awardedXP != null
+                                  ? Text(awardedXP.toString())
+                                  : const CircularProgressIndicator(),
+                            ],
+                          ),
                       ],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.0),
-                    child: LeaderboardWidget(),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.0),
-                    child: QuestsWidget(),
-                  ),
+                  if (gamificationEnabled) ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20.0),
+                      child: LeaderboardWidget(),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20.0),
+                      child: QuestsWidget(),
+                    ),
+                  ]
                 ],
               ),
             ),

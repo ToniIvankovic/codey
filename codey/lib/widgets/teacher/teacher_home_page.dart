@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'create_class_screen.dart';
 import 'view_classes_screen.dart';
 
 class TeacherHomePage extends StatelessWidget {

@@ -21,6 +21,7 @@ namespace CodeyBE.Contracts.Entities.Users
         public string? School { get; set; }
         public List<KeyValuePair<DateOnly, ISet<Quest>>>? Quests { get; set; } = [];
         public double Score { get; set; } = 1;
+        public int GamificationGroup { get; set; }
 
         public static int CalculateTotalXP(ApplicationUser user)
         {

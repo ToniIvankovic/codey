@@ -45,6 +45,7 @@ namespace CodeyBe.Services
 
         public async Task<IdentityResult> RegisterStudent(UserRegistrationRequestDTO user)
         {
+            var userCount = _userManager.Users.Count();
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
                 FirstName = user.FirstName,
@@ -67,6 +68,7 @@ namespace CodeyBe.Services
                 TotalXP = 0,
                 XPachieved = [],
                 School = user.School,
+                GamificationGroup = user.School == "Ostali" ? 0 : userCount % 2 + 1,
             }, user.Password);
             return result;
         }

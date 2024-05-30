@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/widgets/student/exercises/exercises_screen.dart';
@@ -6,11 +7,13 @@ import 'package:flutter/material.dart';
 class PreLessonScreen extends StatelessWidget {
   final Lesson lesson;
   final LessonGroup lessonGroup;
+  final AppUser user;
 
   const PreLessonScreen({
     Key? key,
     required this.lesson,
     required this.lessonGroup,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -23,6 +26,7 @@ class PreLessonScreen extends StatelessWidget {
             builder: (context) => ExercisesScreen(
               lesson: lesson,
               lessonGroup: lessonGroup,
+              user: user,
             ),
           ),
         );
