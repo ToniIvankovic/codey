@@ -51,7 +51,9 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<object>> GetExercisesForLesson(int lessonId)
         {
             var user = User;
-            _loggingService.RequestedLesson(user, lessonId);
+            var appUser = await _userService.GetUser(user)
+                ?? throw new EntityNotFoundException("User not found");
+            _loggingService.RequestedLesson(appUser, lessonId);
             return (await _exercisesService.GetExercisesForLessonAsync(lessonId))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
@@ -63,9 +65,9 @@ namespace CodeyBE.API.Controllers
         public async Task<IEnumerable<object>> GetExercisesForAdaptiveLesson(int lessonId)
         {
             var user = User;
-            _loggingService.RequestedLesson(user, lessonId);
             var appUser = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("User not found");
+            _loggingService.RequestedLesson(appUser, lessonId);
             return (await _exercisesService.GetExercisesForAdaptiveLessonAsync(appUser))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();

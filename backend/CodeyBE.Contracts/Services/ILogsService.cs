@@ -13,10 +13,10 @@ namespace CodeyBE.Contracts.Services
 {
     public interface ILogsService
     {
-        void RequestedLesson(ClaimsPrincipal user, int lessonId);
+        void RequestedLesson(ApplicationUser applicationUser, int lessonId);
         void RequestedExercise(int exerciseId);
         void AnsweredExercise(ApplicationUser applicationUser, int exerciseId, IEnumerable<dynamic> correctAnswers, dynamic givenAnswer, bool correct);
-        void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report);
+        void EndOfLesson(ApplicationUser applicationUser, EndOfLessonReport report);
         Task<IEnumerable<LogExerciseAnswer>> GetLogExerciseAnswersForExercise(int exerciseId);
     }
 }

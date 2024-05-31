@@ -31,19 +31,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-          title: Flexible(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                  child: Text('Python'),
-                ),
-                if (widget.user.gamificationEnabled) ...[
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.whatshot,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                child: Text('Python'),
+              ),
+              if (widget.user.gamificationEnabled) ...[
+                Row(
+                  children: [
+                    Icon(
+                      Icons.whatshot,
+                      color: widget.user.didLessonToday
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.5),
+                    ),
+                    Text(
+                      widget.user.streak.toString(),
+                      style: TextStyle(
                         color: widget.user.didLessonToday
                             ? Theme.of(context).colorScheme.secondary
                             : Theme.of(context)
@@ -51,80 +60,69 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 .onSurface
                                 .withOpacity(0.5),
                       ),
-                      Text(
-                        widget.user.streak.toString(),
-                        style: TextStyle(
-                          color: widget.user.didLessonToday
-                              ? Theme.of(context).colorScheme.secondary
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.5),
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    //chest icon
-                    icon: const Icon(Icons.military_tech),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StudentGamificationScreen(
-                          user: widget.user,
-                        ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  //chest icon
+                  icon: const Icon(Icons.military_tech),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StudentGamificationScreen(
+                        user: widget.user,
                       ),
                     ),
                   ),
-                ],
-                // PROFILE
-                IconButton(
-                  icon: const Icon(Icons.person),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StudentProfileScreen(
-                          user: widget.user,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // LOGOUT
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  //alert dialog
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Odjava'),
-                          content: const Text('Sigurno se želiš odjaviti?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Odustani'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                widget.onLogoutSuper();
-                              },
-                              child: const Text('Odjavi se'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
                 ),
               ],
-            ),
+              // PROFILE
+              IconButton(
+                icon: const Icon(Icons.person),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StudentProfileScreen(
+                        user: widget.user,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // LOGOUT
+              IconButton(
+                icon: const Icon(Icons.logout),
+                //alert dialog
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Odjava'),
+                        content: const Text('Sigurno se želiš odjaviti?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Odustani'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              widget.onLogoutSuper();
+                            },
+                            child: const Text('Odjavi se'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.background,

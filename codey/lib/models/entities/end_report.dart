@@ -28,7 +28,7 @@ class EndReport {
       'totalAnswers': totalAnswers,
       'totalExercises': totalExercises,
       'accuracy': accuracy,
-      'duration': duration.inMilliseconds,
+      'durationMiliseconds': duration.inMilliseconds,
       //convert to list<keyValuePair<int, bool>>
       'answersReport': answersReport!.map((entry) => {
             'key': entry.key,

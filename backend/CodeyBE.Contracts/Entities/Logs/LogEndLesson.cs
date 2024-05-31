@@ -15,7 +15,7 @@ namespace CodeyBE.Contracts.Entities.Logs
         public int Duration { get; set; }
         public double Accuracy { get; set; }
 
-        public LogEndLesson(string userId, int lessonId, int correctAnswers, int totalAnswers, int duration, double accuracy) : base(userId)
+        public LogEndLesson(string userId, int userGroup, int lessonId, int correctAnswers, int totalAnswers, int duration, double accuracy) : base(userId, userGroup)
         {
             LessonId = lessonId;
             CorrectAnswers = correctAnswers;
@@ -24,7 +24,7 @@ namespace CodeyBE.Contracts.Entities.Logs
             Accuracy = accuracy;
         }
 
-        public LogEndLesson(string userId, EndOfLessonReport report) : base(userId)
+        public LogEndLesson(string userId, int userGroup, EndOfLessonReport report) : base(userId, userGroup)
         {
             LessonId = report.LessonId;
             CorrectAnswers = report.CorrectAnswers;

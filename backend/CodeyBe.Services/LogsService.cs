@@ -22,6 +22,7 @@ namespace CodeyBe.Services
             _logsRepository.SaveLogAsync(
                 new LogExerciseAnswer(
                     userId: applicationUser.Email,
+                    userGroup: applicationUser.GamificationGroup,
                     exerciseId,
                     correctAnswer,
                     givenAnswer,
@@ -35,20 +36,22 @@ namespace CodeyBe.Services
             throw new NotImplementedException();
         }
 
-        public void RequestedLesson(ClaimsPrincipal user, int lessonId)
+        public void RequestedLesson(ApplicationUser applicationUser, int lessonId)
         {
             _logsRepository.SaveLogAsync(
                 new LogStartLesson(
-                    userId: user.Claims.First(c => c.Type == ClaimTypes.Email).Value,
+                    userId: applicationUser.UserName!,
+                    userGroup: applicationUser.GamificationGroup,
                     lessonId
             ));
         }
 
-        public void EndOfLesson(ClaimsPrincipal user, EndOfLessonReport report)
+        public void EndOfLesson(ApplicationUser applicationUser, EndOfLessonReport report)
         {
             _logsRepository.SaveLogAsync(
                 new LogEndLesson(
-                    userId: user.Claims.First(c => c.Type == ClaimTypes.Email).Value,
+                    userId: applicationUser.UserName!,
+                    userGroup: applicationUser.GamificationGroup,
                     report
                     ));
 

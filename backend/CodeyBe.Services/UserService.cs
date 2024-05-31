@@ -126,10 +126,10 @@ namespace CodeyBe.Services
         {
             int XP_SOLVED_OLD = 40;
             int XP_SOLVED_NEW = 100;
-            logsService.EndOfLesson(user, lessonReport);
             ApplicationUser? applicationUser = await GetUser(user) ??
                 throw new EntityNotFoundException($"User not found " +
                 $"{user.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault()?.Value}");
+            logsService.EndOfLesson(applicationUser, lessonReport);
             LessonGroup? reportedLessonGroup = await lessonGroupsService.GetLessonGroupByIDAsync(lessonReport.LessonGroupId)
                 ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
 
