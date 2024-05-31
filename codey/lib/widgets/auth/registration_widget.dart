@@ -181,7 +181,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final emailField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'E-mail *',
+        labelText: 'Korisničko ime *',
       ),
       onChanged: (value) {
         setState(() {

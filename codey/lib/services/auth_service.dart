@@ -1,4 +1,5 @@
 import 'package:codey/models/exceptions/authentication_exception.dart';
+import 'package:codey/models/exceptions/invalid_data_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jwt_decode/jwt_decode.dart';
@@ -20,6 +21,10 @@ abstract class AuthService {
     required String email,
     required String password,
     required String school,
+  });
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
   });
 }
 
@@ -44,7 +49,7 @@ class AuthService1 implements AuthService {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode != 200) {
-      throw AuthenticationException('Incorrect username or password');
+      throw AuthenticationException('Neispravno korisnično ime ili lozinka');
     }
 
     final data = json.decode(response.body);
@@ -145,5 +150,35 @@ class AuthService1 implements AuthService {
 
     final int expirationTimestamp = decodedToken['exp'];
     return DateTime.fromMillisecondsSinceEpoch(expirationTimestamp * 1000);
+  }
+
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final Uri changePasswordEndpoint =
+        Uri.parse('${dotenv.env["API_BASE"]}/user/change-password');
+    final response = await http.post(
+      changePasswordEndpoint,
+      body: json.encode({
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      var errorMessage = response.body;
+      // errorMessage = errorMessage['message']
+      //     .toString()
+      //     .substring(1, errorMessage['message'].toString().length - 1)
+      //     .split(", ")
+      //     .join("\n");
+      throw InvalidDataException(errorMessage);
+    }
   }
 }

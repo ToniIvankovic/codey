@@ -12,6 +12,11 @@ abstract class UserService {
   Future<void> initializeUser();
   void logout();
   void updateUser(AppUser user);
+  Future<AppUser> changeUserData({
+    required String firstName,
+    required String lastName,
+    required DateTime dateOfBirth,
+  });
 }
 
 class UserService1 implements UserService {
@@ -55,5 +60,30 @@ class UserService1 implements UserService {
 
     var user = AppUser.fromJson(jsonDecode(response.body));
     updateUser(user);
+  }
+
+  @override
+  Future<AppUser> changeUserData({
+    required String firstName,
+    required String lastName,
+    required DateTime dateOfBirth,
+  }) async {
+    var response = await _authenticatedClient.put(
+      _userEndpoint,
+      body: json.encode({
+        'firstName': firstName,
+        'lastName': lastName,
+        'dateOfBirth': dateOfBirth.toIso8601String(),
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to change user data');
+    }
+
+    var user = AppUser.fromJson(jsonDecode(response.body));
+    updateUser(user);
+    return user;
   }
 }

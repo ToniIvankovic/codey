@@ -207,5 +207,47 @@ namespace CodeyBE.API.Controllers
                 Message = ["User created successfully"]
             });
         }
+
+        [HttpPost("change-password", Name = "changePassword")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangePassword([FromBody] Dictionary<string, string> body)
+        {
+            var oldPassword = body["oldPassword"];
+            var newPassword = body["newPassword"];
+            try
+            {
+                await userService.ChangePassword(User, oldPassword, newPassword);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(400, e.Message);
+            }
+        }
+
+        [HttpPut("", Name = "updateUser")]
+        [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateUser([FromBody] Dictionary<string, string> body)
+        {
+            try
+            {
+                ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
+                var firstName = body["firstName"];
+                var lastName = body["lastName"];
+                var dob = body["dateOfBirth"];
+                applicationUser.FirstName = firstName;
+                applicationUser.LastName = lastName;
+                applicationUser.DateOfBirth = DateOnly.Parse(dob);
+                var newUser = await userService.UpdateUserData(applicationUser);
+                return new OkObjectResult(await ProduceUserDataDTO(newUser));
+            }
+            catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
+            {
+                return StatusCode(401, e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(400, e.Message);
+            }
+        }
     }
 }

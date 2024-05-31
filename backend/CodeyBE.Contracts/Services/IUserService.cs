@@ -20,5 +20,7 @@ namespace CodeyBE.Contracts.Services
         public Task<ApplicationUser?> GetUser(ClaimsPrincipal user);
         public Task<int> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);
         public Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser);
+        public Task ChangePassword(ClaimsPrincipal user, string oldPassword, string newPassword);
+        public Task<ApplicationUser> UpdateUserData(ApplicationUser applicationUser);
     }
 }

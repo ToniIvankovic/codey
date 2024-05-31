@@ -23,7 +23,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     TextField emailTextField = TextField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'E-mail',
+        labelText: 'Korisničko ime',
       ),
       onChanged: (value) {
         setState(() {

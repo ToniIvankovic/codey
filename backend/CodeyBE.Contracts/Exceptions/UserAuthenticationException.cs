@@ -8,6 +8,6 @@ namespace CodeyBE.Contracts.Exceptions
 {
     public class UserAuthenticationException(string message) : Exception(message)
     {
-        public const string INVALID_PASSWORD = "Invalid password";
+        public const string INVALID_PASSWORD = "Neispravna lozinka";
     }
 }

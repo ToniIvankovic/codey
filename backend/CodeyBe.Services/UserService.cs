@@ -336,5 +336,28 @@ namespace CodeyBe.Services
             }
             return userScore;
         }
+
+        public async Task ChangePassword(ClaimsPrincipal user, string oldPassword, string newPassword)
+        {
+            ApplicationUser? applicationUser = await GetUser(user)
+                ?? throw new EntityNotFoundException("User not found");
+            var result = await _userManager.ChangePasswordAsync(applicationUser, oldPassword, newPassword);
+            if (!result.Succeeded)
+            {
+                string reason = result.Errors.First().Description;
+                if(reason == "Incorrect password.")
+                {
+                    throw new UserAuthenticationException(UserAuthenticationException.INVALID_PASSWORD);
+                } else
+                {
+                    throw new InvalidDataException(reason);
+                }
+            }
+        }
+
+        public async Task<ApplicationUser> UpdateUserData(ApplicationUser applicationUser)
+        {
+            return await UpdateUser(applicationUser);
+        }
     }
 }
