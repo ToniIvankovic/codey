@@ -47,7 +47,8 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
           "name": lessonGroup.name,
           "tips": lessonGroup.tips,
           "lessons": lessonGroup.lessons,
-          "order": lessonGroup.order
+          "order": lessonGroup.order,
+          "adaptive": lessonGroup.adaptive,
         }));
     if (response.statusCode != 200) {
       throw Exception('Failed to update lesson group: ${lessonGroup.id}, '
