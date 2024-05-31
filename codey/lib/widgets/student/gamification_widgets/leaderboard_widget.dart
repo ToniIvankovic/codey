@@ -90,15 +90,15 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
               "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
               overflow: TextOverflow.ellipsis),
         ),
-        Text("${leaderboard!.students[i].totalXp} XP",
-            overflow: TextOverflow.visible),
         if (leaderboard!.students[i].streak > 0) ...[
+          Text("${leaderboard!.students[i].streak}"),
           const Padding(
-            padding: EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
             child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
           ),
-          Text("${leaderboard!.students[i].streak}"),
-        ]
+        ],
+        Text("${leaderboard!.students[i].totalXp} XP",
+            overflow: TextOverflow.visible),
       ],
     );
   }

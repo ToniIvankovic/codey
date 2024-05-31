@@ -83,12 +83,14 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                 ),
               ],
             ),
+            // PROGRESS BAR
+            Expanded(
+              child: _generateProgressBar(quest.progress, quest.constraint!),
+            ),
             if (!quest.isCompleted)
-              Expanded(
-                child: Text(
-                  "${quest.progress}/${quest.constraint}",
-                  textAlign: TextAlign.right,
-                ),
+              Text(
+                "${quest.progress}/${quest.constraint}",
+                textAlign: TextAlign.right,
               ),
           ],
         );
@@ -108,12 +110,14 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                 ),
               ],
             ),
+            // PROGRESS BAR
+            Expanded(
+              child: _generateProgressBar(quest.progress, quest.nLessons!),
+            ),
             if (!quest.isCompleted)
-              Expanded(
-                child: Text(
-                  "${quest.progress}/${quest.nLessons}",
-                  textAlign: TextAlign.right,
-                ),
+              Text(
+                "${quest.progress}/${quest.nLessons}",
+                textAlign: TextAlign.right,
               ),
           ],
         );
@@ -133,12 +137,14 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                 ),
               ],
             ),
+            // PROGRESS BAR
+            Expanded(
+              child: _generateProgressBar(quest.progress, quest.nLessons!),
+            ),
             if (!quest.isCompleted)
-              Expanded(
-                child: Text(
-                  "${quest.progress}/${quest.nLessons}",
-                  textAlign: TextAlign.right,
-                ),
+              Text(
+                "${quest.progress}/${quest.nLessons}",
+                textAlign: TextAlign.right,
               ),
           ],
         );
@@ -161,5 +167,28 @@ class _QuestsWidgetState extends State<QuestsWidget> {
           overflow: TextOverflow.ellipsis,
         );
     }
+  }
+
+  Widget _generateProgressBar(int progress, int total) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 15, minHeight: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: progress / total,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
