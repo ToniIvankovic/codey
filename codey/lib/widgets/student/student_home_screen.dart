@@ -1,6 +1,6 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
-import 'package:codey/widgets/student/student_profile_screen.dart';
+import 'package:codey/widgets/student/profile_data/student_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'lesson_groups/lesson_groups_list_widget.dart';
