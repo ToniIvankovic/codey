@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 abstract class LessonGroupsRepository {
   Future<List<LessonGroup>> getAllLessonGroups();
+  Future<LessonGroup> getLessonGroupById(int id);
   void invalidateCache() {}
 }
 
@@ -23,6 +24,31 @@ class LessonGroupsRepository1 implements LessonGroupsRepository {
       return _fetchLessonGroups();
     }
     return Future.value(_lessonGroupsCache!);
+  }
+
+  @override
+  Future<LessonGroup> getLessonGroupById(int id) async {
+    if (_lessonGroupsCache?.where((element) => element.id == id).isNotEmpty ??
+        false) {
+      return _lessonGroupsCache!.firstWhere((element) => element.id == id);
+    }
+    
+    final response = await _authenticatedClient.get(Uri.parse(_apiUrl));
+    if (response.statusCode != 200) {
+      switch (response.statusCode) {
+        case 401:
+          throw UnauthenticatedException(
+              'Unauthorized retrieval of lesson groups');
+        default:
+          throw Exception('Failed to fetch lesson groups, '
+              'Error ${response.statusCode}');
+      }
+    }
+
+    final List<dynamic> data = json.decode(response.body);
+    final LessonGroup lessonGroup =
+        data.map((item) => LessonGroup.fromJson(item)).first;
+    return lessonGroup;
   }
 
   Future<List<LessonGroup>> _fetchLessonGroups() async {
@@ -45,7 +71,7 @@ class LessonGroupsRepository1 implements LessonGroupsRepository {
     _lessonGroupsCache = lessonGroups;
     return lessonGroups;
   }
-  
+
   @override
   void invalidateCache() {
     _lessonGroupsCache = null;

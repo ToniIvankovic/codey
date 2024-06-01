@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 abstract class LessonGroupsService {
   Future<List<LessonGroup>> getAllLessonGroups();
+  Future<LessonGroup> getLessonGroupById(int id);
   Future<LessonGroup> updateLessonGroup(LessonGroup lessonGroup);
   void reorderLessonGroups(List<LessonGroup> list);
   Future<LessonGroup> createLessonGroup({
@@ -34,6 +35,11 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
   @override
   Future<List<LessonGroup>> getAllLessonGroups() {
     return _lessonGroupsRepository.getAllLessonGroups();
+  }
+
+  @override
+  Future<LessonGroup> getLessonGroupById(int id) {
+    return _lessonGroupsRepository.getLessonGroupById(id);
   }
 
   @override

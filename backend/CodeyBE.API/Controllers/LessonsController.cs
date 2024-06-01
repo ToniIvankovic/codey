@@ -10,7 +10,6 @@ namespace CodeyBE.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "STUDENT,CREATOR")]
     public class LessonsController(ILessonsService lessonsService) : ControllerBase
     {
         const string version = "v2";
@@ -24,23 +23,13 @@ namespace CodeyBE.API.Controllers
             return await lessonsService.GetAllLessonsAsync();
         }
 
-        //[Authorize(Roles = "CREATOR")]
-        //[HttpGet("{id}", Name = "getLessonByID")]
-        //[ProducesResponseType(typeof(Lesson), (int)HttpStatusCode.OK)]
-        //public async Task<Lesson?> GetLessonByID(int id)
-        //{
-        //    return await lessonsService.GetLessonByIDAsync(id);
-        //}
-
-        [Authorize(Roles = "CREATOR,STUDENT")]
+        [Authorize(Roles = "CREATOR,STUDENT,TEACHER")]
         [HttpGet(Name = "getLessonsByID")]
         [ProducesResponseType(typeof(List<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<List<Lesson>> GetLessonsByIDs([FromQuery] List<int> ids)
         {
             return await lessonsService.GetLessonsByIDsAsync(ids);
         }
-
-
 
         [Authorize(Roles = "STUDENT,CREATOR")]
         [HttpGet("lessonGroup/{lessonGroupId}", Name = "getLessonsForLessonGroup")]

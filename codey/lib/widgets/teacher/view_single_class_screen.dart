@@ -6,6 +6,8 @@ import 'package:codey/widgets/teacher/edit_class_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'view_single_student_screen.dart';
+
 class ViewSingleClassScreen extends StatefulWidget {
   final Class initialClassData;
   const ViewSingleClassScreen({super.key, required this.initialClassData});
@@ -173,68 +175,6 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class ViewSingleStudentScreen extends StatelessWidget {
-  final AppUser student;
-  const ViewSingleStudentScreen({super.key, required this.student});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${student.firstName} ${student.lastName}'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(50.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Ime: ${student.firstName}',
-                    style: const TextStyle(fontSize: 18),
-                    overflow: TextOverflow.fade,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Prezime: ${student.lastName}',
-                    style: const TextStyle(fontSize: 18),
-                    overflow: TextOverflow.fade,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Email: ${student.email}',
-                    style: const TextStyle(fontSize: 18),
-                    overflow: TextOverflow.fade,
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
