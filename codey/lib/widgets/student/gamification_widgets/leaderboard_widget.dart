@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class LeaderboardWidget extends StatefulWidget {
+  final bool requestedByTeacher;
+  final int? classId;
   const LeaderboardWidget({
     super.key,
+    this.requestedByTeacher = false,
+    this.classId,
   });
 
   @override
@@ -20,10 +24,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   void initState() {
     super.initState();
     leaderboardLoading = true;
-    context
-        .read<UserInteractionService>()
-        .getLeaderboardStudent()
-        .then((value) {
+    fetchLeaderboard().then((value) {
       if (!mounted) {
         return;
       }
@@ -40,6 +41,14 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
         leaderboardLoading = false;
       });
     });
+  }
+
+  Future<Leaderboard> fetchLeaderboard() async {
+    return widget.requestedByTeacher
+        ? await context
+            .read<UserInteractionService>()
+            .getLeaderboardClass(widget.classId!)
+        : await context.read<UserInteractionService>().getLeaderboardStudent();
   }
 
   @override

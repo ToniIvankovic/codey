@@ -81,16 +81,22 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.remove_red_eye),
                           color: Theme.of(context).colorScheme.onBackground,
                           onPressed: () {
-                            Navigator.of(context).push(
+                            Navigator.of(context)
+                                .push(
                               MaterialPageRoute(
                                 builder: (context) => ViewSingleClassScreen(
                                   initialClassData: localClass,
                                 ),
                               ),
-                            );
+                            )
+                                .then((value) {
+                              setState(() {
+                                _classes[index] = value;
+                              });
+                            });
                           },
                         ),
                         IconButton(

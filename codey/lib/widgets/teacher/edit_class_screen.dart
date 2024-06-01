@@ -17,7 +17,9 @@ class EditClassScreen extends StatefulWidget {
 
 class _EditClassScreenState extends State<EditClassScreen> {
   late TextEditingController _nameController;
+  // ALL STUDENTS IN THE SCHOOL
   late final List<AppUser> _students = [];
+  // STUDENTS ALREADY SELECTED FOR THE CLASS
   final List<AppUser> _selectedStudents = [];
   bool studentsLoading = true;
 
@@ -68,7 +70,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
                   shrinkWrap: true,
                   itemCount: _selectedStudents.length,
                   itemBuilder: (context, index) {
-                    final student = _students[index];
+                    final student = _selectedStudents[index];
                     return ListTile(
                         title: Text(
                             "${student.firstName} ${student.lastName} (${student.email})"),
@@ -116,6 +118,12 @@ class _EditClassScreenState extends State<EditClassScreen> {
                   )
                       .then((updatedClass) {
                     Navigator.of(context).pop(updatedClass);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Promjene spremljene'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                   }).catchError(
                     (error) {
                       if (error is NoChangesException) {
