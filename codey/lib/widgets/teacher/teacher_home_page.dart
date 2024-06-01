@@ -1,3 +1,4 @@
+import 'package:codey/widgets/student/profile_data/change_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'view_classes_screen.dart';
 
@@ -46,6 +47,27 @@ class TeacherHomePage extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ChangePasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Promjena lozinke',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
