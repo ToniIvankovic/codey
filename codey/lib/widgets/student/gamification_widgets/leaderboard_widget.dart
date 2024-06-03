@@ -83,7 +83,10 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
               )
             else
               for (var i = 0; i < leaderboard!.students.length; i++)
+              ...[
                 _generateLeaderboardRow(i),
+                const SizedBox(height: 5.0),
+              ]
           ],
         ),
       ),
@@ -97,7 +100,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
         Expanded(
           child: Text(
               "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
-              overflow: TextOverflow.ellipsis),
+              overflow: TextOverflow.clip),
         ),
         if (leaderboard!.students[i].streak > 0) ...[
           Text("${leaderboard!.students[i].streak}"),

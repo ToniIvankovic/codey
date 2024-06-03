@@ -52,13 +52,17 @@ class _QuestsWidgetState extends State<QuestsWidget> {
         else
           for (var quest in quests!)
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(child: _generateQuestText(quest)),
                 if (quest.isCompleted)
                   const Icon(Icons.check_box)
                 else
-                  const Icon(Icons.check_box_outline_blank),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Icon(Icons.check_box_outline_blank),
+                  ),
               ],
             ),
       ],
@@ -68,99 +72,120 @@ class _QuestsWidgetState extends State<QuestsWidget> {
   Widget _generateQuestText(Quest quest) {
     switch (quest.type) {
       case Quest.questGetXp:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
                 const Icon(Icons.star_border),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Osvoji ${quest.constraint} XP: ",
-                    overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Osvoji ${quest.constraint} XP: ",
+                      overflow: TextOverflow.clip,
+                    ),
                   ),
                 ),
               ],
             ),
             // PROGRESS BAR
-            Expanded(
-              child: _generateProgressBar(
-                  quest.progress < quest.constraint!
-                      ? quest.progress
-                      : quest.constraint!,
-                  quest.constraint!),
+            Row(
+              children: [
+                Expanded(
+                  child: _generateProgressBar(
+                      quest.progress < quest.constraint!
+                          ? quest.progress
+                          : quest.constraint!,
+                      quest.constraint!),
+                ),
+                if (!quest.isCompleted)
+                  Text(
+                    "${quest.progress}/${quest.constraint}",
+                    textAlign: TextAlign.right,
+                  ),
+              ],
             ),
-            if (!quest.isCompleted)
-              Text(
-                "${quest.progress}/${quest.constraint}",
-                textAlign: TextAlign.right,
-              ),
           ],
         );
       case Quest.questHighAccuracy:
-        return Row(
+        return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
                 const Icon(Icons.track_changes),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Visoka preciznost (>${quest.constraint}%):",
-                    overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Visoka preciznost (>${quest.constraint}%):",
+                      overflow: TextOverflow.clip,
+                    ),
                   ),
                 ),
               ],
             ),
             // PROGRESS BAR
-            Expanded(
-              child: _generateProgressBar(quest.progress, quest.nLessons!),
+            Row(
+              children: [
+                Expanded(
+                  child: _generateProgressBar(quest.progress, quest.nLessons!),
+                ),
+                if (!quest.isCompleted)
+                  Text(
+                    "${quest.progress}/${quest.nLessons}",
+                    textAlign: TextAlign.right,
+                  ),
+              ],
             ),
-            if (!quest.isCompleted)
-              Text(
-                "${quest.progress}/${quest.nLessons}",
-                textAlign: TextAlign.right,
-              ),
           ],
         );
       case Quest.questHighSpeed:
-        return Row(
+        return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
                 const Icon(Icons.speed),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Velika brzina (<${quest.constraint}s):",
-                    overflow: TextOverflow.ellipsis,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Velika brzina (<${quest.constraint}s):",
+                      overflow: TextOverflow.clip,
+                    ),
                   ),
                 ),
               ],
             ),
             // PROGRESS BAR
-            Expanded(
-              child: _generateProgressBar(quest.progress, quest.nLessons!),
+            Row(
+              children: [
+                Expanded(
+                  child: _generateProgressBar(quest.progress, quest.nLessons!),
+                ),
+                if (!quest.isCompleted)
+                  Text(
+                    "${quest.progress}/${quest.nLessons}",
+                    textAlign: TextAlign.right,
+                  ),
+              ],
             ),
-            if (!quest.isCompleted)
-              Text(
-                "${quest.progress}/${quest.nLessons}",
-                textAlign: TextAlign.right,
-              ),
           ],
         );
       case Quest.questCompleteLessonGroup:
         return const Row(
           children: [
             Icon(Icons.check_circle_outline),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "Dovrši cjelinu",
-                overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Dovrši cjelinu",
+                  overflow: TextOverflow.clip,
+                ),
               ),
             ),
           ],

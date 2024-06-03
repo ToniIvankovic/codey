@@ -33,7 +33,7 @@ class StudentProfileScreen extends StatelessWidget {
           ),
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
               child: StreamBuilder(
                 stream: context.read<UserService>().userStream,
                 builder: (context, snapshot) {
@@ -46,43 +46,72 @@ class StudentProfileScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Text("Korisničko ime:",
-                                style: TextStyle(fontSize: 16)),
+                            Expanded(
+                              child: Text("Korisničko ime:",
+                                  style: TextStyle(fontSize: 16)),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
                             Text(user.email,
                                 style: const TextStyle(fontSize: 16)),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const SizedBox(height: 10.0),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Text("Ime:", style: TextStyle(fontSize: 16)),
+                            Expanded(
+                                child: Text("Ime:",
+                                    style: TextStyle(fontSize: 16))),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
                             Text(user.firstName ?? "",
                                 style: const TextStyle(fontSize: 16)),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const SizedBox(height: 10.0),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Text("Prezime:",
-                                style: TextStyle(fontSize: 16)),
+                            Expanded(child: Text("Prezime:", style: TextStyle(fontSize: 16))),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
                             Text(user.lastName ?? "",
                                 style: const TextStyle(fontSize: 16)),
                           ],
                         ),
-                        if (user.dateOfBirth != null)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const SizedBox(height: 10.0),
+                        if (user.dateOfBirth != null) ...[
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              const Text("Datum rođenja:",
-                                  style: TextStyle(fontSize: 16)),
+                              Expanded(
+                                child: Text("Datum rođenja:",
+                                    style: TextStyle(fontSize: 16)),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
                               Text(
                                   "${user.dateOfBirth!.day}.${user.dateOfBirth!.month}.${user.dateOfBirth!.year}.",
                                   style: const TextStyle(fontSize: 16)),
                             ],
                           ),
+                        ],
                         // CHANGE DATA
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 20.0),
