@@ -59,11 +59,14 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 10.0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 10.0),
               child: Text(
                 "Ljestvica poretka",
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
               ),
             ),
             if (leaderboardLoading)
@@ -77,13 +80,17 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                 ),
               )
             else if (!leaderboardLoading && leaderboard == null)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text("Nema ljestvice poretka"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Nema ljestvice poretka",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
               )
             else
-              for (var i = 0; i < leaderboard!.students.length; i++)
-              ...[
+              for (var i = 0; i < leaderboard!.students.length; i++) ...[
                 _generateLeaderboardRow(i),
                 const SizedBox(height: 5.0),
               ]
@@ -99,18 +106,32 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
       children: [
         Expanded(
           child: Text(
-              "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
-              overflow: TextOverflow.clip),
+            "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
+            overflow: TextOverflow.clip,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
         ),
         if (leaderboard!.students[i].streak > 0) ...[
-          Text("${leaderboard!.students[i].streak}"),
+          Text(
+            "${leaderboard!.students[i].streak}",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
             child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
           ),
         ],
-        Text("${leaderboard!.students[i].totalXp} XP",
-            overflow: TextOverflow.visible),
+        Text(
+          "${leaderboard!.students[i].totalXp} XP",
+          overflow: TextOverflow.visible,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSecondary,
+          ),
+        ),
       ],
     );
   }
