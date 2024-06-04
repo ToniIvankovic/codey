@@ -165,7 +165,10 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           entryTextToDisplay,
-                          style: const TextStyle(fontFamily: 'courier new'),
+                          style: TextStyle(
+                            fontFamily: 'courier new',
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
                         ),
                       ),
                     );
@@ -254,9 +257,13 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
               borderRadius: BorderRadius.circular(pieceBorderRadius),
               color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('↵', style: TextStyle(fontFamily: 'courier new')),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('↵',
+                  style: TextStyle(
+                    fontFamily: 'courier new',
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  )),
             ),
           ),
         );
@@ -277,11 +284,15 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             borderRadius: BorderRadius.circular(pieceBorderRadius),
             color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
           ),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
             child: Text(
               '↵',
-              style: TextStyle(fontSize: 20.0, fontFamily: 'courier new'),
+              style: TextStyle(
+                fontSize: 20.0,
+                fontFamily: 'courier new',
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
             ),
           ),
         ),
@@ -316,11 +327,14 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
               borderRadius: BorderRadius.circular(pieceBorderRadius),
               color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Text(
                 ' ⇥  ',
-                style: TextStyle(fontFamily: 'courier new'),
+                style: TextStyle(
+                  fontFamily: 'courier new',
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
               ),
             ),
           ),
@@ -342,11 +356,15 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             borderRadius: BorderRadius.circular(pieceBorderRadius),
             color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
           ),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
             child: Text(
               '⇥',
-              style: TextStyle(fontSize: 20.0, fontFamily: 'courier new'),
+              style: TextStyle(
+                fontSize: 20.0,
+                fontFamily: 'courier new',
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
             ),
           ),
         ),
