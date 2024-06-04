@@ -243,7 +243,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     }
     var textColor = TextStyle(
       color: isCorrectResponse == true
-          ? Theme.of(context).colorScheme.onSecondary
+          ? Theme.of(context).colorScheme.onPrimaryContainer
           : Theme.of(context).colorScheme.onError,
     );
     return Positioned(
@@ -254,7 +254,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           maxWidth: MediaQuery.of(context).size.width,
         ),
         color: isCorrectResponse == true
-            ? Theme.of(context).colorScheme.inversePrimary.withOpacity(0.95)
+            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.95)
             : Theme.of(context).colorScheme.errorContainer.withOpacity(0.9),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
