@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:codey/models/entities/exercise.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseSAWidget extends StatelessWidget {
@@ -11,6 +12,7 @@ class ExerciseSAWidget extends StatelessWidget {
     required this.statementArea,
     required this.codeArea,
     required this.questionArea,
+    required this.changesEnabled,
   });
 
   final Exercise exercise;
@@ -18,6 +20,7 @@ class ExerciseSAWidget extends StatelessWidget {
   final Widget statementArea;
   final Widget codeArea;
   final Widget questionArea;
+  final ValueListenable<bool> changesEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,7 @@ class ExerciseSAWidget extends StatelessWidget {
           ),
           maxLines: null,
           onChanged: (value) => onAnswerSelected(value),
+          readOnly: !changesEnabled.value,
         ),
       ],
     );

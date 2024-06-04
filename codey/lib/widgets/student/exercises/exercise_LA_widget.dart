@@ -3,6 +3,7 @@
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/widgets/student/exercises/exercise_LA_puzzle_widget.dart';
 import 'package:codey/widgets/student/exercises/exercise_LA_writing_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseLAWidget extends StatefulWidget {
@@ -13,11 +14,13 @@ class ExerciseLAWidget extends StatefulWidget {
     required this.onAnswerSelected,
     required this.statementArea,
     // required this.questionArea,
+    required this.changesEnabled,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
   // final Widget questionArea;
+  final ValueListenable<bool> changesEnabled;
 
   @override
   State<ExerciseLAWidget> createState() => _ExerciseLAWidgetState();
@@ -54,6 +57,7 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
             onAnswerSelected: widget.onAnswerSelected,
             statementArea: widget.statementArea,
             statementOutputArea: statementOutputArea,
+            changesEnabled: widget.changesEnabled,
           )
         else
           ExerciseLAPuzzleWidget(
@@ -61,6 +65,7 @@ class _ExerciseLAWidgetState extends State<ExerciseLAWidget> {
             onAnswerSelected: widget.onAnswerSelected,
             statementArea: widget.statementArea,
             statementOutputArea: statementOutputArea,
+            changesEnabled: widget.changesEnabled,
           ),
         if (widget.exercise.answerOptions != null &&
             widget.exercise.answerOptions!.isNotEmpty)

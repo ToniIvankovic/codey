@@ -2,6 +2,7 @@
 
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseLAPuzzleWidget extends StatefulWidget {
@@ -12,11 +13,13 @@ class ExerciseLAPuzzleWidget extends StatefulWidget {
     required this.onAnswerSelected,
     required this.statementArea,
     required this.statementOutputArea,
+    required this.changesEnabled,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
   final Widget statementOutputArea;
+  final ValueListenable<bool> changesEnabled;
 
   @override
   State<ExerciseLAPuzzleWidget> createState() => _ExerciseLAPuzzleWidgetState();
@@ -170,6 +173,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                     var detectorInAnswer = GestureDetector(
                       key: ValueKey(entry.key),
                       onTap: () {
+                        if (!widget.changesEnabled.value) return;
                         setState(() {
                           answerParts.removeWhere(
                               (widget) => widget.key == ValueKey(entry.key));
@@ -182,6 +186,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                     var detectorInOptions = GestureDetector(
                       key: ValueKey(entry.key),
                       onTap: () {
+                        if (!widget.changesEnabled.value) return;
                         // If the key is present in answerParts, return without handling the tap
                         if (answerParts
                             .any((piece) => piece.key == ValueKey(entry.key))) {
@@ -227,9 +232,11 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
     int currentValue = newlineTabCounter;
     return GestureDetector(
       onTap: () {
+        if (!widget.changesEnabled.value) return;
         var detectorInAnswer = GestureDetector(
           key: ValueKey('↵ $currentValue'),
           onTap: () {
+            if (!widget.changesEnabled.value) return;
             setState(() {
               answerParts.removeWhere(
                 (widget) => widget.key == ValueKey('↵ $currentValue'),
@@ -287,9 +294,11 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
     int currentValue = newlineTabCounter;
     return GestureDetector(
       onTap: () {
+        if (!widget.changesEnabled.value) return;
         var detectorInAnswer = GestureDetector(
           key: ValueKey('⇥ $currentValue'),
           onTap: () {
+            if (!widget.changesEnabled.value) return;
             setState(() {
               answerParts.removeWhere(
                 (widget) => widget.key == ValueKey('⇥ $currentValue'),

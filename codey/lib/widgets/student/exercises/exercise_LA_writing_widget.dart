@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:codey/models/entities/exercise_LA.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseLAWritingWidget extends StatelessWidget {
@@ -11,11 +12,13 @@ class ExerciseLAWritingWidget extends StatelessWidget {
     required this.onAnswerSelected,
     required this.statementArea,
     required this.statementOutputArea,
+    required this.changesEnabled,
   });
 
   final ValueChanged<String> onAnswerSelected;
   final Widget statementArea;
   final Widget statementOutputArea;
+  final ValueListenable<bool> changesEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +34,7 @@ class ExerciseLAWritingWidget extends StatelessWidget {
           maxLines: null,
           minLines: 5,
           onChanged: (value) => onAnswerSelected(value),
+          enabled: changesEnabled.value,
         ),
         statementOutputArea,
       ],

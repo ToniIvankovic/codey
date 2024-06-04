@@ -2,6 +2,7 @@
 
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseMCWidget extends StatefulWidget {
@@ -12,6 +13,8 @@ class ExerciseMCWidget extends StatefulWidget {
     required this.statementArea,
     required this.codeArea,
     required this.questionArea,
+    required this.changesEnabled,
+    required this.correctAnswerSignal,
   }) : super(key: key);
 
   final Exercise exercise;
@@ -19,6 +22,8 @@ class ExerciseMCWidget extends StatefulWidget {
   final Widget statementArea;
   final Widget codeArea;
   final Widget questionArea;
+  final ValueListenable<bool> changesEnabled;
+  final ValueListenable<bool?> correctAnswerSignal;
 
   @override
   State<ExerciseMCWidget> createState() => _ExerciseMCWidgetState();
@@ -28,6 +33,7 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
   String? selectedAnswer;
   late final ExerciseMC exercise;
   late final List<MapEntry<String, dynamic>> answerOptions;
+
   @override
   void initState() {
     super.initState();
@@ -45,39 +51,54 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
         widget.codeArea,
         widget.questionArea,
         for (var option in answerOptions)
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedAnswer = option.key;
-              });
-              widget.onAnswerSelected(selectedAnswer!);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onBackground
-                        .withOpacity(selectedAnswer == option.key ? 1 : 0.5),
-                    width: selectedAnswer == option.key ? 3 : 1.5,
+          Builder(builder: (context) {
+            var color;
+            if (selectedAnswer == option.key &&
+                widget.correctAnswerSignal.value == true) {
+              color = Theme.of(context).colorScheme.primary;
+            } else if (selectedAnswer == option.key &&
+                widget.correctAnswerSignal.value == false) {
+              color = Theme.of(context).colorScheme.error;
+            } else if (selectedAnswer == option.key) {
+              color = Theme.of(context).colorScheme.onBackground.withOpacity(1);
+            } else {
+              color =
+                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5);
+            }
+
+            return GestureDetector(
+              onTap: widget.changesEnabled.value
+                  ? () {
+                      setState(() {
+                        selectedAnswer = option.key;
+                      });
+                      widget.onAnswerSelected(selectedAnswer!);
+                    }
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: color,
+                      width: selectedAnswer == option.key ? 3 : 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.surface,
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Text(
-                      option.value,
-                      style: const TextStyle(fontSize: 16),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Text(
+                        option.value,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
       ],
     );
   }

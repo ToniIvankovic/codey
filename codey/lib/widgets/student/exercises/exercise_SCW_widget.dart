@@ -2,6 +2,7 @@
 
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseSCWWidget extends StatefulWidget {
@@ -10,11 +11,13 @@ class ExerciseSCWWidget extends StatefulWidget {
     required this.exercise,
     required this.onAnswerSelected,
     required this.statementArea,
+    required this.changesEnabled,
   }) : super(key: key);
 
   final ExerciseSCW exercise;
   final ValueChanged<List<String>> onAnswerSelected;
   final Widget statementArea;
+  final ValueListenable<bool> changesEnabled;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -168,6 +171,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
                       var answer = controllers.map((e) => e.text).toList();
                       widget.onAnswerSelected(answer);
                     },
+                    readOnly: !widget.changesEnabled.value,
                     style: const TextStyle(
                       fontFamily: 'courier new',
                       fontSize: 20.0,

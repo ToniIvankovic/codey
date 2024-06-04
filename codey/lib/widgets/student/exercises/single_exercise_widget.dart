@@ -36,6 +36,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   bool waitingForResponse = false;
   Exercise? exercise;
   int repeatCount = 0;
+  var childrenEnabledChanges = ValueNotifier<bool>(true);
+  var childrenSignalCorrect = ValueNotifier<bool?>(null);
 
   @override
   void initState() {
@@ -106,6 +108,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       if (exercise is ExerciseMC)
                         ExerciseMCWidget(
                           key: ValueKey(exercise!.id + 100 * repeatCount),
+                          changesEnabled: childrenEnabledChanges,
+                          correctAnswerSignal: childrenSignalCorrect,
                           exercise: exercise!,
                           onAnswerSelected: (answer) {
                             setState(() {
@@ -120,6 +124,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       else if (exercise is ExerciseSA)
                         ExerciseSAWidget(
                           key: ValueKey(exercise!.id + 100 * repeatCount),
+                          changesEnabled: childrenEnabledChanges,
                           exercise: exercise!,
                           onAnswerSelected: (answer) {
                             setState(() {
@@ -134,6 +139,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       else if (exercise is ExerciseLA)
                         ExerciseLAWidget(
                           key: ValueKey(exercise!.id + 100 * repeatCount),
+                          changesEnabled: childrenEnabledChanges,
                           exercise: exercise! as ExerciseLA,
                           onAnswerSelected: (answer) {
                             setState(() {
@@ -147,6 +153,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       else if (exercise is ExerciseSCW)
                         ExerciseSCWWidget(
                           key: ValueKey(exercise!.id + 100 * repeatCount),
+                          changesEnabled: childrenEnabledChanges,
                           exercise: exercise! as ExerciseSCW,
                           onAnswerSelected: (answer) {
                             setState(() {
@@ -200,11 +207,13 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                 ? () {
                     setState(() {
                       enableCheck = false;
+                      childrenEnabledChanges.value = false;
                     });
                     widget.exercisesService.checkAnswer(exercise!, answer).then(
                       (value) {
                         setState(() {
                           isCorrectResponse = value;
+                          childrenSignalCorrect.value = value;
                         });
                       },
                     );
@@ -292,6 +301,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                         if (widget.onNextExercise != null) {
                           widget.onNextExercise!();
                         }
+                        childrenEnabledChanges.value = true;
+                        childrenSignalCorrect.value = null;
                       });
                     },
                     child: Padding(

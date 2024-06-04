@@ -80,7 +80,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       child: Scaffold(
         appBar: AppBar(
           titleTextStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 18,
+          ),
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
           title: Text('Lekcija: ${widget.lesson.name}'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
@@ -116,7 +119,8 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                                 return PostLessonScreen(
                                   endReport: exercisesService.getEndReport()!,
                                   awardedXP: awardedXP,
-                                  gamificationEnabled: widget.user.gamificationEnabled,
+                                  gamificationEnabled:
+                                      widget.user.gamificationEnabled,
                                 );
                               }));
                             });
