@@ -94,47 +94,72 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                       minHeight: tileSize,
                       maxHeight: tileSize,
                       maxWidth: tileSize),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        group.clickable
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context)
-                                .colorScheme
-                                .secondary
-                                .withOpacity(0.2),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40.0),
+                  child: Builder(builder: (context) {
+                    var buttonBackgroundColor = group.clickable
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.2);
+                    BorderSide buttonBorderSide;
+                    if (group.clickable && !group.finished) {
+                      buttonBorderSide = BorderSide(
+                        color: Theme.of(context).colorScheme.error,
+                        width: 2,
+                      );
+                    } else if (group.clickable && group.finished) {
+                      buttonBorderSide = BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 1,
+                      );
+                    } else {
+                      buttonBorderSide = BorderSide.none;
+                    }
+
+                    return ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          buttonBackgroundColor,
+                        ),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40.0),
+                            side: buttonBorderSide,
+                          ),
                         ),
                       ),
-                    ),
-                    onPressed: group.clickable
-                        ? () => setState(() {
-                              group.isExpanded = !group.isExpanded;
-                              for (var otherGroup in data!) {
-                                if (otherGroup.lessonGroup.id !=
-                                    group.lessonGroup.id) {
-                                  otherGroup.isExpanded = false;
+                      onPressed: group.clickable
+                          ? () => setState(() {
+                                group.isExpanded = !group.isExpanded;
+                                for (var otherGroup in data!) {
+                                  if (otherGroup.lessonGroup.id !=
+                                      group.lessonGroup.id) {
+                                    otherGroup.isExpanded = false;
+                                  }
                                 }
-                              }
-                            })
-                        : null,
-                    child: Text(
-                      group.lessonGroup.name,
-                      style: TextStyle(
-                        color: group.clickable
-                            ? Theme.of(context).colorScheme.onSecondary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSecondary
-                                .withOpacity(0.3),
+                              })
+                          : null,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            group.lessonGroup.name,
+                            style: TextStyle(
+                              color: group.clickable
+                                  ? Theme.of(context).colorScheme.onSecondary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary
+                                      .withOpacity(0.3),
+                            ),
+                            overflow: TextOverflow.clip,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                    );
+                  }),
                 ),
               ),
             ],
