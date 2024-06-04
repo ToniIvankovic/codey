@@ -23,7 +23,7 @@ class PostLessonScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Gotovo!"),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -95,11 +95,11 @@ class PostLessonScreen extends StatelessWidget {
                   if (gamificationEnabled) ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20.0),
-                      child: LeaderboardWidget(),
+                      child: QuestsWidget(),
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20.0),
-                      child: QuestsWidget(),
+                      child: LeaderboardWidget(),
                     ),
                   ]
                 ],
