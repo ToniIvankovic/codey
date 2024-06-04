@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/class.dart';
 import 'package:codey/services/user_interaction_service.dart';
@@ -119,7 +121,8 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                             );
                           },
                         ),
-                        title: Row(
+                        title: Wrap(
+                          direction: Axis.horizontal,
                           children: [
                             Text("${student.firstName} ${student.lastName}",
                                 style: const TextStyle(fontSize: 16)),
@@ -162,11 +165,15 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        constraints: const BoxConstraints(maxWidth: 600),
+                        constraints: BoxConstraints(
+                          maxWidth:
+                              min(600, MediaQuery.of(context).size.width - 100),
+                        ),
                         child: LeaderboardWidget(
                           key: ValueKey(classData),
                           requestedByTeacher: true,
                           classId: classData.id,
+                          showUsernames: true,
                         ),
                       ),
                     ],

@@ -8,10 +8,12 @@ import 'package:provider/provider.dart';
 class LeaderboardWidget extends StatefulWidget {
   final bool requestedByTeacher;
   final int? classId;
+  final bool showUsernames;
   const LeaderboardWidget({
     super.key,
     this.requestedByTeacher = false,
     this.classId,
+    this.showUsernames = false,
   });
 
   @override
@@ -103,48 +105,67 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   }
 
   Widget _generateLeaderboardRow(int i) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
       children: [
-        Expanded(
-          child: StreamBuilder<AppUser>(
-              stream: context.read<UserService>().userStream,
-              builder: (context, snapshot) {
-                String? userName;
-                if (snapshot.hasData) {
-                  userName = snapshot.data!.email;
-                }
-                return Text(
-                  "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
-                  overflow: TextOverflow.clip,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    fontWeight: userName == leaderboard!.students[i].email
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                );
-              }),
-        ),
-        if (leaderboard!.students[i].streak > 0) ...[
-          Text(
-            "${leaderboard!.students[i].streak}",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: StreamBuilder<AppUser>(
+                  stream: context.read<UserService>().userStream,
+                  builder: (context, snapshot) {
+                    String? userName;
+                    if (snapshot.hasData) {
+                      userName = snapshot.data!.email;
+                    }
+                    return Text(
+                      "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                        fontWeight: userName == leaderboard!.students[i].email
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    );
+                  }),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-            child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
-          ),
-        ],
-        Text(
-          "${leaderboard!.students[i].totalXp} XP",
-          overflow: TextOverflow.visible,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSecondary,
-          ),
+            if (leaderboard!.students[i].streak > 0) ...[
+              Text(
+                "${leaderboard!.students[i].streak}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
+              ),
+            ],
+            Text(
+              "${leaderboard!.students[i].totalXp} XP",
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
+          ],
         ),
+        if (widget.showUsernames)
+          Row(
+            children: [
+              Text(
+                "(${leaderboard!.students[i].email})",
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSecondary
+                      .withOpacity(0.6),
+                  fontSize: 12.0,
+                ),
+              ),
+            ],
+          )
       ],
     );
   }
