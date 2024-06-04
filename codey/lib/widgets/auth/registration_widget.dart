@@ -74,108 +74,146 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     if (year != null && month != null && day != null) {
       dateOfBirth = DateTime(year!, month!, day!);
     }
-    final dateOfBirthRow = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
-          child: SizedBox(
-            width: 60,
-            child: TextFormField(
-              maxLength: 2,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'D',
-                counterText: "",
+    final dateOfBirthRow = FormField(
+      builder: (FormFieldState state) {
+        return Column(
+          children: [
+            if (state.errorText != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0,0,0,10),
+                child: Text(
+                  state.errorText.toString(),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                ),
               ),
-              onChanged: (value) {
-                setState(() {
-                  day = int.tryParse(value);
-                  errorMessage = null;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Molimo unesite dan rođenja';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Molimo unesite ispravan dan';
-                }
-                var intValue = int.parse(value);
-                if (intValue < 1 || intValue > 31) {
-                  return 'Molimo unesite ispravan dan';
-                }
-                return null;
-              },
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 8.0, 0),
+                  child: SizedBox(
+                    width: 60,
+                    child: TextFormField(
+                      maxLength: 2,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'D',
+                        counterText: "",
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          day = int.tryParse(value);
+                          errorMessage = null;
+                        });
+                      },
+                      // validator: (value) {
+                      //   if (value == null || value.isEmpty) {
+                      //     return 'Molimo unesite dan rođenja';
+                      //   }
+                      //   if (int.tryParse(value) == null) {
+                      //     return 'Molimo unesite ispravan dan';
+                      //   }
+                      //   var intValue = int.parse(value);
+                      //   if (intValue < 1 || intValue > 31) {
+                      //     return 'Molimo unesite ispravan dan';
+                      //   }
+                      //   return null;
+                      // },
+                      validator: (value) {
+                        return state.hasError ? "" : null;
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: SizedBox(
+                    width: 60,
+                    child: TextFormField(
+                      maxLength: 2,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'M',
+                        counterText: "",
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          month = int.tryParse(value);
+                          errorMessage = null;
+                        });
+                      },
+                      // validator: (value) {
+                      //   if (value == null || value.isEmpty) {
+                      //     return 'Molimo unesite mjesec rođenja';
+                      //   }
+                      //   if (int.tryParse(value) == null) {
+                      //     return 'Molimo unesite ispravan mjesec';
+                      //   }
+                      //   var intValue = int.parse(value);
+                      //   if (intValue < 1 || intValue > 12) {
+                      //     return 'Molimo unesite ispravan mjesec';
+                      //   }
+                      //   return null;
+                      // },
+                      validator: (value) {
+                        return state.hasError ? "" : null;
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                    child: TextFormField(
+                      maxLength: 4,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Godina',
+                        counterText: "",
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          year = int.tryParse(value);
+                          errorMessage = null;
+                        });
+                      },
+                      // validator: (value) {
+                      //   if (value == null || value.isEmpty) {
+                      //     return 'Molimo unesite godinu rođenja';
+                      //   }
+                      //   if (int.tryParse(value) == null) {
+                      //     return 'Molimo unesite ispravnu godinu';
+                      //   }
+                      //   var intValue = int.parse(value);
+                      //   if (intValue < 1900 || intValue > DateTime.now().year) {
+                      //     return 'Molimo unesite ispravnu godinu';
+                      //   }
+                      //   return null;
+                      // },
+                      validator: (value) {
+                        return state.hasError ? "" : null;
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: SizedBox(
-            width: 60,
-            child: TextFormField(
-              maxLength: 2,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'M',
-                counterText: "",
-              ),
-              onChanged: (value) {
-                setState(() {
-                  month = int.tryParse(value);
-                  errorMessage = null;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Molimo unesite mjesec rođenja';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Molimo unesite ispravan mjesec';
-                }
-                var intValue = int.parse(value);
-                if (intValue < 1 || intValue > 12) {
-                  return 'Molimo unesite ispravan mjesec';
-                }
-                return null;
-              },
-            ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-            child: TextFormField(
-              maxLength: 4,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Godina',
-                counterText: "",
-              ),
-              onChanged: (value) {
-                setState(() {
-                  year = int.tryParse(value);
-                  errorMessage = null;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Molimo unesite godinu rođenja';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Molimo unesite ispravnu godinu';
-                }
-                var intValue = int.parse(value);
-                if (intValue < 1900 || intValue > DateTime.now().year) {
-                  return 'Molimo unesite ispravnu godinu';
-                }
-                return null;
-              },
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
+      validator: (value) {
+        if (day == null || month == null || year == null) {
+          return 'Molimo unesite datum rođenja';
+        }
+        var date = DateTime(year!, month!, day!);
+        if (date.day != day || date.month != month || date.year != year) {
+          return 'Molimo unesite ispravan datum';
+        }
+        if (date.isAfter(DateTime.now())) {
+          return 'Datum rođenja ne može biti u budućnosti';
+        }
+        return null;
+      },
     );
 
     final emailField = TextFormField(
@@ -196,7 +234,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     final passwordField = TextFormField(
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Lozika *',
+        labelText: 'Lozinka *',
       ),
       obscureText: true,
       onChanged: (value) {
@@ -223,7 +261,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         },
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Molimo ponoite lozinku';
+            return 'Molimo ponovite lozinku';
           }
           if (value != password) {
             return 'Lozinke se ne podudaraju';
@@ -352,7 +390,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                     });
                   });
                 },
-                child: const Text('Register'),
+                child: const Text('Registracija'),
               ),
             ),
         ],

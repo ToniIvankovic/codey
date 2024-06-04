@@ -45,7 +45,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Uspješna registracija! Sada se možete prijaviti.'),
+                          content: Text(
+                              'Uspješna registracija! Sada se možete prijaviti.'),
                           duration: Duration(seconds: 2),
                         ),
                       );
@@ -57,9 +58,14 @@ class _AuthScreenState extends State<AuthScreen> {
                       showLogin = !showLogin;
                     });
                   },
-                  child: Text(showLogin
-                      ? "Nemaš račun? Registriraj se"
-                      : "Već imaš račun? Prijavi se"),
+                  child: Text(
+                    showLogin
+                        ? "Nemaš račun? Registriraj se"
+                        : "Već imaš račun? Prijavi se",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ],
             ),
