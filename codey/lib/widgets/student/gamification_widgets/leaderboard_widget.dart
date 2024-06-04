@@ -1,5 +1,7 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/leaderboard.dart';
 import 'package:codey/services/user_interaction_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -105,13 +107,24 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Text(
-            "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
-            overflow: TextOverflow.clip,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
-          ),
+          child: StreamBuilder<AppUser>(
+              stream: context.read<UserService>().userStream,
+              builder: (context, snapshot) {
+                String? userName;
+                if (snapshot.hasData) {
+                  userName = snapshot.data!.email;
+                }
+                return Text(
+                  "${i + 1}. ${leaderboard!.students[i].firstName} ${leaderboard!.students[i].lastName}:",
+                  overflow: TextOverflow.clip,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontWeight: userName == leaderboard!.students[i].email
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                );
+              }),
         ),
         if (leaderboard!.students[i].streak > 0) ...[
           Text(
