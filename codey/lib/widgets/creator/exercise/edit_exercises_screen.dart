@@ -251,7 +251,9 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                                             .deleteExercise(exercise.id)
                                             .then((value) {
                                           setState(() {
-                                            exercisesAll.removeAt(index);
+                                            exercisesAll.removeAt(exercisesAll
+                                                .indexWhere((element) =>
+                                                    element.id == exercise.id));
                                           });
                                         });
                                         Navigator.of(context).pop();
@@ -276,8 +278,12 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                             })).then((value) {
                               if (value != null) {
                                 setState(() {
-                                  exercisesAll[index] = value as Exercise;
+                                  exercisesAll[exercisesAll.indexWhere(
+                                          (element) =>
+                                              element.id == value.id)] =
+                                      value as Exercise;
                                 });
+                                filterExercises(selectedType);
                               }
                             });
                           },
