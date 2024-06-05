@@ -50,7 +50,8 @@ class ExerciseSAWidget extends StatelessWidget {
         codeArea,
         statementOutputArea,
         questionArea,
-        TextField(
+        TextFormField(
+          autocorrect: false,
           decoration: const InputDecoration(
             labelText: 'Odgovor',
           ),
