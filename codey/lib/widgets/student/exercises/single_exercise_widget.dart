@@ -38,7 +38,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   int repeatCount = 0;
   var childrenEnabledChanges = ValueNotifier<bool>(true);
   var childrenSignalCorrect = ValueNotifier<bool?>(null);
-
+  final _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -71,7 +71,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             child: Center(
               child: Container(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
+                  minHeight:
+                      MediaQuery.of(context).size.height - kToolbarHeight,
                   // maxWidth: MediaQuery.of(context).size.width,
                 ),
                 child: Padding(
@@ -87,7 +88,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                         Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 15.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -374,8 +376,9 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     if ((exercise! as dynamic).statementCode?.isEmpty) {
       return const SizedBox.shrink();
     }
+    String code = (exercise! as dynamic).statementCode!;
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
@@ -387,22 +390,27 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           dashPattern: const [9, 6],
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: constraints.maxWidth,
-                      minWidth: constraints.maxWidth,
-                    ),
-                    child: Text(
-                      (exercise! as dynamic).statementCode!,
-                      style: const TextStyle(
-                        fontFamily: 'courier new',
-                        fontSize: 20.0,
+              return Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth - 20,
                       ),
-                      softWrap: true,
+                      child: Text(
+                        code,
+                        style: const TextStyle(
+                          fontFamily: 'courier new',
+                          fontSize: 20.0,
+                        ),
+                        // softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                   ),
                 ),

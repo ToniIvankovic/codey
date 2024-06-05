@@ -140,28 +140,35 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                     padding: EdgeInsets.all(15.0),
                     child: Text('Filter by type:'),
                   ),
-                  for (var type in ExerciseType.values)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (selectedType == type) {
-                              selectedType = null;
-                            } else {
-                              selectedType = type;
-                            }
-                          });
-                          filterExercises(selectedType);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: selectedType == type
-                              ? Theme.of(context).colorScheme.secondary
-                              : null,
-                        ),
-                        child: Text(type.toString()),
-                      ),
+                  Expanded(
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      children: [
+                        for (var type in ExerciseType.values)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (selectedType == type) {
+                                    selectedType = null;
+                                  } else {
+                                    selectedType = type;
+                                  }
+                                });
+                                filterExercises(selectedType);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: selectedType == type
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : null,
+                              ),
+                              child: Text(type.toString()),
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
               ListView.builder(

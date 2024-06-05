@@ -159,12 +159,12 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                    minWidth: widget.exercise.defaultGapLengths[usedLines] * 18,
+                    minWidth: widget.exercise.defaultGapLengths[usedLines] * 16,
                     maxWidth: widget.exercise.defaultGapLengths[usedLines] *
-                        18 *
+                        16 *
                         2.5),
                 child: IntrinsicWidth(
-                  stepWidth: 18.0,
+                  // stepWidth: 2.0,
                   child: TextField(
                     controller: controllers[usedLines],
                     onChanged: (value) {
