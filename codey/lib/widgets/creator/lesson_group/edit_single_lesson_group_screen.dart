@@ -2,7 +2,6 @@ import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
-import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/lesson/edit_single_lesson_screen.dart';
 import 'package:codey/widgets/student/lesson_groups/lesson_group_tips_screen.dart';
 import 'package:flutter/foundation.dart';

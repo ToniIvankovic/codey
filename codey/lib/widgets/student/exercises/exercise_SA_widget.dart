@@ -50,14 +50,16 @@ class ExerciseSAWidget extends StatelessWidget {
         codeArea,
         statementOutputArea,
         questionArea,
-        TextFormField(
-          autocorrect: false,
-          decoration: const InputDecoration(
-            labelText: 'Odgovor',
+        SingleChildScrollView(
+          child: TextFormField(
+            autocorrect: false,
+            decoration: const InputDecoration(
+              labelText: 'Odgovor',
+            ),
+            maxLines: null,
+            onChanged: (value) => onAnswerSelected(value),
+            readOnly: !changesEnabled.value,
           ),
-          maxLines: null,
-          onChanged: (value) => onAnswerSelected(value),
-          readOnly: !changesEnabled.value,
         ),
       ],
     );
