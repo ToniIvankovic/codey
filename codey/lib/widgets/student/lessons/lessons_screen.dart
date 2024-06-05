@@ -150,6 +150,48 @@ class _LessonsScreenState extends State<LessonsScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              if (lessonGroupFinished)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 30),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_outline,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        size: 50,
+                                      ),
+                                      Text(
+                                        "Cjelina dovršena",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      if (lessonGroupFinished)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                          child: ElevatedButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text("Dalje"),
+                                                Icon(Icons.arrow_forward),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
                               ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: lessons.length,
@@ -174,30 +216,19 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                   );
                                 },
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 50.0),
-                                child: Column(
-                                  children: [
-                                    if (lessonGroupFinished)
-                                      ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text("Dovrši cjelinu"),
-                                      ),
-                                    if (!lessonGroupFinished)
-                                      const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10.0, horizontal: 30.0),
-                                        child: Text(
-                                          "(Dovrši sve lekcije iznad za nastavak)",
-                                          overflow: TextOverflow.clip,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              )
+                              if (!lessonGroupFinished)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 50.0),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10.0, horizontal: 30.0),
+                                    child: Text(
+                                      "(Dovrši sve lekcije iznad za nastavak)",
+                                      overflow: TextOverflow.clip,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                )
                             ],
                           ),
                         ),
