@@ -41,13 +41,13 @@ namespace CodeyBe.Services
                 new()
                 {
                     PrivateId = 99998,
-                    Name = "Adaptive lesson 1",
+                    Name = "Adaptivna lekcija 1",
                     Adaptive = true,
                 },
                 new()
                 {
                     PrivateId = 99999,
-                    Name = "Adaptive lesson 2",
+                    Name = "Adaptivna lekcija 2",
                     Adaptive = true,
                 },
             ];
