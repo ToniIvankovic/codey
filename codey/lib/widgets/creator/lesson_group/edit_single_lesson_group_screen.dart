@@ -1,8 +1,11 @@
+import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/lesson/edit_single_lesson_screen.dart';
+import 'package:codey/widgets/student/lesson_groups/lesson_group_tips_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -196,14 +199,42 @@ class _EditSingleLessonGroupScreenState
     final tipsRow = Row(
       children: [
         // EDIT/UNDO BUTTON
-        IconButton(
-            onPressed: () {
-              setState(() {
-                tipsEditable = !tipsEditable;
-                tipsEdited = localTips;
-              });
-            },
-            icon: Icon(tipsEditable ? Icons.undo : Icons.edit)),
+        Column(
+          children: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  tipsEditable = !tipsEditable;
+                  tipsEdited = localTips;
+                });
+              },
+              icon: Icon(tipsEditable ? Icons.undo : Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                context.read<UserService>().userStream.first.then(
+                      (value) => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => LessonGroupTipsScreen(
+                            lessonGroup: LessonGroup(
+                              id: widget.lessonGroup.id,
+                              name: widget.lessonGroup.name,
+                              tips: localTips,
+                              lessons: widget.lessonGroup.lessons,
+                              order: widget.lessonGroup.order,
+                              adaptive: widget.lessonGroup.adaptive,
+                            ),
+                            lessonGroupFinished: true,
+                            user: value,
+                          ),
+                        ),
+                      ),
+                    );
+              },
+              icon: const Icon(Icons.remove_red_eye),
+            ),
+          ],
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

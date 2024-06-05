@@ -3,7 +3,7 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/exercises_service.dart';
-import 'package:codey/widgets/student/exercises/post_lesson_screen.dart';
+import 'package:codey/widgets/student/lessons/post_lesson_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

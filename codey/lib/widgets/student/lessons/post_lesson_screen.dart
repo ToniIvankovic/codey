@@ -20,6 +20,8 @@ class PostLessonScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Gotovo!"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: SingleChildScrollView(
         child: Center(

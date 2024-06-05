@@ -4,6 +4,8 @@ import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/widgets/student/exercises/exercises_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../../../util/rich_text_markdown.dart';
+
 class PreLessonScreen extends StatelessWidget {
   final Lesson lesson;
   final LessonGroup lessonGroup;
@@ -18,7 +20,7 @@ class PreLessonScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var nextButton = TextButton.icon(
+    var nextButton = ElevatedButton.icon(
       onPressed: () {
         Navigator.pushReplacement(
           context,
@@ -44,26 +46,36 @@ class PreLessonScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        titleTextStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
+        titleTextStyle: const TextStyle(fontSize: 18),
         title: Text(lesson.name),
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      body: Container(
-        constraints: const BoxConstraints(minWidth: 500.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 50.0),
-                child: Text(
-                  lesson.specificTips!,
-                ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30),
+          child: Container(
+            constraints: const BoxConstraints(minWidth: 500.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 50.0),
+                    child: RichTextMarkdown(
+                      text: lesson.specificTips!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  nextButton,
+                  const SizedBox(height: 50.0)
+                ],
               ),
-              nextButton,
-            ],
+            ),
           ),
         ),
       ),

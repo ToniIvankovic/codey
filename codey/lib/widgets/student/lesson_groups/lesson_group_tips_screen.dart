@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson_group.dart';
+import 'package:codey/util/rich_text_markdown.dart';
 import 'package:codey/widgets/student/lessons/lessons_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +37,13 @@ class LessonGroupTipsScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(lessonGroup.tips!),
+                  RichTextMarkdown(
+                    text: lessonGroup.tips!,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 50.0),
                     child: ElevatedButton(

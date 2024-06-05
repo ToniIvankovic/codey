@@ -1,13 +1,10 @@
-import 'dart:math';
-
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/student/exercises/pre_lesson_screen.dart';
+import 'package:codey/widgets/student/lessons/pre_lesson_screen.dart';
 import 'package:codey/widgets/student/lesson_groups/lesson_group_tips_screen.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -152,7 +149,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (lessonGroupFinished)
+                              if (lessonGroupFinished) ...[
                                 Padding(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 30),
@@ -195,6 +192,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                     ],
                                   ),
                                 ),
+                                const Text("Riješi lekcije ponovno:")
+                              ],
                               ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: lessons.length,
