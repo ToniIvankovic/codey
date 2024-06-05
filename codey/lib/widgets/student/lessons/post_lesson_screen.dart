@@ -22,6 +22,7 @@ class PostLessonScreen extends StatelessWidget {
         title: const Text("Gotovo!"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -120,7 +121,14 @@ class PostLessonScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context, true);
                     },
-                    child: const Text('Završi lekciju'),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Završi lekciju'),
+                        SizedBox(width: 10.0),
+                        Icon(Icons.arrow_forward),
+                      ],
+                    ),
                   ),
                 ),
               ],

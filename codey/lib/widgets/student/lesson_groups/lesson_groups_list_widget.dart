@@ -262,7 +262,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TextButton.icon(
+                        ElevatedButton.icon(
                           onPressed:
                               widget.lessonGroup.tips?.isNotEmpty ?? false
                                   ? () {
@@ -274,31 +274,37 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                                             lessonGroup: widget.lessonGroup,
                                             lessonGroupFinished:
                                                 widget.lessonGroupFinished,
-                                            user: widget.user,
                                           ),
                                         ),
+                                      ).then(
+                                        (goToLesson) {
+                                          if (goToLesson == true) {
+                                            _pushLessonGroup();
+                                          }
+                                        },
                                       );
                                     }
                                   : null,
-                          icon: const Icon(Icons.lightbulb),
+                          icon: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            child: Icon(Icons.lightbulb_outline),
+                          ),
                           label: const Text('Nauči'),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              Theme.of(context).colorScheme.secondary,
+                            ),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              Theme.of(context).colorScheme.onSecondary,
+                            ),
+                          )
                         ),
+                        const SizedBox(width: 30),
                         IconButton.filled(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LessonsScreen(
-                                  key: ValueKey(widget.lessonGroupFinished),
-                                  lessonGroup: widget.lessonGroup,
-                                  lessonGroupFinished:
-                                      widget.lessonGroupFinished,
-                                  user: widget.user,
-                                ),
-                              ),
-                            );
+                            _pushLessonGroup();
                           },
-                          icon: const Icon(Icons.play_arrow),
+                          icon: const Icon(Icons.play_arrow, size: 30),
                         ),
                       ],
                     )
@@ -315,6 +321,20 @@ class _FloatingWindowState extends State<_FloatingWindow> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _pushLessonGroup() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LessonsScreen(
+          key: ValueKey(widget.lessonGroupFinished),
+          lessonGroup: widget.lessonGroup,
+          lessonGroupFinished: widget.lessonGroupFinished,
+          user: widget.user,
         ),
       ),
     );

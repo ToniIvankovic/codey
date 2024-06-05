@@ -7,15 +7,11 @@ import 'package:flutter/material.dart';
 class LessonGroupTipsScreen extends StatelessWidget {
   final LessonGroup lessonGroup;
   final bool lessonGroupFinished;
-  final bool? backDisabled;
-  final AppUser user;
 
   const LessonGroupTipsScreen({
     Key? key,
     required this.lessonGroup,
     required this.lessonGroupFinished,
-    this.backDisabled,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -23,8 +19,12 @@ class LessonGroupTipsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(lessonGroup.name),
-        //disable back button
-        automaticallyImplyLeading: !(backDisabled ?? false),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -47,16 +47,7 @@ class LessonGroupTipsScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 50.0),
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LessonsScreen(
-                            lessonGroup: lessonGroup,
-                            lessonGroupFinished: lessonGroupFinished,
-                            user: user,
-                          ),
-                        ),
-                      ),
+                      onPressed: () => Navigator.pop(context, true),
                       child: const Text('Idi na lekcije'),
                     ),
                   ),

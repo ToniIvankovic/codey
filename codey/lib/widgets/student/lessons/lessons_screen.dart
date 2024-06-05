@@ -56,22 +56,28 @@ class _LessonsScreenState extends State<LessonsScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: IconButton(
+            child: ElevatedButton.icon(
               onPressed: widget.lessonGroup.tips?.isNotEmpty ?? false
                   ? () {
-                      Navigator.of(context).pushReplacement(
+                      Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => LessonGroupTipsScreen(
                             lessonGroup: widget.lessonGroup,
                             lessonGroupFinished: lessonGroupFinished,
-                            backDisabled: true,
-                            user: widget.user,
                           ),
                         ),
                       );
                     }
                   : null,
+              label: const Text(
+                "Nauči",
+                style: TextStyle(fontSize: 16),
+              ),
               icon: const Icon(Icons.lightbulb_outline),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Theme.of(context).colorScheme.onSecondary,
+              ),
             ),
           ),
         ],

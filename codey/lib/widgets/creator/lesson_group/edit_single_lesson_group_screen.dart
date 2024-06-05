@@ -1,4 +1,3 @@
-import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/lesson_groups_service.dart';
@@ -212,24 +211,21 @@ class _EditSingleLessonGroupScreenState
             ),
             IconButton(
               onPressed: () {
-                context.read<UserService>().userStream.first.then(
-                      (value) => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => LessonGroupTipsScreen(
-                            lessonGroup: LessonGroup(
-                              id: widget.lessonGroup.id,
-                              name: widget.lessonGroup.name,
-                              tips: localTips,
-                              lessons: widget.lessonGroup.lessons,
-                              order: widget.lessonGroup.order,
-                              adaptive: widget.lessonGroup.adaptive,
-                            ),
-                            lessonGroupFinished: true,
-                            user: value,
-                          ),
-                        ),
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => LessonGroupTipsScreen(
+                      lessonGroup: LessonGroup(
+                        id: widget.lessonGroup.id,
+                        name: widget.lessonGroup.name,
+                        tips: localTips,
+                        lessons: widget.lessonGroup.lessons,
+                        order: widget.lessonGroup.order,
+                        adaptive: widget.lessonGroup.adaptive,
                       ),
-                    );
+                      lessonGroupFinished: true,
+                    ),
+                  ),
+                );
               },
               icon: const Icon(Icons.remove_red_eye),
             ),
