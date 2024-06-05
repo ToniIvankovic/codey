@@ -17,7 +17,15 @@ class StreakWidget extends StatelessWidget {
           child: Text("Streak", style: TextStyle(fontSize: 18)),
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Icon(
+              Icons.whatshot,
+              color: user.streak > 0
+                  ? Colors.red
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              size: 30.0,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
@@ -25,15 +33,6 @@ class StreakWidget extends StatelessWidget {
                   Text("Trenutni: ${user.streak}"),
                   Text("Najveći: ${user.highestStreak}"),
                 ],
-              ),
-            ),
-            Expanded(
-              child: Icon(
-                Icons.whatshot,
-                color: user.streak > 0
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                size: 30.0,
               ),
             ),
           ],

@@ -41,6 +41,7 @@ class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Card(
+                    color: Theme.of(context).colorScheme.secondary,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -53,7 +54,10 @@ class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
                     ),
                   ),
                 ),
-                StreakWidget(user: widget.user),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: StreakWidget(user: widget.user),
+                ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 18.0),
                   child: QuestsWidget(),

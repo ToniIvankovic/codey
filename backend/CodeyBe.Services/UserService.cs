@@ -24,7 +24,13 @@ namespace CodeyBe.Services
         ILessonGroupsService lessonGroupsService) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-
+        private static readonly int SINGLE_QUEST_XP = 50;
+        private static readonly int XP_SOLVED_OLD = 40;
+        private static readonly int XP_SOLVED_NEW = 100;
+        private static readonly int QUEST_XP_GOAL = 200;
+        private static readonly int QUEST_ACCURACY_PERCENTAGE_GOAL = 90;
+        private static readonly int QUEST_SPEED_GOAL_SECONDS = 45;
+        private static readonly int QUEST_LESSONS_AMOUNT = 3;
 
         public async Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO userDTO)
         {
@@ -124,8 +130,6 @@ namespace CodeyBe.Services
 
         public async Task<int> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport)
         {
-            int XP_SOLVED_OLD = 40;
-            int XP_SOLVED_NEW = 100;
             ApplicationUser? applicationUser = await GetUser(user) ??
                 throw new EntityNotFoundException($"User not found " +
                 $"{user.Claims.Where(claim => claim.Type == ClaimTypes.Email).FirstOrDefault()?.Value}");
@@ -236,7 +240,7 @@ namespace CodeyBe.Services
         private async Task HandleQuestProgress(EndOfLessonReport lessonReport, ApplicationUser applicationUser, int awardedXP, bool completedLessonGroup)
         {
             int newlySolvedQuests = await UpdateQuestProgress(applicationUser, lessonReport, awardedXP, completedLessonGroup);
-            int questsXP = newlySolvedQuests * 50;
+            int questsXP = newlySolvedQuests * SINGLE_QUEST_XP;
             if (questsXP > 0)
                 applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, questsXP));
         }
@@ -285,15 +289,11 @@ namespace CodeyBe.Services
 
         public async Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser)
         {
-            var XPGoal = 150;
-            var accuracyGoal = 90;
-            var speedGoal = 30;
-            var NLessons = 2;
             var quests = new HashSet<Quest>
             {
-                Quest.CreateGetXPQuest(XPGoal),
-                Quest.CreateHighAccuracyQuest(accuracyGoal, NLessons),
-                Quest.CreateHighSpeedQuest(speedGoal, NLessons),
+                Quest.CreateGetXPQuest(QUEST_XP_GOAL),
+                Quest.CreateHighAccuracyQuest(QUEST_ACCURACY_PERCENTAGE_GOAL, QUEST_LESSONS_AMOUNT),
+                Quest.CreateHighSpeedQuest(QUEST_SPEED_GOAL_SECONDS, QUEST_LESSONS_AMOUNT),
                 Quest.CreateCompleteLessonGroupQuest()
             };
             //shuffle quests

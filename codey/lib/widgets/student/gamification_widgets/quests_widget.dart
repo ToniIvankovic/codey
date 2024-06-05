@@ -18,6 +18,7 @@ class QuestsWidget extends StatefulWidget {
 class _QuestsWidgetState extends State<QuestsWidget> {
   Set<Quest>? quests;
   late final StreamSubscription<AppUser> subscription;
+  final int singleQuestXP = 40;
 
   @override
   void initState() {
@@ -51,19 +52,16 @@ class _QuestsWidgetState extends State<QuestsWidget> {
           const CircularProgressIndicator()
         else
           for (var quest in quests!)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(child: _generateQuestText(quest)),
-                if (quest.isCompleted)
-                  const Icon(Icons.check_box)
-                else
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child: Icon(Icons.check_box_outline_blank),
-                  ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: _generateQuestText(quest)),
+                  if (quest.isCompleted) const Icon(Icons.check_box)
+                ],
+              ),
             ),
       ],
     );
@@ -88,6 +86,11 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                     ),
                   ),
                 ),
+                if (!quest.isCompleted)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Text("(+$singleQuestXP XP)"),
+                  ),
               ],
             ),
             // PROGRESS BAR
@@ -125,6 +128,11 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                     ),
                   ),
                 ),
+                if (!quest.isCompleted)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Text("(+$singleQuestXP XP)"),
+                  ),
               ],
             ),
             // PROGRESS BAR
@@ -158,6 +166,11 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                     ),
                   ),
                 ),
+                if (!quest.isCompleted)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Text("(+$singleQuestXP XP)"),
+                  ),
               ],
             ),
             // PROGRESS BAR
@@ -176,10 +189,10 @@ class _QuestsWidgetState extends State<QuestsWidget> {
           ],
         );
       case Quest.questCompleteLessonGroup:
-        return const Row(
+        return Row(
           children: [
-            Icon(Icons.check_circle_outline),
-            Expanded(
+            const Icon(Icons.check_circle_outline),
+            const Expanded(
               child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
@@ -188,6 +201,11 @@ class _QuestsWidgetState extends State<QuestsWidget> {
                 ),
               ),
             ),
+            if (!quest.isCompleted)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                child: Text("(+$singleQuestXP XP)"),
+              ),
           ],
         );
       default:
