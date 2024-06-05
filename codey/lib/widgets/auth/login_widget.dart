@@ -1,5 +1,6 @@
 import 'package:codey/services/session_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -79,6 +80,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 setState(() {
                   waitingResponse = true;
                 });
+                TextInput.finishAutofillContext(shouldSave: true);
                 sessionService
                     .login(username: email, password: password)
                     .then((value) {
