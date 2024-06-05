@@ -21,6 +21,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     SessionService sessionService = context.read<SessionService>();
 
     TextField emailTextField = TextField(
+      autofillHints: const [AutofillHints.username, AutofillHints.email],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Korisničko ime',
@@ -34,6 +35,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
 
     TextField passwordTextField = TextField(
+      autofillHints: const [AutofillHints.password],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Lozinka',

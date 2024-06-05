@@ -43,6 +43,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
   @override
   Widget build(BuildContext context) {
     final firstNameField = TextFormField(
+      autofillHints: const [AutofillHints.givenName, AutofillHints.name],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Ime *',
@@ -56,6 +57,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
       validator: (value) => (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
     );
     final lastNameField = TextFormField(
+      autofillHints: const [AutofillHints.familyName],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Prezime *',
@@ -94,12 +96,15 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                   child: SizedBox(
                     width: 60,
                     child: TextFormField(
+                      autofillHints: const [AutofillHints.birthdayDay],
                       maxLength: 2,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'D',
+                        labelText: 'Dan',
+                        labelStyle: TextStyle(fontSize: 14),
                         counterText: "",
                       ),
+                      keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
                           day = int.tryParse(value);
@@ -128,14 +133,17 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: SizedBox(
-                    width: 60,
+                    width: 80,
                     child: TextFormField(
+                      autofillHints: const [AutofillHints.birthdayMonth],
                       maxLength: 2,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'M',
+                        labelText: 'Mjesec',
+                        labelStyle: TextStyle(fontSize: 14),
                         counterText: "",
                       ),
+                      keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
                           month = int.tryParse(value);
@@ -165,12 +173,15 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
                     child: TextFormField(
+                      autofillHints: const [AutofillHints.birthdayYear],
                       maxLength: 4,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Godina',
+                        labelStyle: TextStyle(fontSize: 14),
                         counterText: "",
                       ),
+                      keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
                           year = int.tryParse(value);
@@ -217,6 +228,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     );
 
     final emailField = TextFormField(
+      autofillHints: const [AutofillHints.email, AutofillHints.username],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Korisničko ime *',
@@ -232,6 +244,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     );
 
     final passwordField = TextFormField(
+      autofillHints: const [AutofillHints.newPassword],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Lozinka *',
@@ -248,6 +261,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
     );
 
     final confirmPasswordField = TextFormField(
+        autofillHints: const [AutofillHints.newPassword],
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
           labelText: 'Ponovljena lozinka *',
@@ -319,7 +333,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           ),
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
-            child: Text("Datum rođenja *"),
+            child: Text("Datum rođenja *", style: TextStyle(fontSize: 16)),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
