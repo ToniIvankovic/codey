@@ -88,50 +88,6 @@ Future main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  final colorScheme1 = const ColorScheme(
-    background: Color(0xffffecd1),
-    primary: Color(0xff15616d),
-    secondary: Color(0xffff7d00),
-    surface: Color(0xffff7d00),
-    error: Color(0xff78290f),
-    inversePrimary: Color(0xffffecd1),
-    onBackground: Color(0xff001524),
-    onPrimary: Color(0xffffecd1),
-    onSecondary: Color(0xffffecd1),
-    onSurface: Color(0xff001524),
-    onError: Color(0xffffecd1),
-    brightness: Brightness.light,
-  );
-
-  final colorScheme2 = const ColorScheme(
-    background: Color(0xffeaac8b),
-    primary: Color(0xff355070),
-    secondary: Color(0xffb56576),
-    surface: Color(0xff6d597a),
-    error: Color(0xffe56b6f),
-    inversePrimary: Color(0xffffecd1),
-    onBackground: Color(0xff355070),
-    onPrimary: Color(0xffeaac8b),
-    onSecondary: Color(0xffeaac8b),
-    onSurface: Color(0xffeaac8b),
-    onError: Color(0xffeaac8b),
-    brightness: Brightness.light,
-  );
-  final colorScheme3 = const ColorScheme(
-    background: Color(0xffffffff),
-    primary: Color(0xffff9f1c),
-    secondary: Color(0xff2ec4b6),
-    surface: Color(0xffcbf3f0),
-    error: Color(0xffe56b6f),
-    inversePrimary: Color(0xffffecd1),
-    onBackground: Color(0xffff9f1c),
-    onPrimary: Color(0xff000000),
-    onSecondary: Color(0xffff9f1c),
-    onSurface: Color(0xffff9f1c),
-    onError: Color(0xff000000),
-    brightness: Brightness.light,
-  );
   final colorScheme4 = const ColorScheme(
     background: Color(0xffffffff),
     primary: Color(0xff389c9a),

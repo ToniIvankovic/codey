@@ -52,7 +52,7 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
         widget.questionArea,
         for (var option in answerOptions)
           Builder(builder: (context) {
-            var color;
+            Color color;
             if (selectedAnswer == option.key &&
                 widget.correctAnswerSignal.value == true) {
               color = Theme.of(context).colorScheme.primary;

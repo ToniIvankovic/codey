@@ -42,10 +42,10 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
     specificTipsInitial = widget.lesson.specificTips;
     specificTipsLocal = widget.lesson.specificTips;
     exerciseService.getAllExercisesForLesson(widget.lesson).then(
-          (value) => setState(() => {
-                exercisesInitial = List.of(value),
-                exercisesLocal = List.of(value),
-              }),
+          (value) => setState(() {
+            exercisesInitial = List.of(value);
+            exercisesLocal = List.of(value);
+          }),
         );
   }
 

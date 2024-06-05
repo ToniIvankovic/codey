@@ -27,9 +27,9 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
     if (lessonGroupsLocal == null) {
       final lessonGroupsService = context.read<LessonGroupsService>();
       lessonGroupsService.getAllLessonGroups().then((value) => setState(
-            () => {
-              lessonGroupsInitial = List.of(value),
-              lessonGroupsLocal = List.of(value),
+            () {
+              lessonGroupsInitial = List.of(value);
+              lessonGroupsLocal = List.of(value);
             },
           ));
       return const Center(
