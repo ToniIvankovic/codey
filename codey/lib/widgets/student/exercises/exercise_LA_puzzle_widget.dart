@@ -30,6 +30,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
   List<GestureDetector> answerParts = [];
   List<MapEntry<String, dynamic>> answerOptions = [];
   int newlineTabCounter = 0;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -106,20 +107,25 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
               radius: const Radius.circular(10.0),
               strokeWidth: borderWidth,
               dashPattern: const [6, 6],
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.all(paddingAroundCodeArea),
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      minHeight: initialCodeAreaHeight -
-                          2 * paddingAroundCodeArea -
-                          2 * borderWidth,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: answerPartsWithNewlines,
+              child: Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(paddingAroundCodeArea),
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minHeight: initialCodeAreaHeight -
+                            2 * paddingAroundCodeArea -
+                            2 * borderWidth,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: answerPartsWithNewlines,
+                      ),
                     ),
                   ),
                 ),

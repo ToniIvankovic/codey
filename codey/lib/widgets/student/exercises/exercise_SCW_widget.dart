@@ -26,6 +26,7 @@ class ExerciseSCWWidget extends StatefulWidget {
 
 class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
   late List<TextEditingController> controllers;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -79,7 +80,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
   Widget _generateCodeArea() {
     var textLines = widget.exercise.statementCode.split("\n");
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
@@ -90,20 +91,28 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
           dashPattern: const [6, 6],
           radius: const Radius.circular(10.0),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 1.5,
                 minWidth: MediaQuery.of(context).size.width,
               ),
               width: MediaQuery.of(context).size.width,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ..._generateLinesWithGaps(textLines),
-                  ],
+              child: Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ..._generateLinesWithGaps(textLines),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
