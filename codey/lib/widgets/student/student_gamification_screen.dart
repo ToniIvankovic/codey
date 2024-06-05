@@ -32,38 +32,41 @@ class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         child: Center(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 60.0, vertical: 40.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Card(
-                    color: Theme.of(context).colorScheme.secondary,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("XP: ${widget.user.totalXp}",
-                              style: const TextStyle(fontSize: 16)),
-                        ],
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 60.0, vertical: 40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Card(
+                      color: Theme.of(context).colorScheme.secondary,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("XP: ${widget.user.totalXp}",
+                                style: const TextStyle(fontSize: 16)),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: StreakWidget(user: widget.user),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0),
-                  child: QuestsWidget(),
-                ),
-                const LeaderboardWidget(),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: StreakWidget(user: widget.user),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 18.0),
+                    child: QuestsWidget(),
+                  ),
+                  const LeaderboardWidget(),
+                ],
+              ),
             ),
           ),
         ),

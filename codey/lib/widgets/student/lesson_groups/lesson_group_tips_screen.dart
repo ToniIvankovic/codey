@@ -25,31 +25,36 @@ class LessonGroupTipsScreen extends StatelessWidget {
         //disable back button
         automaticallyImplyLeading: !(backDisabled ?? false),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(lessonGroup.tips!),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 50.0),
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LessonsScreen(
-                          lessonGroup: lessonGroup,
-                          lessonGroupFinished: lessonGroupFinished,
-                          user: user,
+          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 50),
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 600,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(lessonGroup.tips!),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 50.0),
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LessonsScreen(
+                            lessonGroup: lessonGroup,
+                            lessonGroupFinished: lessonGroupFinished,
+                            user: user,
+                          ),
                         ),
                       ),
+                      child: const Text('Idi na lekcije'),
                     ),
-                    child: const Text('Idi na lekcije'),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

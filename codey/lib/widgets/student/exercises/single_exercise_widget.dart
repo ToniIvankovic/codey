@@ -60,131 +60,146 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     }
 
     // single exercise, button
-    return Stack(
-      children: [
-        SingleChildScrollView(
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
-              maxWidth: MediaQuery.of(context).size.width,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width,
+        maxWidth: MediaQuery.of(context).size.width,
+      ),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Center(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - kToolbarHeight,
+                  // maxWidth: MediaQuery.of(context).size.width,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      maxWidth: 800,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           children: [
-                            Expanded(
-                              child: LinearProgressIndicator(
-                                value: context
-                                    .read<ExercisesService>()
-                                    .sessionProgress,
-                                borderRadius: BorderRadius.circular(10),
-                                minHeight: 20,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 15.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: LinearProgressIndicator(
+                                      value: context
+                                          .read<ExercisesService>()
+                                          .sessionProgress,
+                                      borderRadius: BorderRadius.circular(10),
+                                      minHeight: 20,
+                                    ),
+                                  )
+                                ],
                               ),
-                            )
+                            ),
+                            if (exercise?.repeated == true)
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.refresh,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  const Text(
+                                    'Pogrešno odgovoreno',
+                                  ),
+                                ],
+                              ),
+                            if (exercise is ExerciseMC)
+                              ExerciseMCWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                correctAnswerSignal: childrenSignalCorrect,
+                                exercise: exercise!,
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    this.answer = answer;
+                                    enableCheck = true;
+                                  });
+                                },
+                                statementArea: _buildStaticStatementArea(),
+                                codeArea: _buildStaticCodeArea(),
+                                questionArea: _buildStaticQuestionArea(),
+                              )
+                            else if (exercise is ExerciseSA)
+                              ExerciseSAWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                exercise: exercise!,
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    this.answer = answer;
+                                    enableCheck = true;
+                                  });
+                                },
+                                statementArea: _buildStaticStatementArea(),
+                                codeArea: _buildStaticCodeArea(),
+                                questionArea: _buildStaticQuestionArea(),
+                              )
+                            else if (exercise is ExerciseLA)
+                              ExerciseLAWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                exercise: exercise! as ExerciseLA,
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    this.answer = answer;
+                                    enableCheck = answer.isNotEmpty;
+                                  });
+                                },
+                                statementArea: _buildStaticStatementArea(),
+                                // questionArea: _buildStaticQuestionArea(),
+                              )
+                            else if (exercise is ExerciseSCW)
+                              ExerciseSCWWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                exercise: exercise! as ExerciseSCW,
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    this.answer = answer;
+                                    enableCheck = answer.isNotEmpty &&
+                                        answer.every(
+                                            (element) => element.isNotEmpty);
+                                  });
+                                },
+                                statementArea: _buildStaticStatementArea(),
+                              ),
+                            if (exercise!.specificTip != null)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 20.0),
+                                child: Text(
+                                  "**HINT**\n${exercise!.specificTip!}",
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
-                      ),
-                      if (exercise?.repeated == true)
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.refresh,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            const Text(
-                              'Pogrešno odgovoreno',
-                            ),
-                          ],
-                        ),
-                      if (exercise is ExerciseMC)
-                        ExerciseMCWidget(
-                          key: ValueKey(exercise!.id + 100 * repeatCount),
-                          changesEnabled: childrenEnabledChanges,
-                          correctAnswerSignal: childrenSignalCorrect,
-                          exercise: exercise!,
-                          onAnswerSelected: (answer) {
-                            setState(() {
-                              this.answer = answer;
-                              enableCheck = true;
-                            });
-                          },
-                          statementArea: _buildStaticStatementArea(),
-                          codeArea: _buildStaticCodeArea(),
-                          questionArea: _buildStaticQuestionArea(),
-                        )
-                      else if (exercise is ExerciseSA)
-                        ExerciseSAWidget(
-                          key: ValueKey(exercise!.id + 100 * repeatCount),
-                          changesEnabled: childrenEnabledChanges,
-                          exercise: exercise!,
-                          onAnswerSelected: (answer) {
-                            setState(() {
-                              this.answer = answer;
-                              enableCheck = true;
-                            });
-                          },
-                          statementArea: _buildStaticStatementArea(),
-                          codeArea: _buildStaticCodeArea(),
-                          questionArea: _buildStaticQuestionArea(),
-                        )
-                      else if (exercise is ExerciseLA)
-                        ExerciseLAWidget(
-                          key: ValueKey(exercise!.id + 100 * repeatCount),
-                          changesEnabled: childrenEnabledChanges,
-                          exercise: exercise! as ExerciseLA,
-                          onAnswerSelected: (answer) {
-                            setState(() {
-                              this.answer = answer;
-                              enableCheck = answer.isNotEmpty;
-                            });
-                          },
-                          statementArea: _buildStaticStatementArea(),
-                          // questionArea: _buildStaticQuestionArea(),
-                        )
-                      else if (exercise is ExerciseSCW)
-                        ExerciseSCWWidget(
-                          key: ValueKey(exercise!.id + 100 * repeatCount),
-                          changesEnabled: childrenEnabledChanges,
-                          exercise: exercise! as ExerciseSCW,
-                          onAnswerSelected: (answer) {
-                            setState(() {
-                              this.answer = answer;
-                              enableCheck = answer.isNotEmpty &&
-                                  answer.every((element) => element.isNotEmpty);
-                            });
-                          },
-                          statementArea: _buildStaticStatementArea(),
-                        ),
-                      if (exercise!.specificTip != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: Text(
-                            "**HINT**\n${exercise!.specificTip!}",
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ),
-                    ],
+                        if (isCorrectResponse == null) _buildCheckButton(),
+                      ],
+                    ),
                   ),
-                  if (isCorrectResponse == null) _buildCheckButton(),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-        if (isCorrectResponse != null) _buildNextButtonArea(),
-      ],
+          if (isCorrectResponse != null) _buildNextButtonArea(),
+        ],
+      ),
     );
   }
 
@@ -248,6 +263,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     );
     return Positioned(
       bottom: 0,
+      left: 0,
       child: Container(
         constraints: BoxConstraints(
           minWidth: MediaQuery.of(context).size.width,

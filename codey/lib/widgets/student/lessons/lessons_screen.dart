@@ -88,7 +88,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                 children: [
                   Padding(
                     padding: EdgeInsets.all(10.0),
-                    child: Text("Učitavanje podataka o korisniku..."),
+                    child: Text("Učitavanje lekcija u cjelini..."),
                   ),
                   CircularProgressIndicator(
                     strokeWidth: 5,
@@ -108,8 +108,19 @@ class _LessonsScreenState extends State<LessonsScreen> {
               builder:
                   (BuildContext context, AsyncSnapshot<AppUser?> userSnapshot) {
                 if (userSnapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(
-                    strokeWidth: 5,
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text("Učitavanje podataka o korisniku..."),
+                        ),
+                        CircularProgressIndicator(
+                          strokeWidth: 5,
+                        ),
+                      ],
+                    ),
                   );
                 } else if (userSnapshot.hasError) {
                   return Text('Pogreška: ${userSnapshot.error}');
@@ -117,7 +128,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   return const Text('Nema podataka o korisniku');
                 } else {
                   AppUser user = userSnapshot.data!;
-                  if (user.highestLessonGroupId == widget.lessonGroup.id && !lessonGroupFinished) {
+                  if (user.highestLessonGroupId == widget.lessonGroup.id &&
+                      !lessonGroupFinished) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       setState(() {
                         lessonGroupFinished = true;
@@ -125,66 +137,69 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     });
                   }
                   return SingleChildScrollView(
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minHeight:
-                            MediaQuery.of(context).size.height - kToolbarHeight,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50.0, vertical: 15.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: lessons.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                var lesson = lessons[index];
-                                bool isClickable;
-                                // Lesson group not already solved
-                                if (!lessonGroupFinished) {
-                                  isClickable = widget.lessonGroup.lessons
-                                          .indexOf(lesson.id) <=
-                                      widget.lessonGroup.lessons
-                                          .indexOf(user.nextLessonId ?? 0);
-                                } else {
-                                  isClickable = true;
-                                }
-                                return _generateSingleLessonItem(
-                                  lesson: lesson,
-                                  nextLessonId: user.nextLessonId,
-                                  context: context,
-                                  isClickable: isClickable,
-                                  lastLessonId: lessons.last.id,
-                                );
-                              },
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 50.0),
-                              child: Column(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: lessonGroupFinished
-                                        ? () => Navigator.of(context).pop()
-                                        : null,
-                                    child: const Text("Dovrši cjelinu"),
-                                  ),
-                                  if (!lessonGroupFinished)
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10.0, horizontal: 30.0),
-                                      child: Text(
-                                        "(Dovrši sve lekcije iznad za nastavak)",
-                                        overflow: TextOverflow.clip,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                ],
+                    child: Center(
+                      child: Container(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height -
+                              kToolbarHeight,
+                          maxWidth: 600,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50.0, vertical: 15.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: lessons.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var lesson = lessons[index];
+                                  bool isClickable;
+                                  // Lesson group not already solved
+                                  if (!lessonGroupFinished) {
+                                    isClickable = widget.lessonGroup.lessons
+                                            .indexOf(lesson.id) <=
+                                        widget.lessonGroup.lessons
+                                            .indexOf(user.nextLessonId ?? 0);
+                                  } else {
+                                    isClickable = true;
+                                  }
+                                  return _generateSingleLessonItem(
+                                    lesson: lesson,
+                                    nextLessonId: user.nextLessonId,
+                                    context: context,
+                                    isClickable: isClickable,
+                                    lastLessonId: lessons.last.id,
+                                  );
+                                },
                               ),
-                            )
-                          ],
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 50.0),
+                                child: Column(
+                                  children: [
+                                    if (lessonGroupFinished)
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text("Dovrši cjelinu"),
+                                      ),
+                                    if (!lessonGroupFinished)
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 10.0, horizontal: 30.0),
+                                        child: Text(
+                                          "(Dovrši sve lekcije iznad za nastavak)",
+                                          overflow: TextOverflow.clip,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
