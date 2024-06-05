@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
@@ -174,7 +176,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                       ),
                                       if (lessonGroupFinished)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10),
                                           child: ElevatedButton(
                                             onPressed: () =>
                                                 Navigator.of(context).pop(),
@@ -244,71 +247,94 @@ class _LessonsScreenState extends State<LessonsScreen> {
     );
   }
 
-  DottedBorder _generateSingleLessonItem({
+  Widget _generateSingleLessonItem({
     required BuildContext context,
     required Lesson lesson,
     required int? nextLessonId,
     required bool isClickable,
     required int lastLessonId,
   }) {
-    return DottedBorder(
-      color: lesson.id == nextLessonId && !lessonGroupFinished
-          ? Theme.of(context).colorScheme.primary
-          : Colors.transparent,
-      dashPattern: const [9, 9],
-      radius: const Radius.circular(50.0),
-      child: ListTile(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                lesson.name,
-                style: isClickable
-                    ? null
-                    : TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onBackground
-                            .withOpacity(0.5),
-                      ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            IconButton(
-              onPressed: isClickable
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PreLessonScreen(
-                            lesson: lesson,
-                            lessonGroup: widget.lessonGroup,
-                            user: widget.user,
-                          ),
+    return
+        // Border.all(
+        //   color: lesson.id == nextLessonId && !lessonGroupFinished
+        //       ? Theme.of(context).colorScheme.primary
+        //       : Colors.transparent,
+        Builder(builder: (context) {
+      Border border;
+      Color? color;
+      if (lesson.id == nextLessonId && !lessonGroupFinished) {
+        border = Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 4.0,
+        );
+        color = Theme.of(context).colorScheme.surface;
+      } else if (isClickable) {
+        border = Border.all(
+          color: Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+          width: 1.0,
+        );
+        color = Theme.of(context).colorScheme.surface;
+      } else {
+        border = Border.all(
+          color: Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
+          width: 1.0,
+        );
+        color = null;
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: border,
+            color: color,
+          ),
+          child: ListTile(
+            onTap: isClickable
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PreLessonScreen(
+                          lesson: lesson,
+                          lessonGroup: widget.lessonGroup,
+                          user: widget.user,
                         ),
-                      ).then(
-                        (value) {
-                          if (value == null) return;
-                          if (lastLessonId == lesson.id) {
-                            setState(() {
-                              lessonGroupFinished = true;
-                            });
-                          }
-                        },
-                      );
-                    }
-                  : null,
-              icon: Icon(
-                Icons.play_arrow,
-                color: isClickable
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              ),
+                      ),
+                    ).then(
+                      (value) {
+                        if (value == null) return;
+                        if (lastLessonId == lesson.id) {
+                          setState(() {
+                            lessonGroupFinished = true;
+                          });
+                        }
+                      },
+                    );
+                  }
+                : null,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  lesson.name,
+                  textAlign: TextAlign.center,
+                  style: isClickable
+                      ? null
+                      : TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onBackground
+                              .withOpacity(0.5),
+                        ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
