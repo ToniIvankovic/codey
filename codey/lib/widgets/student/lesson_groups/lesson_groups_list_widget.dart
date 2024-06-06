@@ -121,9 +121,10 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                         backgroundColor: WidgetStateProperty.all<Color>(
                           buttonBackgroundColor,
                         ),
-                        elevation: WidgetStateProperty.all<double>(3),
-                        shape:
-                            WidgetStateProperty.all<RoundedRectangleBorder>(
+                        elevation: group.clickable
+                            ? WidgetStateProperty.all<double>(3)
+                            : null,
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0),
                             side: buttonBorderSide,
@@ -264,43 +265,42 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton.icon(
-                          onPressed:
-                              widget.lessonGroup.tips?.isNotEmpty ?? false
-                                  ? () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              LessonGroupTipsScreen(
-                                            lessonGroup: widget.lessonGroup,
-                                            lessonGroupFinished:
-                                                widget.lessonGroupFinished,
+                            onPressed:
+                                widget.lessonGroup.tips?.isNotEmpty ?? false
+                                    ? () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                LessonGroupTipsScreen(
+                                              lessonGroup: widget.lessonGroup,
+                                              lessonGroupFinished:
+                                                  widget.lessonGroupFinished,
+                                            ),
                                           ),
-                                        ),
-                                      ).then(
-                                        (goToLesson) {
-                                          if (goToLesson == true) {
-                                            _pushLessonGroup();
-                                          }
-                                        },
-                                      );
-                                    }
-                                  : null,
-                          icon: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            child: Icon(Icons.lightbulb_outline),
-                          ),
-                          label: const Text('Nauči'),
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all<Color>(
-                              Theme.of(context).colorScheme.secondary,
+                                        ).then(
+                                          (goToLesson) {
+                                            if (goToLesson == true) {
+                                              _pushLessonGroup();
+                                            }
+                                          },
+                                        );
+                                      }
+                                    : null,
+                            icon: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5),
+                              child: Icon(Icons.lightbulb_outline),
                             ),
-                            elevation: WidgetStateProperty.all<double>(2),
-                            foregroundColor: WidgetStateProperty.all<Color>(
-                              Theme.of(context).colorScheme.onSecondary,
-                            ),
-                          )
-                        ),
+                            label: const Text('Nauči'),
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.secondary,
+                              ),
+                              elevation: WidgetStateProperty.all<double>(2),
+                              foregroundColor: WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.onSecondary,
+                              ),
+                            )),
                         const SizedBox(width: 30),
                         IconButton.filled(
                           onPressed: () {

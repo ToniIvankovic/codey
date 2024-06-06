@@ -72,12 +72,16 @@ class _AuthScreenState extends State<AuthScreen> {
                             showLogin
                                 ? "Nemaš račun? Registriraj se"
                                 : "Već imaš račun? Prijavi se",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const Icon(Icons.arrow_forward_ios_rounded),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ],
                       ),
                     ),

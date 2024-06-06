@@ -23,7 +23,7 @@ import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
   bool isProd = const String.fromEnvironment("ENV") == "prod";
-  // isProd = true;
+  isProd = true;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -114,7 +114,7 @@ class MyApp extends StatelessWidget {
     error: Color.fromARGB(255, 189, 78, 82),
     errorContainer: Color.fromARGB(255, 139, 47, 50),
     onErrorContainer: Color.fromARGB(255, 255, 209, 210),
-    inversePrimary: Color.fromARGB(255, 40, 48, 47),
+    inversePrimary: Color.fromARGB(255, 23, 60, 53),
     primaryContainer: Color.fromARGB(255, 41, 100, 95),
     onPrimaryContainer: Color(0xffcbf3f0),
     onPrimary: Color(0xfff8f8f8),
