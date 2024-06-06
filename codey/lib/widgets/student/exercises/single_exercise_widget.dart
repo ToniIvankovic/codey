@@ -184,7 +184,8 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                 child: Text(
                                   "**HINT**\n${exercise!.specificTip!}",
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     fontSize: 16.0,
                                   ),
                                 ),
@@ -258,9 +259,14 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       }
       correctAnswer = answerWithCode;
     }
-    var textColor = TextStyle(
+    var containerTextColor = TextStyle(
       color: isCorrectResponse == true
           ? Theme.of(context).colorScheme.onPrimaryContainer
+          : Theme.of(context).colorScheme.onErrorContainer,
+    );
+    var buttonTextColor = TextStyle(
+      color: isCorrectResponse == true
+          ? Theme.of(context).colorScheme.onPrimary
           : Theme.of(context).colorScheme.onError,
     );
     return Positioned(
@@ -280,26 +286,47 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                isCorrectResponse == true ? 'Točno!' : 'Netočno...',
-                style: textColor.copyWith(
-                  fontSize: 20.0,
-                ),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                    child: Icon(
+                      isCorrectResponse == true
+                          ? Icons.check
+                          : Icons.clear_outlined,
+                      color: containerTextColor.color,
+                    ),
+                  ),
+                  Text(
+                    isCorrectResponse == true ? 'Točno!' : 'Netočno...',
+                    style: containerTextColor.copyWith(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              if (isCorrectResponse != true) ...[
-                Text(
-                  'Točan odgovor:',
-                  style: textColor.copyWith(
-                    fontSize: 16.0,
+              if (isCorrectResponse != true)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Točan odgovor:',
+                        style: containerTextColor.copyWith(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        correctAnswer,
+                        style: containerTextColor.copyWith(
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  correctAnswer,
-                  style: textColor.copyWith(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
               SizedBox(
                 width: double.infinity,
                 child: Padding(
@@ -328,9 +355,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                       child: Text(
                         'DALJE',
                         style: TextStyle(
-                          color: isCorrectResponse == true
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.onError,
+                          color: buttonTextColor.color,
                         ),
                       ),
                     ),
