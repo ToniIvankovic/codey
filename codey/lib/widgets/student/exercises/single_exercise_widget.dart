@@ -184,7 +184,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                 child: Text(
                                   "**HINT**\n${exercise!.specificTip!}",
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error,
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontSize: 16.0,
                                   ),
                                 ),
