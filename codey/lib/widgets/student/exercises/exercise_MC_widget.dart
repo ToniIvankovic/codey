@@ -60,10 +60,10 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                 widget.correctAnswerSignal.value == false) {
               color = Theme.of(context).colorScheme.error;
             } else if (selectedAnswer == option.key) {
-              color = Theme.of(context).colorScheme.onBackground.withOpacity(1);
+              color = Theme.of(context).colorScheme.onSurface.withOpacity(1);
             } else {
               color =
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5);
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
             }
 
             return GestureDetector(
@@ -84,14 +84,17 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                       width: selectedAnswer == option.key ? 3 : 1.5,
                     ),
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(25.0),
                       child: Text(
                         option.value,
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
                       ),
                     ),
                   ),

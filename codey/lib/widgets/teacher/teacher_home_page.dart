@@ -39,7 +39,7 @@ class TeacherHomePage extends StatelessWidget {
                       "Pregled razreda",
                       style: TextStyle(
                         fontSize: 18,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onInverseSurface,
                       ),
                     ),
                   ),
@@ -60,7 +60,7 @@ class TeacherHomePage extends StatelessWidget {
                     child: Text(
                       'Promjena lozinke',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onInverseSurface,
                       ),
                     ),
                   ),
@@ -77,7 +77,7 @@ class TeacherHomePage extends StatelessWidget {
                     child: Text(
                       'Odjava',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onInverseSurface,
                       ),
                     ),
                   ),

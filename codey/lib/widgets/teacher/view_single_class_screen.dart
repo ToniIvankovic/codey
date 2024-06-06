@@ -55,10 +55,15 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
       appBar: AppBar(
         title: Text('Razred ${classData.name}'),
       ),
-      body: WillPopScope(
-        onWillPop: () async {
-          Navigator.of(context).pop(classData);
-          return false;
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) {
+            return;
+          }
+          if (context.mounted) {
+            Navigator.of(context).pop(classData);
+          }
         },
         child: SingleChildScrollView(
           child: Padding(

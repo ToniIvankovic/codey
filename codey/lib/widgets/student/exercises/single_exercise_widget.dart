@@ -406,7 +406,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Theme.of(context).colorScheme.inverseSurface,
           borderRadius: BorderRadius.circular(10),
         ),
         child: DottedBorder(

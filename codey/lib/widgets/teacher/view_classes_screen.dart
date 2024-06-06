@@ -56,7 +56,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
               'Razredi',
               style: TextStyle(
                 fontSize: 24,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             if (classesLoading)
@@ -74,7 +74,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                       localClass.name,
                       style: TextStyle(
                         fontSize: 20,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     trailing: Row(
@@ -82,7 +82,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_red_eye),
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                           onPressed: () {
                             Navigator.of(context)
                                 .push(
@@ -101,7 +101,7 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                           onPressed: () =>
                               handleClassDelete(context, localClass),
                         ),

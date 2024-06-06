@@ -42,40 +42,44 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   @override
   Widget build(BuildContext context) {
     final exercisesService = context.read<ExercisesService>();
-    return WillPopScope(
-      onWillPop: () async {
-        return await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Izlazak'),
-              content: const Text(
-                  'Želiš li sigurno izići iz lekcije? Riješene vježbe bit će izgubljene.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('Ne, ostani u lekciji'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('Da, iziđi'),
-                ),
-              ],
-            );
-          },
-        ).then((value) {
-          if (value == true) {
-            if (exercisesService.sessionActive) {
-              exercisesService.endSession(false);
-            }
-            return true;
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
+        bool dialogResponse = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Izlazak'),
+                  content: const Text(
+                      'Želiš li sigurno izići iz lekcije? Riješene vježbe bit će izgubljene.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      child: const Text('Ne, ostani u lekciji'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                      child: const Text('Da, iziđi'),
+                    ),
+                  ],
+                );
+              },
+            ) ??
+            false;
+
+        if (dialogResponse == true && context.mounted) {
+          if (exercisesService.sessionActive) {
+            exercisesService.endSession(false);
           }
-          return false;
-        });
+          Navigator.pop(context);
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -87,7 +91,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           title: Text('Lekcija: ${widget.lesson.name}'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: currentExercise == null
               ? const Center(

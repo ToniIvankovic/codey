@@ -29,7 +29,7 @@ class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
         iconTheme:
             IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: Center(
           child: Container(

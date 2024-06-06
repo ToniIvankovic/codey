@@ -41,7 +41,7 @@ class LessonGroupTipsScreen extends StatelessWidget {
                     text: lessonGroup.tips!,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Padding(

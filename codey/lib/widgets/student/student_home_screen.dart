@@ -47,7 +47,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           ? Theme.of(context).colorScheme.secondary
                           : Theme.of(context)
                               .colorScheme
-                              .onSurface
+                              .onInverseSurface
                               .withOpacity(0.5),
                     ),
                     Text(
@@ -57,7 +57,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                             ? Theme.of(context).colorScheme.secondary
                             : Theme.of(context)
                                 .colorScheme
-                                .onSurface
+                                .onInverseSurface
                                 .withOpacity(0.5),
                       ),
                     ),
@@ -125,7 +125,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             ],
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

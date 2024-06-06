@@ -23,7 +23,7 @@ class StreakWidget extends StatelessWidget {
               Icons.whatshot,
               color: user.streak > 0
                   ? Colors.red
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  : Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.5),
               size: 30.0,
             ),
             Padding(

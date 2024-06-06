@@ -118,11 +118,12 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
 
                     return ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
+                        backgroundColor: WidgetStateProperty.all<Color>(
                           buttonBackgroundColor,
                         ),
+                        elevation: WidgetStateProperty.all<double>(3),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0),
                             side: buttonBorderSide,
@@ -235,7 +236,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
           width: 2.5 * 125.0,
           height: 150,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.inverseSurface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -291,10 +292,11 @@ class _FloatingWindowState extends State<_FloatingWindow> {
                           ),
                           label: const Text('Nauči'),
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
+                            backgroundColor: WidgetStateProperty.all<Color>(
                               Theme.of(context).colorScheme.secondary,
                             ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
+                            elevation: WidgetStateProperty.all<double>(2),
+                            foregroundColor: WidgetStateProperty.all<Color>(
                               Theme.of(context).colorScheme.onSecondary,
                             ),
                           )

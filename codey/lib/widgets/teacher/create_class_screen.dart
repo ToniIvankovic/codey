@@ -35,7 +35,7 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     decoration: const InputDecoration(
                       labelText: 'Naziv razreda',

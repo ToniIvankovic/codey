@@ -44,7 +44,7 @@ class PreLessonScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         titleTextStyle: const TextStyle(fontSize: 18),
         title: Text(lesson.name),
@@ -66,7 +66,7 @@ class PreLessonScreen extends StatelessWidget {
                     child: RichTextMarkdown(
                       text: lesson.specificTips!,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                       ),
                     ),

@@ -103,7 +103,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             child: DottedBorder(
               borderType: BorderType.RRect,
               color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               radius: const Radius.circular(10.0),
               strokeWidth: borderWidth,
               dashPattern: const [6, 6],
@@ -157,7 +157,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                         border: Border.all(
                           color: Theme.of(context)
                               .colorScheme
-                              .onBackground
+                              .onSurface
                               .withOpacity(0.5),
                           width: 1.0,
                         ),
@@ -257,7 +257,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             decoration: BoxDecoration(
               border: Border.all(
                 color:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 width: 1.0,
               ),
               borderRadius: BorderRadius.circular(pieceBorderRadius),
@@ -284,7 +284,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
           decoration: BoxDecoration(
             border: Border.all(
               color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               width: 1.0,
             ),
             borderRadius: BorderRadius.circular(pieceBorderRadius),
@@ -327,7 +327,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
             decoration: BoxDecoration(
               border: Border.all(
                 color:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 width: 1.0,
               ),
               borderRadius: BorderRadius.circular(pieceBorderRadius),
@@ -356,7 +356,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
           decoration: BoxDecoration(
             border: Border.all(
               color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               width: 1.0,
             ),
             borderRadius: BorderRadius.circular(pieceBorderRadius),

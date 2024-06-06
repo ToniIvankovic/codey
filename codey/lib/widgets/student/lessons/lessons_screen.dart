@@ -82,7 +82,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
           ),
         ],
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: FutureBuilder<List<Lesson>>(
         future: lessonsFuture,
         builder: (BuildContext context, AsyncSnapshot<List<Lesson>> snapshot) {
@@ -273,17 +273,17 @@ class _LessonsScreenState extends State<LessonsScreen> {
           color: Theme.of(context).colorScheme.primary,
           width: 4.0,
         );
-        color = Theme.of(context).colorScheme.surface;
+        color = Theme.of(context).colorScheme.inverseSurface;
       } else if (isClickable) {
         border = Border.all(
-          color: Theme.of(context).colorScheme.onBackground.withOpacity(0.5),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
           width: 1.0,
         );
-        color = Theme.of(context).colorScheme.surface;
+        color = Theme.of(context).colorScheme.inverseSurface;
         solved = true;
       } else {
         border = Border.all(
-          color: Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
           width: 1.0,
         );
         color = null;
@@ -332,7 +332,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                       : TextStyle(
                           color: Theme.of(context)
                               .colorScheme
-                              .onBackground
+                              .onSurface
                               .withOpacity(0.5),
                         ),
                   overflow: TextOverflow.ellipsis,
@@ -342,7 +342,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   padding: const EdgeInsets.fromLTRB(5, 3, 0, 0),
                   child: Icon(
                     Icons.refresh,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: Theme.of(context).colorScheme.onInverseSurface,
                     size: 20,
                   ),
                 ),
