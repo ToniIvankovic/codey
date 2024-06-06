@@ -404,7 +404,10 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                     });
                   });
                 },
-                child: const Text('Registracija'),
+                child: const Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text('Registracija'),
+                ),
               ),
             ),
         ],

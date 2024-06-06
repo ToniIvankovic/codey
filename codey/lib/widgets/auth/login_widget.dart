@@ -95,7 +95,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                   });
                 });
               },
-              child: const Text('Prijava'),
+              child: const Padding(
+                padding: EdgeInsets.all(5),
+                child: Text('Prijava'),
+              ),
             ),
           ),
       ],
