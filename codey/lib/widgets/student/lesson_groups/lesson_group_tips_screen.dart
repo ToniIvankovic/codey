@@ -17,6 +17,8 @@ class LessonGroupTipsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(lessonGroup.name),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
