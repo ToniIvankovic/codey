@@ -19,7 +19,6 @@ class EditLessonGroupsScreen extends StatefulWidget {
 class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
   List<LessonGroup>? lessonGroupsInitial;
   List<LessonGroup>? lessonGroupsLocal;
-  List<LessonGroup> lessonGroupsToDelete = [];
   int? expandedId;
 
   @override
@@ -111,10 +110,38 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                   IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () {
-                      setState(() {
-                        lessonGroupsLocal!.remove(lessonGroup);
-                        lessonGroupsToDelete.add(lessonGroup);
-                      });
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: const Text("Delete lesson group"),
+                                content: const Text(
+                                    "Are you sure you want to delete this lesson group?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              )).then(
+                        (value) {
+                          if (value == true) {
+                            context
+                                .read<LessonGroupsService>()
+                                .deleteLessonGroup(lessonGroup.id)
+                                .then(
+                                  (value) => setState(() {
+                                    lessonGroupsLocal!.remove(lessonGroup);
+                                    lessonGroupsInitial!.remove(lessonGroup);
+                                  }),
+                                );
+                          }
+                        },
+                      );
                     },
                   ),
                 ],
@@ -187,13 +214,12 @@ class _EditLessonGroupsScreenState extends State<EditLessonGroupsScreen> {
                           context.read<LessonGroupsService>();
                       lessonGroupsService
                           .reorderLessonGroups(lessonGroupsLocal!);
-                      for (var lessonGroup in lessonGroupsToDelete) {
-                        lessonGroupsService
-                            .deleteLessonGroup(lessonGroup.id)
-                            .then((value) => setState(() {
-                                  lessonGroupsLocal!.remove(lessonGroup);
-                                }));
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Lesson groups reordered"),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
                       Navigator.pop(context);
                     }
                   : null,

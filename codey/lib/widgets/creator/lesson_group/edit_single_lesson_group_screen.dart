@@ -209,23 +209,25 @@ class _EditSingleLessonGroupScreenState
               icon: Icon(tipsEditable ? Icons.undo : Icons.edit),
             ),
             IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => LessonGroupTipsScreen(
-                      lessonGroup: LessonGroup(
-                        id: widget.lessonGroup.id,
-                        name: widget.lessonGroup.name,
-                        tips: localTips,
-                        lessons: widget.lessonGroup.lessons,
-                        order: widget.lessonGroup.order,
-                        adaptive: widget.lessonGroup.adaptive,
-                      ),
-                      lessonGroupFinished: true,
-                    ),
-                  ),
-                );
-              },
+              onPressed: (localTips != null && localTips!.isNotEmpty)
+                  ? () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => LessonGroupTipsScreen(
+                            lessonGroup: LessonGroup(
+                              id: widget.lessonGroup.id,
+                              name: widget.lessonGroup.name,
+                              tips: localTips,
+                              lessons: widget.lessonGroup.lessons,
+                              order: widget.lessonGroup.order,
+                              adaptive: widget.lessonGroup.adaptive,
+                            ),
+                            lessonGroupFinished: true,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
               icon: const Icon(Icons.remove_red_eye),
             ),
           ],
