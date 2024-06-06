@@ -23,7 +23,7 @@ import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
   bool isProd = const String.fromEnvironment("ENV") == "prod";
-  isProd = true;
+  // isProd = true;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
