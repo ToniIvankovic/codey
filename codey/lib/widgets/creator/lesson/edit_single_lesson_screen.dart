@@ -1,10 +1,13 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
+import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/creator/exercise/pick_exercise_screen.dart';
+import 'package:codey/widgets/student/lessons/pre_lesson_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -117,6 +120,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                 const Text("Please save or cancel changes first")
               else if (!madeChanges)
                 const Text("No changes made"),
+              const SizedBox(height: 20.0),
             ],
           ),
         ),
@@ -182,14 +186,53 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                 },
                 icon: const Icon(Icons.save),
               )
-            : IconButton(
-                onPressed: () {
-                  setState(() {
-                    specificTipsEditable = !specificTipsEditable;
-                    specificTipsEdited = specificTipsLocal;
-                  });
-                },
-                icon: const Icon(Icons.edit),
+            : Column(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        specificTipsEditable = !specificTipsEditable;
+                        specificTipsEdited = specificTipsLocal;
+                      });
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      context.read<UserService>().userStream.first.then(
+                        (value) {
+                          return Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PreLessonScreen(
+                                  lessonGroup: LessonGroup(
+                                    id: 0,
+                                    name: "Lesson group",
+                                    tips: "Lesson group description",
+                                    lessons: [widget.lesson.id],
+                                    order: 0,
+                                  ),
+                                  lesson: Lesson(
+                                    id: 0,
+                                    name: "Lesson",
+                                    specificTips: specificTipsLocal,
+                                    exerciseIds: exercisesLocal.map((e) => e.id).toList(),                                  
+                                  ),
+                                  user: value),
+                            ),
+                          ).then((value) {
+                            if (value != null) {
+                              setState(() {
+                                exercisesLocal.add(value as Exercise);
+                              });
+                            }
+                          });
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.remove_red_eye),
+                  ),
+                ],
               ),
         const Text("Specific tips: "),
         if (specificTipsEditable) ...[
