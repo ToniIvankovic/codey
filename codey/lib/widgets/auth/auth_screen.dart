@@ -55,18 +55,30 @@ class _AuthScreenState extends State<AuthScreen> {
                         );
                       },
                     ),
+                  const SizedBox(height: 20),
                   TextButton(
                     onPressed: () {
                       setState(() {
                         showLogin = !showLogin;
                       });
                     },
-                    child: Text(
-                      showLogin
-                          ? "Nemaš račun? Registriraj se"
-                          : "Već imaš račun? Prijavi se",
-                      style: const TextStyle(
-                        fontSize: 16,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            showLogin
+                                ? "Nemaš račun? Registriraj se"
+                                : "Već imaš račun? Prijavi se",
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded),
+                        ],
                       ),
                     ),
                   ),
