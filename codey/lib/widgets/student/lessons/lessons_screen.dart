@@ -267,6 +267,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
         Builder(builder: (context) {
       Border border;
       Color? color;
+      bool solved = false;
       if (lesson.id == nextLessonId && !lessonGroupFinished) {
         border = Border.all(
           color: Theme.of(context).colorScheme.primary,
@@ -279,6 +280,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
           width: 1.0,
         );
         color = Theme.of(context).colorScheme.surface;
+        solved = true;
       } else {
         border = Border.all(
           color: Theme.of(context).colorScheme.onBackground.withOpacity(0.2),
@@ -334,6 +336,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                               .withOpacity(0.5),
                         ),
                   overflow: TextOverflow.ellipsis,
+                ),
+                if(solved)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(5, 3, 0, 0),
+                  child: Icon(
+                    Icons.refresh,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    size: 20,
+                  ),
                 ),
               ],
             ),
