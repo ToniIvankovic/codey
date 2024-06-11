@@ -316,8 +316,8 @@ namespace CodeyBe.Services
 
         private static double AdjustUserScore(double userScore, Exercise exercise, bool correct, bool repeated)
         {
-            const double POSITIVE_LEARNING_RATE = 0.05;
-            const double NEGATIVE_LEARNING_RATE = 0.05;
+            const double POSITIVE_LEARNING_RATE = 0.1;
+            const double NEGATIVE_LEARNING_RATE = 0.1;
             double exerciseScore = exercise.Difficulty;
             if (correct && exerciseScore > userScore)
             {

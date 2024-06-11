@@ -274,7 +274,7 @@ namespace CodeyBe.Services
         private bool ValidateAnswerSA(ExerciseSA exercise, string answer)
         {
             IEnumerable<string> correctAnswers = exercise.CorrectAnswers!.Select(d => (string)d);
-            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: true);
+            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: false);
         }
 
         private bool ValidateAnswerSCW(IEnumerable<IEnumerable<string>> correctAnswers, IEnumerable<string> givenAnswers)
@@ -291,7 +291,7 @@ namespace CodeyBe.Services
                     answer,
                     correctAnswers: correctAnswersFori,
                     allowTrim: true,
-                    allowCaseInsensitive: true);
+                    allowCaseInsensitive: false);
 
                 if (!currentMatch)
                 {
@@ -308,7 +308,7 @@ namespace CodeyBe.Services
             {
                 return false;
             }
-            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: true);
+            return CompareAnswers(answer, correctAnswers, allowTrim: true, allowCaseInsensitive: false);
         }
 
         private bool CompareAnswers(string answer, IEnumerable<string> correctAnswers, bool allowTrim, bool allowCaseInsensitive)
