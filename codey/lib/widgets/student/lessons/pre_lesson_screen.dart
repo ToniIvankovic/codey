@@ -46,7 +46,10 @@ class PreLessonScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        titleTextStyle: const TextStyle(fontSize: 18),
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
         title: Text(lesson.name),
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         backgroundColor: Theme.of(context).colorScheme.primary,

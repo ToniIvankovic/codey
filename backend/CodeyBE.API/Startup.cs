@@ -64,7 +64,7 @@ namespace CodeyBE.API
             {
                 identityOptions.Password.RequiredLength = 8;
                 identityOptions.Password.RequireLowercase = true;
-                identityOptions.Password.RequireUppercase = true;
+                identityOptions.Password.RequireUppercase = false;
                 identityOptions.Password.RequireDigit = true;
                 identityOptions.Password.RequireNonAlphanumeric = false;
             },

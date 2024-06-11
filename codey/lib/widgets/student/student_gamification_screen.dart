@@ -12,7 +12,8 @@ class StudentGamificationScreen extends StatefulWidget {
   });
 
   @override
-  State<StudentGamificationScreen> createState() => _StudentGamificationScreenState();
+  State<StudentGamificationScreen> createState() =>
+      _StudentGamificationScreenState();
 }
 
 class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
@@ -49,8 +50,14 @@ class _StudentGamificationScreenState extends State<StudentGamificationScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("XP: ${widget.user.totalXp}",
-                                style: const TextStyle(fontSize: 16)),
+                            Text(
+                              "XP: ${widget.user.totalXp}",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                            ),
                           ],
                         ),
                       ),
