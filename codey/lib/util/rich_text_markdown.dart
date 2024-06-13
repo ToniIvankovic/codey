@@ -57,6 +57,7 @@ class RichTextMarkdown extends StatelessWidget {
         fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
         fontFamily: isCode ? 'courier new' : null,
         fontStyle: isItalic ? FontStyle.italic : FontStyle.normal,
+        fontSize: isCode ? ((style.fontSize ?? 18) + 2) : style.fontSize,
       ),
     );
   }
