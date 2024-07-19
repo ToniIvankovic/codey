@@ -179,4 +179,11 @@ local.properties
 **/web/assets/
 **/windows/Flutter/flutter_assets/
 **/windows/Flutter/flutter_export_environment.bat
-**/build/
+
+**/linux
+**/macos
+**/windows
+# **/web
+**/android
+**/ios
+**/build

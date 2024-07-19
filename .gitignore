@@ -49,3 +49,5 @@ npm-debug.log
 yarn-error.log
 /backend/CodeyBE.API/appsettings.json
 /backend/CodeyBE.API/secrets.json
+
+analiza/
