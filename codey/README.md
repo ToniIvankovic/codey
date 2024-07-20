@@ -1,16 +1,18 @@
-# codey
+# Frontend app - Codey
+This is the fronted part of the Codey app. The source code is located in the [lib](lib) directory. \
+The code is structurally divided by the Model-Service-Repository pattern, where: 
+- models define classes and interfaces,
+- services process raw data and give information or cause state changes,
+- repositories are concerned with fetching data from the backend API.
+  
+In the [widgets](widgets) directory, all the widgets used in the app are located. \
+The widgets are separated into 5 categories, each category building the respective interface:
+- Student interface 👨‍🎓
+- Teacher interface 🧑‍🏫
+- Creator interface 🎨
+- Admin interface 🎛️
+- Authentication interface 🔐
+  
+Each interface is logically very independent of the others, but some of the widgets are reused, so the it is structurally still a single app.
 
-Diplomski rad - Toni Ivanković
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app is deployed on AWS and it is possible to test it on the following url: [https://d3l6qdq14kds7s.cloudfront.net/](https://d3l6qdq14kds7s.cloudfront.net/)
