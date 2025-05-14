@@ -22,8 +22,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
-  bool isProd = const String.fromEnvironment("ENV") == "prod";
-  // isProd = true;
+  bool isProd = true;
+  //isProd = false;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -139,7 +139,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Codey - Python Course'),
+      home: const MyHomePage(title: 'Codey'),
     );
   }
 }

@@ -88,68 +88,79 @@ class _AddStudentsScreenState extends State<AddStudentsScreen> {
                 },
               ),
             ),
-            for (var student in selectedStudents)
-              Row(
-                children: [
-                  Checkbox(
-                    value: selectedStudents.contains(student),
-                    onChanged: (value) {
-                      if (value!) {
-                        setState(() {
-                          selectedStudents.add(student);
-                        });
-                      } else {
-                        setState(() {
-                          selectedStudents.remove(student);
-                        });
-                      }
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: student.classId != null &&
-                            student.classId != widget.classIdInProgress
-                        ? Text(
-                            "${student.email} (već u razredu ${student.classId})")
-                        : Text(student.email),
-                  ),
-                ],
-              ),
-            if (loadingStudents)
-              const CircularProgressIndicator()
-            else
-              for (var student in nonSelectedStudents)
-                Row(
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Checkbox(
-                      value: selectedStudents.contains(student),
-                      onChanged: (value) {
-                        if (value!) {
-                          setState(() {
-                            selectedStudents.add(student);
-                          });
-                        } else {
-                          setState(() {
-                            selectedStudents.remove(student);
-                          });
-                        }
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: student.classId != null &&
-                              student.classId != widget.classIdInProgress
-                          ? Text(
-                              "${student.email} (već u razredu ${student.classId})")
-                          : Text(student.email),
-                    ),
+                    for (var student in selectedStudents)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: selectedStudents.contains(student),
+                            onChanged: (value) {
+                              if (value!) {
+                                setState(() {
+                                  selectedStudents.add(student);
+                                });
+                              } else {
+                                setState(() {
+                                  selectedStudents.remove(student);
+                                });
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: student.classId != null &&
+                                    student.classId != widget.classIdInProgress
+                                ? Text(
+                                    "${student.email} (već u razredu ${student.classId})")
+                                : Text(student.email),
+                          ),
+                        ],
+                      ),
+                    if (loadingStudents)
+                      const CircularProgressIndicator()
+                    else
+                      for (var student in nonSelectedStudents)
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: selectedStudents.contains(student),
+                              onChanged: (value) {
+                                if (value!) {
+                                  setState(() {
+                                    selectedStudents.add(student);
+                                  });
+                                } else {
+                                  setState(() {
+                                    selectedStudents.remove(student);
+                                  });
+                                }
+                              },
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: student.classId != null &&
+                                      student.classId != widget.classIdInProgress
+                                  ? Text(
+                                      "${student.email} (već u razredu ${student.classId})")
+                                  : Text(student.email),
+                            ),
+                          ],
+                        ),
                   ],
                 ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, selectedStudents);
-              },
-              child: const Text('Dodaj označene učenike'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, selectedStudents);
+                },
+                child: const Text('Dodaj označene učenike'),
+              ),
             ),
           ],
         ),

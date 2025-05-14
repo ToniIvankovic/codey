@@ -36,7 +36,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             children: [
               const Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                child: Text('Python'),
+                child: Text('UX/UI'),
               ),
               if (widget.user.gamificationEnabled) ...[
                 Row(
