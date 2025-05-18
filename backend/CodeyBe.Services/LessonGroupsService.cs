@@ -15,7 +15,11 @@ namespace CodeyBe.Services
     {
         private readonly ILessonGroupsRepository _lessonGroupsRepository = lessonGroupsRepository;
 
-        public int FirstLessonGroupId => 10001;
+        public async Task<int> GetFirstLessonGroupIdAsync()
+        {
+            var lessonGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(1);
+            return lessonGroup?.PrivateId ?? throw new EntityNotFoundException();
+        }
 
         public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync()
         {

@@ -47,11 +47,14 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                 (item) => ListItem(
                   lessonGroup: item,
                   clickable: item.order <=
-                      (lessonGroups
-                          .where((lessonGroup) =>
-                              lessonGroup.id == widget.user.nextLessonGroupId)
-                          .first
-                          .order),
+                      (widget.user.nextLessonGroupId == null
+                          ? 0
+                          : (lessonGroups
+                              .where((lessonGroup) =>
+                                  lessonGroup.id ==
+                                  widget.user.nextLessonGroupId)
+                              .first
+                              .order)),
                   finished: widget.user.highestLessonGroupId == null
                       ? false
                       : item.order <=

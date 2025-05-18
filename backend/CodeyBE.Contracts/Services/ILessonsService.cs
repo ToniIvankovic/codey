@@ -11,7 +11,7 @@ namespace CodeyBE.Contracts.Services
 {
     public interface ILessonsService
     {
-        public int FirstLessonId { get; }
+        public Task<int> GetFirstLessonIdAsync();
         public Task<IEnumerable<Lesson>> GetAllLessonsAsync();
         public Task<Lesson?> GetLessonByIDAsync(int id);
         public Task<IEnumerable<Lesson>> GetLessonsForLessonGroupAsync(int lessonGroupId);

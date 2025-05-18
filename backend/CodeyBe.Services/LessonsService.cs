@@ -63,7 +63,7 @@ namespace CodeyBe.Services
             }
             LessonGroup? nextLessonGroup = await _lessonGroupsService.GetNextLessonGroupForLessonGroupId(lessonGroup.PrivateId)
                 ?? throw new EntityNotFoundException("Next lesson group not found");
-            if(nextLessonGroup.Adaptive ?? false)
+            if (nextLessonGroup.Adaptive ?? false)
             {
                 return GetLessonsForAdaptiveLessonGroupAsync(nextLessonGroup)[0].PrivateId;
             }
@@ -92,6 +92,20 @@ namespace CodeyBe.Services
             return await _lessonsRepository.GetLessonsByIDsAsync(ids);
         }
 
-        public int FirstLessonId => 10001;
+        public async Task<int> GetFirstLessonIdAsync()
+        {
+            var lgr = await _lessonGroupsService.GetFirstLessonGroupIdAsync();
+            if (lgr == null)
+            {
+                throw new EntityNotFoundException("No lesson groups found");
+            }
+            var lesson = (await GetLessonsForLessonGroupAsync(lgr)).FirstOrDefault();
+            if (lesson == null)
+            {
+                throw new EntityNotFoundException("No lessons found");
+            }
+            return lesson?.PrivateId ?? throw new EntityNotFoundException("No lessons found");
+        }
+
     }
 }

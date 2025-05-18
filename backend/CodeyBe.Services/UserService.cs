@@ -27,10 +27,11 @@ namespace CodeyBe.Services
         private static readonly int SINGLE_QUEST_XP = 50;
         private static readonly int XP_SOLVED_OLD = 40;
         private static readonly int XP_SOLVED_NEW = 100;
-        private static readonly int QUEST_XP_GOAL = 200;
+        private static readonly int DAILY_QUEST_AMOUNT = 3;
+        private static readonly int QUEST_XP_GOAL = 120;
         private static readonly int QUEST_ACCURACY_PERCENTAGE_GOAL = 90;
-        private static readonly int QUEST_SPEED_GOAL_SECONDS = 45;
-        private static readonly int QUEST_LESSONS_AMOUNT = 3;
+        private static readonly int QUEST_SPEED_GOAL_SECONDS = 60;
+        private static readonly int QUEST_LESSONS_AMOUNT = 2;
 
         public async Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO userDTO)
         {
@@ -69,8 +70,8 @@ namespace CodeyBe.Services
                 ],
                 HighestLessonGroupId = null,
                 HighestLessonId = null,
-                NextLessonGroupId = lessonGroupsService.FirstLessonGroupId,
-                NextLessonId = lessonsService.FirstLessonId,
+                NextLessonGroupId = await lessonGroupsService.GetFirstLessonGroupIdAsync(),
+                NextLessonId = await lessonsService.GetFirstLessonIdAsync(),
                 TotalXP = 0,
                 XPachieved = [],
                 School = user.School,
@@ -297,7 +298,7 @@ namespace CodeyBe.Services
                 Quest.CreateCompleteLessonGroupQuest()
             };
             //shuffle quests
-            quests = [.. quests.OrderBy(x => Guid.NewGuid()).Take(2)];
+            quests = [.. quests.OrderBy(x => Guid.NewGuid()).Take(DAILY_QUEST_AMOUNT)];
             applicationUser.Quests ??= [];
             applicationUser.Quests?.Add(new KeyValuePair<DateOnly, ISet<Quest>>(DateOnly.FromDateTime(DateTime.Now), quests));
             await UpdateUser(applicationUser);
