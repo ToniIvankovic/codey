@@ -331,14 +331,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: lastNameField,
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
-            child: Text("Datum rođenja *", style: TextStyle(fontSize: 16)),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
-            child: dateOfBirthRow,
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.fromLTRB(0, 8.0, 0, 0),
+          //   child: Text("Datum rođenja *", style: TextStyle(fontSize: 16)),
+          // ),
+          // Padding(
+          //   padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
+          //   child: dateOfBirthRow,
+          // ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: emailField,
@@ -380,14 +380,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                   setState(() {
                     errorMessage = null;
                     waitingResponse = true;
-                    dateOfBirth = DateTime(year!, month!, day!);
+                    // dateOfBirth = DateTime(year!, month!, day!);
                   });
                   context
                       .read<AuthService>()
                       .registerUser(
                         firstName: firstName,
                         lastName: lastName,
-                        dateOfBirth: dateOfBirth!,
+                        // dateOfBirth: dateOfBirth!,
                         email: email,
                         password: password,
                         school: school!,

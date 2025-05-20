@@ -17,7 +17,7 @@ abstract class AuthService {
   Future<void> registerUser({
     required String firstName,
     required String lastName,
-    required DateTime dateOfBirth,
+    DateTime dateOfBirth,
     required String email,
     required String password,
     required String school,
@@ -66,7 +66,7 @@ class AuthService1 implements AuthService {
   Future<void> registerUser({
     required String firstName,
     required String lastName,
-    required DateTime dateOfBirth,
+    DateTime? dateOfBirth,
     required String email,
     required String password,
     required String school,
@@ -76,7 +76,7 @@ class AuthService1 implements AuthService {
       body: json.encode({
         'firstName': firstName,
         'lastName': lastName,
-        'dateOfBirth': dateOfBirth.toIso8601String(),
+        'dateOfBirth': dateOfBirth?.toIso8601String(),
         'email': email,
         'password': password,
         'school': school,

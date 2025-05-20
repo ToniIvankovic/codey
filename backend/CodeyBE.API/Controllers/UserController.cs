@@ -36,7 +36,7 @@ namespace CodeyBE.API.Controllers
                 {
                     FirstName = firstName,
                     LastName = lastName,
-                    DateOfBirth = DateOnly.Parse(dob),
+                    DateOfBirth = dob != null ? DateOnly.Parse(dob) : null,
                     Email = email,
                     Password = password,
                     School = school
