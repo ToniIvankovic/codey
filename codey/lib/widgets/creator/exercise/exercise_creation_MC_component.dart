@@ -22,7 +22,7 @@ class _ExerciseCreationMCComponentState
     extends State<ExerciseCreationMCComponent> {
   String? statementCode;
   String? question;
-  Map<String, String> answerOptions = {};
+  Map<String, String?> answerOptions = {};
   String? correctAnswer;
 
   dynamic _packFields() {
@@ -42,7 +42,7 @@ class _ExerciseCreationMCComponentState
       statementCode = widget.existingExercise!.statementCode;
       question = widget.existingExercise!.question;
       answerOptions =
-          widget.existingExercise!.answerOptions.cast<String, String>();
+          widget.existingExercise!.answerOptions.cast<String, String?>();
       correctAnswer = widget.existingExercise!.correctAnswer;
     }
   }
@@ -63,9 +63,9 @@ class _ExerciseCreationMCComponentState
               });
               widget.onChange(_packFields());
             },
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter statement code'
-                : null,
+            // validator: (value) => value == null || value.isEmpty
+            //     ? 'Please enter statement code'
+            //     : null,
           );
         }),
         TextFormField(
@@ -82,19 +82,22 @@ class _ExerciseCreationMCComponentState
           validator: (value) =>
               value == null || value.isEmpty ? 'Please enter a question' : null,
         ),
-        for (var option in ["A", "B", "C"])
+        for (var option in ["A", "B", "C", "D"])
           TextFormField(
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(labelText: 'Answer option $option'),
             initialValue: answerOptions[option],
             onSaved: (value) {
+              if(value == null || value.isEmpty) {
+                value = null;
+              }
               setState(() {
-                answerOptions[option] = value!;
+                answerOptions[option] = value;
               });
               widget.onChange(_packFields());
             },
-            validator: (value) => value == null || value.isEmpty
+            validator: (value) => (["A", "B"].contains(option)) && (value == null || value.isEmpty)
                 ? 'Please enter an option'
                 : null,
           ),
@@ -106,6 +109,7 @@ class _ExerciseCreationMCComponentState
             DropdownMenuItem(value: "A", child: Text("A")),
             DropdownMenuItem(value: "B", child: Text("B")),
             DropdownMenuItem(value: "C", child: Text("C")),
+            DropdownMenuItem(value: "D", child: Text("D")),
           ],
           onChanged: (String? value) {
             setState(() {

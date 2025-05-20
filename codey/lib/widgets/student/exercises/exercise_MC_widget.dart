@@ -38,7 +38,10 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
   void initState() {
     super.initState();
     exercise = widget.exercise as ExerciseMC;
-    answerOptions = exercise.answerOptions.entries.toList();
+    answerOptions = exercise.answerOptions.entries
+        .toList()
+        .where((entry) => entry.value != null)
+        .toList();
     answerOptions.shuffle();
   }
 
@@ -62,8 +65,7 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
             } else if (selectedAnswer == option.key) {
               color = Theme.of(context).colorScheme.onSurface.withOpacity(1);
             } else {
-              color =
-                  Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+              color = Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
             }
 
             return GestureDetector(
