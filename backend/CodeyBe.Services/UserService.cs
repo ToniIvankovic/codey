@@ -32,6 +32,7 @@ namespace CodeyBe.Services
         private static readonly int QUEST_ACCURACY_PERCENTAGE_GOAL = 90;
         private static readonly int QUEST_SPEED_GOAL_SECONDS = 60;
         private static readonly int QUEST_LESSONS_AMOUNT = 2;
+        private static readonly int QUEST_COMPLETE_EXERCISES_AMOUNT = 20;
 
         public async Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO userDTO)
         {
@@ -281,6 +282,9 @@ namespace CodeyBe.Services
                     case QuestTypes.COMPLETE_LESSON_GROUP:
                         newlyCompleted += Quest.UpdateCompleteLessonGroupQuest(completedLessonGroup, quest);
                         break;
+                    case QuestTypes.COMPLETE_EXERCISES:
+                        newlyCompleted += Quest.UpdateCompleteExercisesQuest(lessonReport.CorrectAnswers, quest);
+                        break;
                 }
             }
             await UpdateUser(applicationUser);
@@ -295,7 +299,8 @@ namespace CodeyBe.Services
                 Quest.CreateGetXPQuest(QUEST_XP_GOAL),
                 Quest.CreateHighAccuracyQuest(QUEST_ACCURACY_PERCENTAGE_GOAL, QUEST_LESSONS_AMOUNT),
                 Quest.CreateHighSpeedQuest(QUEST_SPEED_GOAL_SECONDS, QUEST_LESSONS_AMOUNT),
-                Quest.CreateCompleteLessonGroupQuest()
+                Quest.CreateCompleteLessonGroupQuest(),
+                Quest.CreateCompleteExercisesQuest(QUEST_COMPLETE_EXERCISES_AMOUNT)
             };
             //shuffle quests
             quests = [.. quests.OrderBy(x => Guid.NewGuid()).Take(DAILY_QUEST_AMOUNT)];

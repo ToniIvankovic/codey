@@ -12,5 +12,6 @@ namespace CodeyBE.Contracts.Enumerations
         public const string HIGH_ACCURACY = "HIGH_ACCURACY";
         public const string HIGH_SPEED = "HIGH_SPEED";
         public const string COMPLETE_LESSON_GROUP = "COMPLETE_LESSON_GROUP";
+        public const string COMPLETE_EXERCISES = "COMPLETE_EXERCISES";
     }
 }

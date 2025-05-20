@@ -208,6 +208,44 @@ class _QuestsWidgetState extends State<QuestsWidget> {
               ),
           ],
         );
+      case Quest.questCompleteExercises:
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.fitness_center),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Riješi ovoliko vježbi: ${quest.constraint}",
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ),
+                if (!quest.isCompleted)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Text("(+$singleQuestXP XP)"),
+                  ),
+              ],
+            ),
+            // PROGRESS BAR
+            Row(
+              children: [
+                Expanded(
+                  child: _generateProgressBar(quest.progress, quest.constraint!),
+                ),
+                if (!quest.isCompleted)
+                  Text(
+                    "${quest.progress}/${quest.constraint!}",
+                    textAlign: TextAlign.right,
+                  ),
+              ],
+            ),
+          ],
+        );
       default:
         return const Text(
           "Nepoznat cilj",

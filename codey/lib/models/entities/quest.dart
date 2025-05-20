@@ -25,6 +25,8 @@ abstract class Quest {
         return QuestHighSpeed.fromJson(json);
       case questCompleteLessonGroup:
         return QuestCompleteLessonGroup.fromJson(json);
+      case questCompleteExercises:
+        return QuestCompleteExercises.fromJson(json);
       default:
         throw InvalidDataException("Invalid quest type");
     }
@@ -34,6 +36,7 @@ abstract class Quest {
   static const String questHighAccuracy = "HIGH_ACCURACY";
   static const String questHighSpeed = "HIGH_SPEED";
   static const String questCompleteLessonGroup = "COMPLETE_LESSON_GROUP";
+  static const String questCompleteExercises = "COMPLETE_EXERCISES";
 }
 
 class QuestGetXp extends Quest {
@@ -118,6 +121,27 @@ class QuestCompleteLessonGroup extends Quest {
   factory QuestCompleteLessonGroup.fromJson(Map<String, dynamic> json) {
     return QuestCompleteLessonGroup(
       progress: json['progress'],
+      isCompleted: json['isCompleted'],
+    );
+  }
+}
+
+class QuestCompleteExercises extends Quest {
+  QuestCompleteExercises({
+    required int progress,
+    required int constraint,
+    required bool isCompleted,
+  }) : super(
+          type: Quest.questCompleteExercises,
+          progress: progress,
+          constraint: constraint,
+          isCompleted: isCompleted,
+        );
+
+  factory QuestCompleteExercises.fromJson(Map<String, dynamic> json) {
+    return QuestCompleteExercises(
+      progress: json['progress'],
+      constraint: json['constraint'],
       isCompleted: json['isCompleted'],
     );
   }

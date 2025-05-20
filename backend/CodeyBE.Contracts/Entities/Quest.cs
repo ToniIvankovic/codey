@@ -62,6 +62,17 @@ namespace CodeyBE.Contracts.Entities
                 IsCompleted = false
             };
         }
+        public static Quest CreateCompleteExercisesQuest(int numberOfExercises)
+        {
+            return new Quest
+            {
+                Type = QuestTypes.COMPLETE_EXERCISES,
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Constraint = numberOfExercises,
+                Progress = 0,
+                IsCompleted = false
+            };
+        }
 
 
         public static int UpdateCompleteLessonGroupQuest(bool completedLessonGroup, Quest quest)
@@ -102,6 +113,18 @@ namespace CodeyBE.Contracts.Entities
         public static int UpdateGetXPQuest(int awardedXP, Quest quest)
         {
             quest.Progress += awardedXP;
+            if (quest.Progress >= quest.Constraint)
+            {
+                quest.IsCompleted = true;
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int UpdateCompleteExercisesQuest(int completedExercisesCount, Quest quest)
+        {
+            quest.Progress += completedExercisesCount;
             if (quest.Progress >= quest.Constraint)
             {
                 quest.IsCompleted = true;
