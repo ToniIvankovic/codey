@@ -59,7 +59,7 @@ namespace CodeyBE.Contracts.DTOs
                     .ToHashSet()
                     ?? [],
                 Score = user.Score,
-                GamificationEnabled = user.GamificationGroup != 1
+                GamificationEnabled = true // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
             };
         }
 
