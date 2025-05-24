@@ -77,9 +77,9 @@ class _ExerciseCreationSAComponentState
               });
               widget.onChange(_packFields());
             },
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter statement code'
-                : null,
+            // validator: (value) => value == null || value.isEmpty
+            //     ? 'Please enter statement code'
+            //     : null,
           );
         }),
         TextFormField(
@@ -142,11 +142,14 @@ class _ExerciseCreationSAComponentState
               );
             },
           ),
-          ElevatedButton(
-            onPressed: () {
-              _addAnswer();
-            },
-            child: const Text('Add Answer'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                _addAnswer();
+              },
+              child: const Text('Add Answer'),
+            ),
           ),
         ],
         CheckboxListTile(

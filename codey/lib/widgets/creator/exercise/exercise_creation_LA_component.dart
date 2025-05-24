@@ -105,11 +105,14 @@ class _ExerciseCreationSAComponentState
             );
           },
         ),
-        ElevatedButton(
-          onPressed: () {
-            _addAnswer();
-          },
-          child: const Text('Add Answer'),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () {
+              _addAnswer();
+            },
+            child: const Text('Add Answer'),
+          ),
         ),
         const Text('Possible Puzzle Pieces:'),
         Row(
