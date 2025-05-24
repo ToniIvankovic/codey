@@ -235,7 +235,11 @@ class _QuestsWidgetState extends State<QuestsWidget> {
             Row(
               children: [
                 Expanded(
-                  child: _generateProgressBar(quest.progress, quest.constraint!),
+                  child: _generateProgressBar(
+                      quest.progress < quest.constraint!
+                          ? quest.progress
+                          : quest.constraint!,
+                      quest.constraint!),
                 ),
                 if (!quest.isCompleted)
                   Text(

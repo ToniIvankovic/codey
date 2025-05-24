@@ -21,7 +21,7 @@ class StreakWidget extends StatelessWidget {
           children: [
             Icon(
               Icons.whatshot,
-              color: user.streak > 0
+              color: user.didLessonToday
                   ? Colors.red
                   : Theme.of(context).colorScheme.onInverseSurface.withOpacity(0.5),
               size: 30.0,

@@ -33,6 +33,8 @@ namespace CodeyBe.Services
         private static readonly int QUEST_SPEED_GOAL_SECONDS = 60;
         private static readonly int QUEST_LESSONS_AMOUNT = 2;
         private static readonly int QUEST_COMPLETE_EXERCISES_AMOUNT = 20;
+        private static readonly int XP_STREAK_EXTENSION = 20;
+        private static readonly int LONG_STREAK_MIN_LENGTH = 3;
 
         public async Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO userDTO)
         {
@@ -140,7 +142,8 @@ namespace CodeyBe.Services
                 ?? throw new EntityNotFoundException($"Lesson group with id {lessonReport.LessonGroupId} not found.");
 
             bool solvedNewLesson = CheckIfSolvedNewLesson(lessonReport.LessonId, (int)applicationUser.NextLessonId!, reportedLessonGroup);
-
+            bool extendedLongStreak = !applicationUser.DidLessonToday()
+                && applicationUser.CalculateStreak() >= LONG_STREAK_MIN_LENGTH - 1;
             int awardedXP;
             bool completedLessonGroup = false;
             if (solvedNewLesson)
@@ -158,11 +161,15 @@ namespace CodeyBe.Services
             {
                 awardedXP = XP_SOLVED_OLD;
             }
+            if (extendedLongStreak)
+            {
+                awardedXP += XP_STREAK_EXTENSION;
+            }
             int oldXp = applicationUser.TotalXP;
             applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, awardedXP));
             await HandleQuestProgress(lessonReport, applicationUser, awardedXP, completedLessonGroup);
 
-            applicationUser.TotalXP = ApplicationUser.CalculateTotalXP(applicationUser);
+            applicationUser.TotalXP = applicationUser.CalculateTotalXP();
             int totalAwardedXP = applicationUser.TotalXP - oldXp;
 
             await UpdateUserScoreFromLessonReport(lessonReport.AnswersReport, applicationUser);
@@ -247,10 +254,12 @@ namespace CodeyBe.Services
                 applicationUser.XPachieved.Add(new KeyValuePair<DateTime, int>(DateTime.Now, questsXP));
         }
 
-        private async Task<int> UpdateQuestProgress(ApplicationUser applicationUser,
+        private async Task<int> UpdateQuestProgress(
+            ApplicationUser applicationUser,
             EndOfLessonReport lessonReport,
             int awardedXP,
-            bool completedLessonGroup)
+            bool completedLessonGroup
+        )
         {
             if (applicationUser.Quests == null)
             {
@@ -351,10 +360,11 @@ namespace CodeyBe.Services
             if (!result.Succeeded)
             {
                 string reason = result.Errors.First().Description;
-                if(reason == "Incorrect password.")
+                if (reason == "Incorrect password.")
                 {
                     throw new UserAuthenticationException(UserAuthenticationException.INVALID_PASSWORD);
-                } else
+                }
+                else
                 {
                     throw new InvalidDataException(reason);
                 }

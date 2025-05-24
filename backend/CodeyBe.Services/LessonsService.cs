@@ -95,10 +95,6 @@ namespace CodeyBe.Services
         public async Task<int> GetFirstLessonIdAsync()
         {
             var lgr = await _lessonGroupsService.GetFirstLessonGroupIdAsync();
-            if (lgr == null)
-            {
-                throw new EntityNotFoundException("No lesson groups found");
-            }
             var lesson = (await GetLessonsForLessonGroupAsync(lgr)).FirstOrDefault();
             if (lesson == null)
             {

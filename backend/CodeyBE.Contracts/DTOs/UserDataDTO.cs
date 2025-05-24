@@ -43,16 +43,16 @@ namespace CodeyBE.Contracts.DTOs
                 NextLessonId = user.NextLessonId,
                 NextLessonGroupId = user.NextLessonGroupId,
                 Roles = user.Roles,
-                TotalXP = ApplicationUser.CalculateTotalXP(user), //TODO: ApplicationUser field totalXP not used
+                TotalXP = user.CalculateTotalXP(), //TODO: ApplicationUser field totalXP not used
                 XPachieved = user.XPachieved,
-                HighestStreak = CalculateHighestStreak(user),
-                CurrentStreak = CalculateStreak(user),
-                JustUpdatedStreak = CalculateDidLessonToday(user)
+                HighestStreak = user.CalculateHighestStreak(),
+                CurrentStreak = user.CalculateStreak(),
+                JustUpdatedStreak = user.DidLessonToday()
                     && user.XPachieved
                         .Select(u => u.Key.Date)
                         .Where(date => date == DateTime.Now.Date)
                         .Count() == 1,
-                DidLessonToday = CalculateDidLessonToday(user),
+                DidLessonToday = user.DidLessonToday(),
                 DailyQuests = user.Quests
                     ?.Where(q => q.Key == DateOnly.FromDateTime(DateTime.Now))
                     .SelectMany(q => q.Value)
@@ -61,63 +61,6 @@ namespace CodeyBE.Contracts.DTOs
                 Score = user.Score,
                 GamificationEnabled = true // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
             };
-        }
-
-        public static int CalculateStreak(ApplicationUser user)
-        {
-            var today = DateTime.Now.Date;
-            var streak = 0;
-            var datesSet = user.XPachieved
-                .Where(entry => entry.Value > 0)
-                .Select(entry => entry.Key.Date)
-                .ToHashSet();
-            if (!datesSet.Contains(today))
-            {
-                today = today.AddDays(-1);
-            }
-            while (datesSet.Contains(today))
-            {
-                streak++;
-                today = today.AddDays(-1);
-            }
-            return streak;
-        }
-
-
-        public static bool CalculateDidLessonToday(ApplicationUser user)
-        {
-            return user.XPachieved.Any(x => x.Key.Date == DateTime.Now.Date);
-        }
-
-        public static int CalculateHighestStreak(ApplicationUser user)
-        {
-            var highestStreak = 0;
-            var currentStreak = 0;
-            var sortedXP = user.XPachieved.OrderByDescending(x => x.Key).ToList();
-            for (int i = 0; i < sortedXP.Count; i++)
-            {
-                if (sortedXP[i].Value > 0)
-                {
-                    currentStreak++;
-                    while (i < sortedXP.Count - 1 && sortedXP[i].Key.Date == sortedXP[i + 1].Key.Date)
-                    {
-                        i++;
-                    }
-                }
-                else
-                {
-                    if (currentStreak > highestStreak)
-                    {
-                        highestStreak = currentStreak;
-                    }
-                    currentStreak = 0;
-                }
-            }
-            if (currentStreak > highestStreak)
-            {
-                highestStreak = currentStreak;
-            }
-            return highestStreak;
         }
     }
 }

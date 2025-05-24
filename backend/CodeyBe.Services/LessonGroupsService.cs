@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeyBE.Contracts.DTOs;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
 
 namespace CodeyBe.Services
 {
@@ -18,7 +20,7 @@ namespace CodeyBe.Services
         public async Task<int> GetFirstLessonGroupIdAsync()
         {
             var lessonGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(1);
-            return lessonGroup?.PrivateId ?? throw new EntityNotFoundException();
+            return lessonGroup?.PrivateId ?? throw new EntityNotFoundException("No lesson groups found");
         }
 
         public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync()
