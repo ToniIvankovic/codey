@@ -24,7 +24,7 @@ namespace CodeyBe.Services
         ILessonGroupsService lessonGroupsService) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private static readonly int SINGLE_QUEST_XP = 50;
+        private static readonly int SINGLE_QUEST_XP = 40;
         private static readonly int XP_SOLVED_OLD = 40;
         private static readonly int XP_SOLVED_NEW = 100;
         private static readonly int DAILY_QUEST_AMOUNT = 3;
