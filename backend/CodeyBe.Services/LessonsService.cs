@@ -92,9 +92,9 @@ namespace CodeyBe.Services
             return await _lessonsRepository.GetLessonsByIDsAsync(ids);
         }
 
-        public async Task<int> GetFirstLessonIdAsync()
+        public async Task<int> GetFirstLessonIdAsync(int courseId)
         {
-            var lgr = await _lessonGroupsService.GetFirstLessonGroupIdAsync();
+            var lgr = await _lessonGroupsService.GetFirstLessonGroupIdAsync(courseId);
             var lesson = (await GetLessonsForLessonGroupAsync(lgr)).FirstOrDefault();
             if (lesson == null)
             {

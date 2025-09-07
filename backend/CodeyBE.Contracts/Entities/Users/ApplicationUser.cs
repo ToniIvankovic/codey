@@ -1,4 +1,5 @@
 ﻿using AspNetCore.Identity.Mongo.Model;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace CodeyBE.Contracts.Entities.Users
         public List<KeyValuePair<DateOnly, ISet<Quest>>>? Quests { get; set; } = [];
         public double Score { get; set; } = 1;
         public int GamificationGroup { get; set; }
+        [BsonElement("courseId")]
+        public int CourseId { get; set; }
 
         public int CalculateTotalXP()
         {

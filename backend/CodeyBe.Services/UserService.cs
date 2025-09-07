@@ -73,8 +73,8 @@ namespace CodeyBe.Services
                 ],
                 HighestLessonGroupId = null,
                 HighestLessonId = null,
-                NextLessonGroupId = await lessonGroupsService.GetFirstLessonGroupIdAsync(),
-                NextLessonId = await lessonsService.GetFirstLessonIdAsync(),
+                NextLessonGroupId = await lessonGroupsService.GetFirstLessonGroupIdAsync(user.CourseId),
+                NextLessonId = await lessonsService.GetFirstLessonIdAsync(user.CourseId),
                 TotalXP = 0,
                 XPachieved = [],
                 School = user.School,
@@ -374,6 +374,13 @@ namespace CodeyBe.Services
         public async Task<ApplicationUser> UpdateUserData(ApplicationUser applicationUser)
         {
             return await UpdateUser(applicationUser);
+        }
+
+        public async Task<int> GerUserCourseId(ClaimsPrincipal user)
+        {
+            ApplicationUser? applicationUser = await GetUser(user)
+                ?? throw new EntityNotFoundException("User not found");
+            return applicationUser.CourseId;
         }
     }
 }

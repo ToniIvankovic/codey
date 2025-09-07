@@ -117,10 +117,11 @@ namespace CodeyBe.Services
             const int N_EXERCISES = 15;
             const double RATIO_EASIER = 0.3;
             int highestLessonGroup = (int)user.HighestLessonGroupId!;
+            int courseId = user.CourseId;
             LessonGroup lessonGroup = await _lessonGroupsService.GetLessonGroupByIDAsync(highestLessonGroup)
                 ?? throw new EntityNotFoundException($"No lesson group found with id {highestLessonGroup}");
             List<LessonGroup> eligibleLessonGroups = [
-                .. (await _lessonGroupsService.GetAllLessonGroupsAsync())
+                .. (await _lessonGroupsService.GetAllLessonGroupsAsync(courseId))
                                 .Where(lgr => lgr.Order <= lessonGroup.Order && !(lgr.Adaptive ?? false))
                                 .OrderBy(lgr => lgr.Order)
 ,

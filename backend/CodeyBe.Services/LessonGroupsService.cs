@@ -17,15 +17,16 @@ namespace CodeyBe.Services
     {
         private readonly ILessonGroupsRepository _lessonGroupsRepository = lessonGroupsRepository;
 
-        public async Task<int> GetFirstLessonGroupIdAsync()
+        public async Task<int> GetFirstLessonGroupIdAsync(int courseId)
         {
-            var lessonGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(1);
+            var lessonGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(courseId, 1);
             return lessonGroup?.PrivateId ?? throw new EntityNotFoundException("No lesson groups found");
         }
 
-        public Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync()
+        public async Task<IEnumerable<LessonGroup>> GetAllLessonGroupsAsync(int currentUserCourseId)
         {
-            return _lessonGroupsRepository.GetAllAsync();
+            return (await _lessonGroupsRepository.GetAllAsync())
+                .Where(lg => lg.CourseId == currentUserCourseId);
         }
 
         public Task<LessonGroup?> GetLessonGroupByIDAsync(int id)
@@ -37,7 +38,7 @@ namespace CodeyBe.Services
         {
             LessonGroup group = await GetLessonGroupByIDAsync(lessonGroupId) ?? throw new EntityNotFoundException();
             int order = group.Order + 1;
-            LessonGroup? nextGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(order);
+            LessonGroup? nextGroup = await _lessonGroupsRepository.GetLessonGroupByOrderAsync(group.CourseId, order);
             return nextGroup;
         }
 

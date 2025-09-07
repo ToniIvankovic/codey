@@ -29,6 +29,7 @@ namespace CodeyBE.Contracts.DTOs
         public ISet<Quest>? DailyQuests { get; set; }
         public required double Score { get; set; }
         public required bool GamificationEnabled { get; set; }
+        public required int CourseId { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -59,7 +60,8 @@ namespace CodeyBE.Contracts.DTOs
                     .ToHashSet()
                     ?? [],
                 Score = user.Score,
-                GamificationEnabled = true // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
+                GamificationEnabled = true, // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
+                CourseId = user.CourseId,
             };
         }
     }

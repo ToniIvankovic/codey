@@ -32,6 +32,7 @@ namespace CodeyBE.API.Controllers
                 var email = body["email"];
                 var password = body["password"];
                 var school = body["school"];
+                var courseId = int.Parse(body["courseId"]);
                 var result = await userService.RegisterStudent(new UserRegistrationRequestDTO
                 {
                     FirstName = firstName,
@@ -39,7 +40,8 @@ namespace CodeyBE.API.Controllers
                     DateOfBirth = dob != null ? DateOnly.Parse(dob) : null,
                     Email = email,
                     Password = password,
-                    School = school
+                    School = school,
+                    CourseId = courseId
                 });
                 if (result.Succeeded)
                 {
@@ -150,10 +152,12 @@ namespace CodeyBE.API.Controllers
         {
             var email = body["email"];
             var password = body["password"];
+            var courseId = int.Parse(body["courseId"]);
             var result = await userService.RegisterCreator(new UserRegistrationRequestDTO
             {
                 Email = email,
-                Password = password
+                Password = password,
+                CourseId = courseId
             });
             if (result.Succeeded)
             {
@@ -174,6 +178,7 @@ namespace CodeyBE.API.Controllers
         public async Task<IActionResult> RegisterTeacher([FromBody] Dictionary<string, string> body)
         {
             string firstName, lastName, email, password, school;
+            int courseId;
             try
             {
                 firstName = body["firstName"];
@@ -181,6 +186,7 @@ namespace CodeyBE.API.Controllers
                 email = body["email"];
                 password = body["password"];
                 school = body["school"];
+                courseId = int.Parse(body["courseId"]);
             }
             catch (KeyNotFoundException e)
             {
@@ -193,7 +199,8 @@ namespace CodeyBE.API.Controllers
                 LastName = lastName,
                 Email = email,
                 Password = password,
-                School = school
+                School = school,
+                CourseId = courseId
             });
             if (!result.Succeeded)
             {

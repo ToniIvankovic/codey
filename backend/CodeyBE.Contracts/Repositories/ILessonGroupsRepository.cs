@@ -10,7 +10,8 @@ namespace CodeyBE.Contracts.Repositories
 {
     public interface ILessonGroupsRepository : IRepository<LessonGroup>
     {
-        public Task<LessonGroup?> GetLessonGroupByOrderAsync(int order);
+        public Task<IEnumerable<LessonGroup>> GetAllAsync(int courseId);
+        public Task<LessonGroup?> GetLessonGroupByOrderAsync(int courseId, int order);
         Task<LessonGroup> CreateAsync(LessonGroupCreationDTO lessonGroup);
         Task DeleteAsync(int id);
         Task<LessonGroup> UpdateAsync(int id, LessonGroupCreationDTO lessonGroup);
