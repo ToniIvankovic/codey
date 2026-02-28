@@ -79,6 +79,7 @@ namespace CodeyBe.Services
                 XPachieved = [],
                 School = user.School,
                 GamificationGroup = user.School == "Ostali" ? 0 : userCount % 2 + 1,
+                CourseId = user.CourseId,
             }, user.Password);
             return result;
         }
@@ -100,6 +101,7 @@ namespace CodeyBe.Services
                         ClaimValue = user.Email
                     },
                 ],
+                CourseId = user.CourseId,
             }, user.Password);
             return result;
         }
@@ -123,6 +125,7 @@ namespace CodeyBe.Services
                     },
                 ],
                 School = user.School,
+                CourseId = user.CourseId,
             }, user.Password);
             return result;
         }

@@ -14,7 +14,7 @@ namespace CodeyBE.Contracts.Services
 {
     public interface IExercisesService
     {
-        public Task<IEnumerable<Exercise>> GetAllExercisesAsync();
+        public Task<IEnumerable<Exercise>> GetAllExercisesAsync(int CourseId);
         public Task<Exercise?> GetExerciseByIDAsync(int id);
         public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
 

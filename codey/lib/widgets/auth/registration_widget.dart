@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,9 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
   String? school;
   final List<String> schools = [];
 
+  Course? course;
+  final List<Course> courses = [];
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +42,12 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
     );
+    setState(() {
+      courses.addAll([
+        Course(id: 10001, name: "DMM"),
+        Course(id: 10002, name: "Python"),
+      ]);
+    });
   }
 
   @override
@@ -82,10 +92,11 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           children: [
             if (state.errorText != null)
               Padding(
-                padding: const EdgeInsets.fromLTRB(0,0,0,10),
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                 child: Text(
                   state.errorText.toString(),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error, fontSize: 12),
                 ),
               ),
             Row(
@@ -319,6 +330,42 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
       ],
     );
 
+    final coursesDropdown = Row(
+      children: [
+        Expanded(
+          child: FormField<String>(
+            builder: (FormFieldState<String> state) {
+              return DropdownButtonFormField<String>(
+                value: course?.name,
+                items: courses
+                    .map((course) => DropdownMenuItem(
+                          value: course.name,
+                          child: Text(course.name),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    course = courses.firstWhere((c) => c.name == value);
+                  });
+                },
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'Tečaj *',
+                  errorText: state.errorText,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Molimo odaberite tečaj';
+                  }
+                  return null;
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+
     return Form(
       key: formKey,
       child: Column(
@@ -354,6 +401,10 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: schoolDropdown,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: coursesDropdown,
           ),
           if (errorMessage != null)
             Text(
@@ -391,6 +442,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
                         email: email,
                         password: password,
                         school: school!,
+                        courseId: course!.id,
                       )
                       .then((value) {
                     setState(() {

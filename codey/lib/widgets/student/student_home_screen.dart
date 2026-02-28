@@ -1,4 +1,5 @@
 import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/widgets/student/profile_data/student_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,13 @@ import 'student_gamification_screen.dart';
 class StudentHomeScreen extends StatefulWidget {
   final VoidCallback onLogoutSuper;
   final AppUser user;
+  final int courseId;
 
   const StudentHomeScreen({
     super.key,
     required this.onLogoutSuper,
     required this.user,
+    required this.courseId
   });
 
   @override
@@ -34,9 +37,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                child: Text('DMM'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                child: Text(widget.courseId.toString()),
               ),
               if (widget.user.gamificationEnabled) ...[
                 Row(

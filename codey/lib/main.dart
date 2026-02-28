@@ -23,7 +23,7 @@ import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
   bool isProd = true;
-  //isProd = false;
+  // isProd = false;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -35,6 +35,9 @@ Future main() async {
         Provider<AuthenticatedClient>(
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
+        Provider<UserService>(
+            create: (context) => UserService1(context.read<AuthService>(),
+                context.read<AuthenticatedClient>())),
         Provider<AdminFunctionsService>(
           create: (context) =>
               AdminFunctionsServiceImpl(context.read<AuthenticatedClient>()),
@@ -50,20 +53,19 @@ Future main() async {
         Provider<LessonGroupsService>(
           create: (context) => LessonGroupsServiceV1(
               context.read<LessonGroupsRepository>(),
-              context.read<AuthenticatedClient>()),
+              context.read<AuthenticatedClient>(),
+              context.read<UserService>()),
         ),
         Provider<LessonsRepository>(
           create: (context) => LessonsRepository1(
               context.read<AuthenticatedClient>(),
-              context.read<ExercisesRepository>()),
+              context.read<ExercisesRepository>(),
+              context.read<UserService>()),
         ),
         Provider<LessonsService>(
           create: (context) =>
               LessonsServiceV1(context.read<LessonsRepository>()),
         ),
-        Provider<UserService>(
-            create: (context) => UserService1(context.read<AuthService>(),
-                context.read<AuthenticatedClient>())),
         Provider<ExercisesService>(
           create: (context) => ExercisesServiceV1(
             context.read<ExercisesRepository>(),
@@ -175,12 +177,17 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (snapshot.hasError ||
             !snapshot.hasData ||
             snapshot.data == null) {
+          if (snapshot.hasError) {
+            debugPrint('AuthService.token error: ${snapshot.error}');
+            debugPrint('${snapshot.stackTrace}');
+          }
           return AuthScreen(
             onLogin: () => setState(() => loggedIn = true),
           );
         }
         onLogout() {
           context.read<SessionService>().logout();
+          context.read<LessonGroupsRepository>().invalidateCache();
           setState(() => loggedIn = false);
         }
 
@@ -207,6 +214,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else if (snapshot.hasError || snapshot.data == null) {
+              if (snapshot.hasError) {
+                debugPrint('UserService.userStream error: ${snapshot.error}');
+                debugPrint('${snapshot.stackTrace}');
+              }
               onLogout();
               return const Scaffold(
                 body: Center(
@@ -237,6 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   key: ValueKey(user),
                   onLogoutSuper: onLogout,
                   user: user,
+                  courseId: user.courseId,
                 );
               }
               return const Scaffold(

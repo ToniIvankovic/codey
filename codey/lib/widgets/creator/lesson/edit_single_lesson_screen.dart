@@ -211,12 +211,16 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                                     tips: "Lesson group description",
                                     lessons: [widget.lesson.id],
                                     order: 0,
+                                    courseId: widget.lesson.courseId,
                                   ),
                                   lesson: Lesson(
                                     id: 0,
                                     name: "Lesson",
                                     specificTips: specificTipsLocal,
-                                    exerciseIds: exercisesLocal.map((e) => e.id).toList(),                                  
+                                    exerciseIds: exercisesLocal
+                                        .map((e) => e.id)
+                                        .toList(),
+                                    courseId: widget.lesson.courseId,
                                   ),
                                   user: value),
                             ),
@@ -335,6 +339,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => CreateExerciseScreen(
                                       existingExercise: exercisesEdited[index],
+                                      courseId: widget.lesson.courseId,
                                     ),
                                   ),
                                 ).then((value) {

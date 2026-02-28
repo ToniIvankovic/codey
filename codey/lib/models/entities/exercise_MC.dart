@@ -20,6 +20,7 @@ class ExerciseMC extends Exercise {
     String? statementOutput,
     required this.answerOptions,
     required this.correctAnswer,
+    required courseId,
   }) : super(
           id: id,
           difficulty: difficulty,
@@ -27,6 +28,7 @@ class ExerciseMC extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          courseId: courseId,
         );
 
   factory ExerciseMC.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class ExerciseMC extends Exercise {
       specificTip: json['specificTip'],
       answerOptions: json['answerOptions'],
       correctAnswer: json['correctAnswer'],
+      courseId: json['courseId'],
     );
   }
 
@@ -51,6 +54,7 @@ class ExerciseMC extends Exercise {
       'type': type.toString(),
       'answerOptions': answerOptions,
       'correctAnswer': correctAnswer,
+      'courseId': courseId,
     };
 
     if (statement != null) {
@@ -83,6 +87,7 @@ class ExerciseMC extends Exercise {
       statementOutput: other.statementOutput,
       answerOptions: other.answerOptions,
       correctAnswer: other.correctAnswer,
+      courseId: other.courseId,
     );
   }
 }

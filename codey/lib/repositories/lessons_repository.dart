@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:codey/models/DTOs/lesson_creation_DTO.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,8 +28,10 @@ class LessonsRepository1 implements LessonsRepository {
   final Map<int, Lesson> _cache = {};
   final http.Client _authenticatedClient;
   final ExercisesRepository _exercisesRepository;
+  final UserService _userService;
 
-  LessonsRepository1(this._authenticatedClient, this._exercisesRepository);
+  LessonsRepository1(
+      this._authenticatedClient, this._exercisesRepository, this._userService);
 
   @override
   Future<List<Lesson>> getLessonsForGroup(LessonGroup lessonGroup) async {
@@ -137,13 +141,16 @@ class LessonsRepository1 implements LessonsRepository {
     List<int> exerciseIds,
   ) async {
     var apiUri = Uri.parse('${dotenv.env["API_BASE"]}/lessons');
+    var courseId = (await _userService.userStream.first).courseId;
+    var dto = LessonCreationDto(
+      name: name,
+      specificTips: tips,
+      exerciseIds: exerciseIds,
+      courseId: courseId,
+    );
     final response = await _authenticatedClient.post(
       apiUri,
-      body: json.encode({
-        'name': name,
-        'specificTips': tips,
-        'exercises': exerciseIds,
-      }),
+      body: json.encode(dto.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -190,14 +197,17 @@ class LessonsRepository1 implements LessonsRepository {
     List<int> exerciseIds,
   ) async {
     invalidateCache(id);
-    var response = await _authenticatedClient
-        .put(Uri.parse('${dotenv.env["API_BASE"]}/lessons/$id'),
-            body: json.encode({
-              'name': name,
-              'specificTips': tips ?? "", //TODO: maybe leave null?
-              'exercises': exerciseIds,
-            }),
-            headers: {'Content-Type': 'application/json'});
+    var courseId = (await _userService.userStream.first).courseId;
+    var dto = LessonCreationDto(
+      name: name,
+      specificTips: tips,
+      exerciseIds: exerciseIds,
+      courseId: courseId,
+    );
+    var response = await _authenticatedClient.put(
+        Uri.parse('${dotenv.env["API_BASE"]}/lessons/$id'),
+        body: json.encode(dto.toJson()),
+        headers: {'Content-Type': 'application/json'});
 
     if (response.statusCode != 200) {
       switch (response.statusCode) {

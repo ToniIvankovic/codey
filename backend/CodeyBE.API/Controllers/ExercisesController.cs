@@ -31,7 +31,8 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<object>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<object>> GetAllExercises()
         {
-            return (await _exercisesService.GetAllExercisesAsync())
+            var currentUserCourseId = await userService.GerUserCourseId(User);
+            return (await _exercisesService.GetAllExercisesAsync(currentUserCourseId))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }

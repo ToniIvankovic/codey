@@ -14,6 +14,7 @@ abstract class Exercise {
   final String? statementOutput;
   ExerciseStatistics? statistics;
   bool? repeated = false;
+  final int courseId;
 
   Exercise({
     required this.id,
@@ -23,6 +24,7 @@ abstract class Exercise {
     this.specificTip,
     this.statementOutput,
     this.statistics,
+    required this.courseId,
   });
 
   factory Exercise.fromJson(Map<String, dynamic> json) {

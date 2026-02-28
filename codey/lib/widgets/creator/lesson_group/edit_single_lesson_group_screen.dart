@@ -112,6 +112,7 @@ class _EditSingleLessonGroupScreenState
                                   : lessonsEdited!.map((e) => e.id).toList(),
                               order: widget.lessonGroup.order,
                               adaptive: adaptive,
+                              courseId: widget.lessonGroup.courseId,
                             );
 
                             // Save changes on BE
@@ -221,6 +222,7 @@ class _EditSingleLessonGroupScreenState
                               lessons: widget.lessonGroup.lessons,
                               order: widget.lessonGroup.order,
                               adaptive: widget.lessonGroup.adaptive,
+                              courseId: widget.lessonGroup.courseId,
                             ),
                             lessonGroupFinished: true,
                           ),

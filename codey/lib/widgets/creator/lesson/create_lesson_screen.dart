@@ -1,6 +1,7 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,16 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   String? name;
   String? specificTips;
   List<Exercise> exercises = [];
+  late int courseId;
+
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<UserService>().userStream.first.then((user) => setState(() {
+          courseId = user.courseId;
+        }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +100,7 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                                     builder: (context) => CreateExerciseScreen(
                                       key: ValueKey(exercise),
                                       existingExercise: exercise,
+                                      courseId: courseId,
                                     ),
                                   ),
                                 ).then((value) {

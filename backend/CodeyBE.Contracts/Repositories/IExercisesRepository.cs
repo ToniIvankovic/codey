@@ -11,6 +11,7 @@ namespace CodeyBE.Contracts.Repositories
 {
     public interface IExercisesRepository : IRepository<Exercise>
     {
+        Task<IEnumerable<Exercise>> GetAllAsync(int courseId);
         IEnumerable<Exercise> GetExercisesByID(IEnumerable<int> ids);
 
         public static Exercise MapToSpecificExerciseType(Exercise exercise)

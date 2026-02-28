@@ -30,7 +30,7 @@ namespace CodeyBE.Contracts.Entities
         [BsonIgnoreIfNull]
         public double? RecommendedLevel { get; set; }
         [BsonElement("courseId")]
-        public int CourseId { get; set; }
+        public required int CourseId { get; set; }
 
     }
 }

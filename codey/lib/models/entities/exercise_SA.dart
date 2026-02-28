@@ -20,6 +20,7 @@ class ExerciseSA extends Exercise {
     String? specificTip,
     this.correctAnswers,
     this.raisesError,
+    required courseId,
   }) : super(
           type: ExerciseType.SA,
           id: id,
@@ -27,6 +28,7 @@ class ExerciseSA extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          courseId: courseId,
         );
 
   factory ExerciseSA.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class ExerciseSA extends Exercise {
           ? List<String>.from(json['correctAnswers'])
           : null,
       raisesError: json['raisesError'],
+      courseId: json['courseId'],
     );
   }
 
@@ -57,6 +60,7 @@ class ExerciseSA extends Exercise {
         'specificTip': specificTip,
         'correctAnswers': correctAnswers,
         'raisesError': raisesError,
+        'courseId': courseId,
       };
 
   factory ExerciseSA.fromExercise(ExerciseSA other) {
@@ -70,6 +74,7 @@ class ExerciseSA extends Exercise {
       question: (other).question,
       correctAnswers: (other).correctAnswers,
       raisesError: (other).raisesError,
+      courseId: other.courseId,
     );
   }
 }

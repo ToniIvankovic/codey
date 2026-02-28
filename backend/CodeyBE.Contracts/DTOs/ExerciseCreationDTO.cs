@@ -15,5 +15,6 @@
         public List<dynamic>? CorrectAnswers { get; set; }
         public bool? RaisesError { get; set; }
         public string? SpecificTip { get; set; }
+        public required int CourseId { get; set; }
     }
 }

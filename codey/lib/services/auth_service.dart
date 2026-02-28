@@ -1,3 +1,4 @@
+import 'package:codey/models/DTOs/user_registration_dto.dart';
 import 'package:codey/models/exceptions/authentication_exception.dart';
 import 'package:codey/models/exceptions/invalid_data_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
@@ -21,6 +22,7 @@ abstract class AuthService {
     required String email,
     required String password,
     required String school,
+    required int courseId,
   });
   Future<void> changePassword({
     required String oldPassword,
@@ -70,17 +72,19 @@ class AuthService1 implements AuthService {
     required String email,
     required String password,
     required String school,
+    required int courseId,
   }) async {
     final response = await http.post(
       _registerEndpoint,
-      body: json.encode({
-        'firstName': firstName,
-        'lastName': lastName,
-        'dateOfBirth': dateOfBirth?.toIso8601String(),
-        'email': email,
-        'password': password,
-        'school': school,
-      }),
+      body: json.encode(UserRegistrationDTO(
+              firstName: firstName,
+              lastName: lastName,
+              dateOfBirth: dateOfBirth,
+              email: email,
+              password: password,
+              school: school,
+              courseId: courseId)
+          .toJson()),
       headers: {'Content-Type': 'application/json'},
     );
 

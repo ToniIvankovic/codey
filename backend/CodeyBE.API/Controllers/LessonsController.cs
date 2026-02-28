@@ -1,4 +1,5 @@
-﻿using CodeyBE.Contracts.DTOs;
+﻿using CodeyBe.Services;
+using CodeyBE.Contracts.DTOs;
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Services;
@@ -10,17 +11,19 @@ namespace CodeyBE.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class LessonsController(ILessonsService lessonsService) : ControllerBase
+    public class LessonsController(ILessonsService lessonsService, IUserService userService) : ControllerBase
     {
         const string version = "v2";
         private readonly ILessonsService lessonsService = lessonsService;
+        private readonly IUserService userService = userService;
 
         [Authorize(Roles = "CREATOR")]
         [HttpGet("all", Name = "getAllLessons")]
         [ProducesResponseType(typeof(IEnumerable<Lesson>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Lesson>> GetAllLessons()
         {
-            return await lessonsService.GetAllLessonsAsync();
+            var currentUserCourseId = await userService.GerUserCourseId(User);
+            return await lessonsService.GetAllLessonsAsync(currentUserCourseId);
         }
 
         [Authorize(Roles = "CREATOR,STUDENT,TEACHER")]

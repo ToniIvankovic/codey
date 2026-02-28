@@ -5,6 +5,7 @@ class LessonGroup {
   List<int> lessons;
   int order;
   bool adaptive;
+  int courseId;
 
   LessonGroup({
     required this.id,
@@ -13,6 +14,7 @@ class LessonGroup {
     required this.lessons,
     required this.order,
     this.adaptive = false,
+    required this.courseId,
   });
 
   factory LessonGroup.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class LessonGroup {
       lessons: json['lessonIds'].cast<int>(),
       order: json['order'],
       adaptive: json['adaptive'] ?? false,
+      courseId: json['courseId'],
     );
   }
 
@@ -34,6 +37,7 @@ class LessonGroup {
       'lessonIds': lessons,
       'order': order,
       'adaptive': adaptive,
+      'courseId': courseId,
     };
   }
 }

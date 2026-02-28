@@ -15,6 +15,7 @@ class ExerciseLA extends Exercise {
     String? specificTip,
     this.answerOptions,
     required this.correctAnswers,
+    required courseId,
   }) : super(
           type: ExerciseType.LA,
           id: id,
@@ -22,6 +23,7 @@ class ExerciseLA extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          courseId: courseId,
         );
 
   factory ExerciseLA.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class ExerciseLA extends Exercise {
       correctAnswers: json['correctAnswers'] != null
           ? List<String>.from(json['correctAnswers'])
           : [],
+      courseId: json['courseId'],
     );
   }
 
@@ -49,6 +52,7 @@ class ExerciseLA extends Exercise {
         'specificTip': specificTip,
         'answerOptions': answerOptions,
         'correctAnswers': correctAnswers,
+        'courseId': courseId,
       };
 
   factory ExerciseLA.fromExercise(ExerciseLA other) {
@@ -60,6 +64,7 @@ class ExerciseLA extends Exercise {
       specificTip: other.specificTip,
       answerOptions: (other).answerOptions,
       correctAnswers: (other).correctAnswers,
+      courseId: other.courseId,
     );
   }
 }

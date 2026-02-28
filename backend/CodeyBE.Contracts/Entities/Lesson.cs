@@ -23,5 +23,7 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("adaptive")]
         [BsonIgnoreIfNull]
         public bool? Adaptive { get; set; }
+        [BsonElement("courseId")]
+        public required int CourseId { get; set; }
     }
 }

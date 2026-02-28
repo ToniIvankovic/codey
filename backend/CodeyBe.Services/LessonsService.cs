@@ -12,7 +12,11 @@ namespace CodeyBe.Services
         private readonly ILessonsRepository _lessonsRepository = lessonsRepository;
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
 
-        public async Task<IEnumerable<Lesson>> GetAllLessonsAsync()
+        public async Task<IEnumerable<Lesson>> GetAllLessonsAsync(int courseId)
+        {
+            return await _lessonsRepository.GetAllAsync(courseId);
+        }
+        private async Task<IEnumerable<Lesson>> GetAllLessonsAsync()
         {
             return await _lessonsRepository.GetAllAsync();
         }
@@ -43,12 +47,14 @@ namespace CodeyBe.Services
                     PrivateId = 99998,
                     Name = "Adaptivna lekcija 1",
                     Adaptive = true,
+                    CourseId = lessonGroup.CourseId,
                 },
                 new()
                 {
                     PrivateId = 99999,
                     Name = "Adaptivna lekcija 2",
                     Adaptive = true,
+                    CourseId = lessonGroup.CourseId,
                 },
             ];
         }

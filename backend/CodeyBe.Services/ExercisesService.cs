@@ -26,9 +26,9 @@ namespace CodeyBe.Services
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
         private readonly ILogsService _logsService = logsService;
 
-        public async Task<IEnumerable<Exercise>> GetAllExercisesAsync()
+        public async Task<IEnumerable<Exercise>> GetAllExercisesAsync(int courseId)
         {
-            return EnrichExercisesList(await _exercisesRepository.GetAllAsync());
+            return EnrichExercisesList(await _exercisesRepository.GetAllAsync(courseId));
         }
 
         public async Task<Exercise?> GetExerciseByIDAsync(int id)

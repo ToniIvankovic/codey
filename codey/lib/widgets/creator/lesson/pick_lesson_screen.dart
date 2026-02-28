@@ -25,55 +25,57 @@ class _PickLessonScreenState extends State<PickLessonScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const Text('Pick a lesson'),
-            FutureBuilder(
-                future: lessonsService.getAllLessons(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Lesson>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-                  final lessons = snapshot.data!.reversed.toList();
-                  lessons.removeWhere((lesson) => widget.existingLessons
-                      .map((lesson) => lesson.id)
-                      .contains(lesson.id));
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const CreateLessonScreen();
-                            })).then((value) {
-                              if (value != null) {
-                                setState(() {
-                                  lessons.insert(0, value as Lesson);
-                                });
-                              }
-                            });
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add new lesson')),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: lessons.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            title: Text(
-                                "${lessons[index].name} (${lessons[index].id})"),
-                            onTap: () {
-                              Navigator.pop(context, lessons[index]);
+            Expanded(
+              child: FutureBuilder(
+                  future: lessonsService.getAllLessons(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Lesson>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+                    final lessons = snapshot.data!.reversed.toList();
+                    lessons.removeWhere((lesson) => widget.existingLessons
+                        .map((lesson) => lesson.id)
+                        .contains(lesson.id));
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextButton.icon(
+                            onPressed: () {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return const CreateLessonScreen();
+                              })).then((value) {
+                                if (value != null) {
+                                  setState(() {
+                                    lessons.insert(0, value as Lesson);
+                                  });
+                                }
+                              });
                             },
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                })
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add a new lesson')),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: lessons.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ListTile(
+                                title: Text(
+                                    "${lessons[index].name} (${lessons[index].id})"),
+                                onTap: () {
+                                  Navigator.pop(context, lessons[index]);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+            )
           ],
         ),
       ),
