@@ -14,5 +14,6 @@ namespace CodeyBE.Contracts.DTOs
         public double Difficulty { get; set; } = ex.Difficulty;
         public string? Statement { get; set; } = ex.Statement;
         public string? SpecificTip { get; set; } = ex.SpecificTip;
+        public int CourseId { get; set; } = ex.CourseId;
     }
 }

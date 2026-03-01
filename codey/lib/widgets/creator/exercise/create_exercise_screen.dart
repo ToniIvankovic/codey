@@ -20,9 +20,11 @@ class CreateExerciseScreen extends StatefulWidget {
   const CreateExerciseScreen({
     super.key,
     this.existingExercise,
+    required this.courseId,
   });
 
   final Exercise? existingExercise;
+  final int courseId;
   @override
   State<CreateExerciseScreen> createState() => _CreateExerciseScreenState();
 }
@@ -35,6 +37,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
   String? statementOutput;
   String? specificTip;
   dynamic innerFields;
+  int? courseId;
 
   @override
   void initState() {
@@ -44,6 +47,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     statement = widget.existingExercise?.statement;
     statementOutput = widget.existingExercise?.statementOutput;
     specificTip = widget.existingExercise?.specificTip;
+    courseId = widget.courseId;
   }
 
   Exercise createExercise() {
@@ -58,6 +62,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         question: innerFields['question'],
         answerOptions: innerFields['answerOptions'],
         correctAnswer: innerFields['correctAnswer'],
+        courseId: courseId,
       );
     } else if (type == ExerciseType.SA) {
       return ExerciseSA(
@@ -70,6 +75,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statementCode: innerFields['statementCode'],
         question: innerFields['question'],
         raisesError: innerFields['raisesError'],
+        courseId: courseId,
       );
     } else if (type == ExerciseType.LA) {
       return ExerciseLA(
@@ -80,6 +86,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         specificTip: specificTip,
         correctAnswers: innerFields['correctAnswers'].cast<String>(),
         answerOptions: innerFields['answerOptions'].cast<String, String>(),
+        courseId: courseId,
       );
     } else if (type == ExerciseType.SCW) {
       return ExerciseSCW(
@@ -91,6 +98,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         defaultGapLengths: innerFields['defaultGapLengths'],
         specificTip: specificTip,
         correctAnswers: innerFields['correctAnswers'],
+        courseId: courseId,
       );
     } else {
       throw Exception('Invalid exercise type');

@@ -1,10 +1,13 @@
 import 'package:codey/auth/authenticated_client.dart';
+import 'package:http/http.dart' as http;
 import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/repositories/courses_repository.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/admin_functions_service.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
@@ -23,7 +26,7 @@ import 'widgets/creator/creator_home_page.dart';
 
 Future main() async {
   bool isProd = true;
-  //isProd = false;
+  // isProd = false;
   String env = isProd ? ".env.prod" : ".env.dev";
   await dotenv.dotenv.load(fileName: env);
   runApp(
@@ -35,6 +38,9 @@ Future main() async {
         Provider<AuthenticatedClient>(
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
+        Provider<UserService>(
+            create: (context) => UserService1(context.read<AuthService>(),
+                context.read<AuthenticatedClient>())),
         Provider<AdminFunctionsService>(
           create: (context) =>
               AdminFunctionsServiceImpl(context.read<AuthenticatedClient>()),
@@ -50,20 +56,19 @@ Future main() async {
         Provider<LessonGroupsService>(
           create: (context) => LessonGroupsServiceV1(
               context.read<LessonGroupsRepository>(),
-              context.read<AuthenticatedClient>()),
+              context.read<AuthenticatedClient>(),
+              context.read<UserService>()),
         ),
         Provider<LessonsRepository>(
           create: (context) => LessonsRepository1(
               context.read<AuthenticatedClient>(),
-              context.read<ExercisesRepository>()),
+              context.read<ExercisesRepository>(),
+              context.read<UserService>()),
         ),
         Provider<LessonsService>(
           create: (context) =>
               LessonsServiceV1(context.read<LessonsRepository>()),
         ),
-        Provider<UserService>(
-            create: (context) => UserService1(context.read<AuthService>(),
-                context.read<AuthenticatedClient>())),
         Provider<ExercisesService>(
           create: (context) => ExercisesServiceV1(
             context.read<ExercisesRepository>(),
@@ -79,6 +84,13 @@ Future main() async {
           create: (context) => UserInteractionServiceImpl(
             context.read<AuthenticatedClient>(),
           ),
+        ),
+        Provider<CoursesRepository>(
+          create: (context) => CoursesRepository1(http.Client()),
+        ),
+        Provider<CoursesService>(
+          create: (context) =>
+              CoursesServiceV1(context.read<CoursesRepository>()),
         ),
       ],
       child: const MyApp(),
@@ -175,12 +187,17 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (snapshot.hasError ||
             !snapshot.hasData ||
             snapshot.data == null) {
+          if (snapshot.hasError) {
+            debugPrint('AuthService.token error: ${snapshot.error}');
+            debugPrint('${snapshot.stackTrace}');
+          }
           return AuthScreen(
             onLogin: () => setState(() => loggedIn = true),
           );
         }
         onLogout() {
           context.read<SessionService>().logout();
+          context.read<LessonGroupsRepository>().invalidateCache();
           setState(() => loggedIn = false);
         }
 
@@ -207,6 +224,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             } else if (snapshot.hasError || snapshot.data == null) {
+              if (snapshot.hasError) {
+                debugPrint('UserService.userStream error: ${snapshot.error}');
+                debugPrint('${snapshot.stackTrace}');
+              }
               onLogout();
               return const Scaffold(
                 body: Center(
@@ -237,6 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   key: ValueKey(user),
                   onLogoutSuper: onLogout,
                   user: user,
+                  course: user.course,
                 );
               }
               return const Scaffold(

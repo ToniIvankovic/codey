@@ -141,7 +141,7 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 throw new Exception("Update failed");
             }
-            if(updateResult.MatchedCount == 0)
+            if (updateResult.MatchedCount == 0)
             {
                 throw new EntityNotFoundException("Entity not found");
             }
@@ -160,6 +160,13 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 throw new EntityNotFoundException("Delete failed");
             }
+        }
+
+        public async Task<IEnumerable<Exercise>> GetAllAsync(int courseId)
+        {
+            return (await base.GetAllAsync())
+                .Where(ex => ex.CourseId == courseId).ToList()
+                .Select(ex => IExercisesRepository.MapToSpecificExerciseType(ex));
         }
     }
 }

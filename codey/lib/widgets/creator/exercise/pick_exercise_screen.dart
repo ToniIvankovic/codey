@@ -1,6 +1,7 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
   List<Exercise> exercisesAll = [];
   List<Exercise> exercisesFiltered = [];
   ExerciseType? selectedType;
+  late int courseId;
 
   @override
   void initState() {
@@ -33,6 +35,9 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
         exercisesFiltered = List.of(exercisesAll);
       });
     });
+    context.read<UserService>().userStream.first.then((user) => setState(() {
+          courseId = user.course.id;
+        }));
   }
 
   void filterExercises(ExerciseType? type) {
@@ -64,7 +69,7 @@ class _PickExerciseScreenState extends State<PickExerciseScreen> {
                 label: const Text('Add new exercise'),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const CreateExerciseScreen();
+                    return CreateExerciseScreen(courseId: courseId);
                   })).then((value) {
                     if (value != null) {
                       setState(() {

@@ -12,7 +12,7 @@ namespace CodeyBE.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize(Roles = "STUDENT,CREATOR,TEACHER")]
-    public class LessonGroupsController(ILessonGroupsService lessonGroupsService) : ControllerBase
+    public class LessonGroupsController(ILessonGroupsService lessonGroupsService, IUserService userService) : ControllerBase
     {
         const string version = "v2";
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
@@ -21,7 +21,8 @@ namespace CodeyBE.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<LessonGroup>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<LessonGroup>> GetAllLessonGroups()
         {
-            return await _lessonGroupsService.GetAllLessonGroupsAsync();
+            var currentUserCourseId = await userService.GerUserCourseId(User);
+            return await _lessonGroupsService.GetAllLessonGroupsAsync(currentUserCourseId);
         }
 
         [Authorize(Roles = "CREATOR,TEACHER")]

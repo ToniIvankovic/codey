@@ -1,4 +1,4 @@
-﻿using CodeyBE.Contracts.Entities;
+using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Users;
 using System;
 using System.Collections.Generic;
@@ -29,6 +29,7 @@ namespace CodeyBE.Contracts.DTOs
         public ISet<Quest>? DailyQuests { get; set; }
         public required double Score { get; set; }
         public required bool GamificationEnabled { get; set; }
+        public required CourseSummaryDTO Course { get; set; }
 
         public static UserDataDTO FromUser(ApplicationUser user)
         {
@@ -59,7 +60,8 @@ namespace CodeyBE.Contracts.DTOs
                     .ToHashSet()
                     ?? [],
                 Score = user.Score,
-                GamificationEnabled = true // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
+                GamificationEnabled = true, // ENABLE IF TESTING WITH CONTROL GROUP user.GamificationGroup != 1
+                Course = CourseSummaryDTO.FromCourse(user.Course),
             };
         }
     }

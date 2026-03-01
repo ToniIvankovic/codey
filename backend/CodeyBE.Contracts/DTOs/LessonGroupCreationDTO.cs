@@ -13,5 +13,6 @@ namespace CodeyBE.Contracts.DTOs
         public required IEnumerable<int> Lessons { get; set; }
         public int? Order { get; set; }
         public bool? Adaptive { get; set; }
+        public required int CourseId { get; set; }
     }
 }

@@ -31,6 +31,7 @@ namespace CodeyBE.Data.DB.Repositories
                 Name = lesson.Name,
                 Exercises = lesson.Exercises,
                 SpecificTips = lesson.SpecificTips,
+                CourseId = lesson.CourseId
             });
             return (await GetByIdAsync(nextId))!;
         }
@@ -58,7 +59,7 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 throw new EntityNotFoundException("Lesson not found");
             }
-            if(updateResult.ModifiedCount == 0)
+            if (updateResult.ModifiedCount == 0)
             {
                 throw new NoChangesException("No changes");
             }
@@ -81,6 +82,13 @@ namespace CodeyBE.Data.DB.Repositories
                 .Find(lesson => ids.Contains(lesson.PrivateId))
                 .ToListAsync())
                 .OrderBy(lesson => ids.IndexOf(lesson.PrivateId))
+                .ToList();
+        }
+
+        public async Task<IEnumerable<Lesson>> GetAllAsync(int courseId)
+        {
+            return (await base.GetAllAsync())
+                .Where(ex => ex.CourseId == courseId)
                 .ToList();
         }
     }

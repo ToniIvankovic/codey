@@ -18,6 +18,7 @@ class ExerciseSCW extends Exercise {
     required this.defaultGapLengths,
     String? specificTip,
     this.correctAnswers,
+    required courseId,
   }) : super(
           type: ExerciseType.SCW,
           id: id,
@@ -25,6 +26,7 @@ class ExerciseSCW extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          courseId: courseId,
         );
 
   factory ExerciseSCW.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class ExerciseSCW extends Exercise {
       defaultGapLengths: defaultGapLengthsInt,
       statementOutput: json['statementOutput'],
       correctAnswers: correctAnswersList,
+      courseId: json['courseId'],
     );
   }
 
@@ -56,6 +59,7 @@ class ExerciseSCW extends Exercise {
         'defaultGapLengths': defaultGapLengths,
         'statementOutput': statementOutput,
         'correctAnswers': correctAnswers,
+        'courseId': courseId,
       };
 
   factory ExerciseSCW.fromExercise(ExerciseSCW other) {
@@ -68,6 +72,7 @@ class ExerciseSCW extends Exercise {
       defaultGapLengths: other.defaultGapLengths,
       statementOutput: other.statementOutput,
       correctAnswers: other.correctAnswers,
+      courseId: other.courseId,
     );
   }
 }

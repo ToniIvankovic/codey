@@ -1,6 +1,7 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
   int? expandedId;
   bool loadingStatistics = false;
   late bool loadingExercises;
+  late int courseId;
 
   @override
   void initState() {
@@ -39,6 +41,9 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
         exercisesFiltered = List.of(exercisesAll);
       });
     });
+    context.read<UserService>().userStream.first.then((user) => setState(() {
+          courseId = user.course.id;
+        }));
   }
 
   void filterExercises(ExerciseType? type) {
@@ -70,11 +75,12 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
               child: TextButton.icon(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const CreateExerciseScreen();
+                    return CreateExerciseScreen(courseId: courseId);
                   })).then((value) {
                     if (value != null) {
                       setState(() {
-                        exercisesAll.add(value as Exercise);
+                        exercisesAll.insert(0, value as Exercise);
+                        filterExercises(selectedType);
                       });
                     }
                   });
@@ -261,6 +267,8 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                                             exercisesAll.removeAt(exercisesAll
                                                 .indexWhere((element) =>
                                                     element.id == exercise.id));
+                                            filterExercises(selectedType);
+                                            expandedId = null;
                                           });
                                         });
                                         Navigator.of(context).pop();
@@ -281,6 +289,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                                 MaterialPageRoute(builder: (context) {
                               return CreateExerciseScreen(
                                 existingExercise: exercise,
+                                courseId: courseId,
                               );
                             })).then((value) {
                               if (value != null) {

@@ -10,6 +10,7 @@ namespace CodeyBE.Contracts.Repositories
 {
     public interface ILessonsRepository : IRepository<Lesson>
     {
+        Task<IEnumerable<Lesson>> GetAllAsync(int courseId);
         Task<Lesson> CreateAsync(LessonCreationDTO lesson);
         Task DeleteAsync(int id);
         Task<List<Lesson>> GetLessonsByIDsAsync(List<int> id);

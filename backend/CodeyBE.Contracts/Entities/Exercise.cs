@@ -59,6 +59,8 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("specificTip")]
         [BsonIgnoreIfNull]
         public string? SpecificTip { get; set; }
+        [BsonElement("courseId")]
+        public int CourseId { get; set; }
         public Exercise(Exercise ex)
         {
             Id = ex.Id;
@@ -75,6 +77,7 @@ namespace CodeyBE.Contracts.Entities
             CorrectAnswers = ex.CorrectAnswers;
             RaisesError = ex.RaisesError;
             SpecificTip = ex.SpecificTip;
+            CourseId = ex.CourseId;
         }
 
         public Exercise(int id, ExerciseCreationDTO exerciseCreationDTO)
@@ -92,6 +95,7 @@ namespace CodeyBE.Contracts.Entities
             CorrectAnswers = exerciseCreationDTO.CorrectAnswers;
             RaisesError = exerciseCreationDTO.RaisesError;
             SpecificTip = exerciseCreationDTO.SpecificTip;
+            CourseId = exerciseCreationDTO.CourseId;
         }
 
         override public bool Equals(object? obj)

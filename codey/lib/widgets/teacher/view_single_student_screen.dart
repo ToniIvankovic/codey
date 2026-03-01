@@ -45,6 +45,7 @@ class _ViewSingleStudentScreenState extends State<ViewSingleStudentScreen> {
         id: widget.student.highestLessonId!,
         name: "ADAPTIVNA",
         exerciseIds: [],
+        courseId: 0,
       );
       return;
     }

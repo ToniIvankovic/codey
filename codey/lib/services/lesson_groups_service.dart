@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:codey/models/DTOs/lesson_creation_DTO.dart';
+import 'package:codey/models/DTOs/lesson_group_creation_dto.dart';
 import 'package:codey/models/entities/lesson_group.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '/repositories/lesson_groups_repository.dart';
 import 'package:http/http.dart' as http;
@@ -28,9 +31,10 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
       Uri.parse('${dotenv.env["API_BASE"]}/lessonGroups/$id');
   final LessonGroupsRepository _lessonGroupsRepository;
   final http.Client _authenticatedClient;
+  final UserService _userService;
 
-  LessonGroupsServiceV1(
-      this._lessonGroupsRepository, this._authenticatedClient);
+  LessonGroupsServiceV1(this._lessonGroupsRepository, this._authenticatedClient,
+      this._userService);
 
   @override
   Future<List<LessonGroup>> getAllLessonGroups() {
@@ -49,13 +53,14 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({
-          "name": lessonGroup.name,
-          "tips": lessonGroup.tips,
-          "lessons": lessonGroup.lessons,
-          "order": lessonGroup.order,
-          "adaptive": lessonGroup.adaptive,
-        }));
+        body: jsonEncode(LessonGroupCreationDto(
+          name: lessonGroup.name,
+          tips: lessonGroup.tips,
+          lessons: lessonGroup.lessons,
+          order: lessonGroup.order,
+          adaptive: lessonGroup.adaptive,
+          courseId: lessonGroup.courseId,
+        ).toJson()));
     if (response.statusCode != 200) {
       throw Exception('Failed to update lesson group: ${lessonGroup.id}, '
           'Error ${response.statusCode}');
@@ -91,16 +96,19 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
     required bool adaptive,
   }) async {
     _lessonGroupsRepository.invalidateCache();
+    int courseId = (await _userService.userStream.first).course.id;
+    var dto = LessonGroupCreationDto(
+      name: name,
+      tips: tips,
+      lessons: lessons ?? [],
+      adaptive: adaptive,
+      courseId: courseId,
+    );
     var response = await _authenticatedClient.post(_apiUriBase,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({
-          "name": name,
-          "tips": tips,
-          "lessons": lessons,
-          "adaptive": adaptive,
-        }));
+        body: jsonEncode(dto.toJson()));
     if (response.statusCode != 200) {
       throw Exception('Failed to create lesson group, '
           'Error ${response.statusCode}');

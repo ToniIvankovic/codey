@@ -12,7 +12,16 @@ namespace CodeyBE.Data.DB.Repositories
     {
         public override async Task<IEnumerable<LessonGroup>> GetAllAsync()
         {
-            return (await base.GetAllAsync()).OrderBy(lgr => lgr.Order).ToList();
+            return (await base.GetAllAsync())
+                .OrderBy(lgr => lgr.Order)
+                .ToList();
+        }
+        public async Task<IEnumerable<LessonGroup>> GetAllAsync(int courseId)
+        {
+            return (await base.GetAllAsync())
+                .OrderBy(lgr => lgr.Order)
+                .Where(lgr => lgr.CourseId == courseId)
+                .ToList();
         }
         public override async Task<LessonGroup?> GetByIdAsync(int id)
         {
@@ -42,13 +51,14 @@ namespace CodeyBE.Data.DB.Repositories
                 LessonIds = lessonGroup.Lessons.ToList(),
                 Order = newOrder,
                 Adaptive = lessonGroup.Adaptive,
+                CourseId = lessonGroup.CourseId
             });
             return (await GetByIdAsync(newId))!;
         }
 
         public async Task<LessonGroup> UpdateAsync(int id, LessonGroupCreationDTO lessonGroup)
         {
-            if(lessonGroup.Adaptive ?? false)
+            if (lessonGroup.Adaptive ?? false)
             {
                 lessonGroup.Lessons = new List<int>() { 99998, 99999 };
             }
@@ -78,9 +88,14 @@ namespace CodeyBE.Data.DB.Repositories
             }
         }
 
-        public async Task<LessonGroup?> GetLessonGroupByOrderAsync(int order)
+        public async Task<LessonGroup?> GetLessonGroupByOrderAsync(int courseId, int order)
         {
-            return await _collection.Find(lessonGroup => lessonGroup.Order == order).FirstOrDefaultAsync();
+            return await _collection
+                .Find(lessonGroup => 
+                    lessonGroup.Order == order
+                    && lessonGroup.CourseId == courseId
+                )
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<LessonGroup>> UpdateOrderAsync(List<LessonGroupsReorderDTO> lessonGroupOrderList)

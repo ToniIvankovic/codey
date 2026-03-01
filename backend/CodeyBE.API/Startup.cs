@@ -127,6 +127,12 @@ namespace CodeyBE.API
                 IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
                 return new ClassesRepository(dbContext);
             });
+            services.AddScoped<ICoursesRepository>(provider =>
+            {
+                IMongoDbContext dbContext = provider.GetRequiredService<IMongoDbContext>();
+                return new CoursesRepository(dbContext);
+            });
+            services.AddScoped<IUsersRepository, UsersRepository>();
 
 
             // Configure the services
@@ -137,6 +143,7 @@ namespace CodeyBE.API
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<ILogsService, LogsService>();
             services.AddScoped<IInteractionService, InteractionService>();
+            services.AddScoped<ICoursesService, CoursesService>();
         }
     }
 

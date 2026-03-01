@@ -21,45 +21,24 @@ namespace CodeyBE.API.Controllers
         [AllowAnonymous]
         [HttpPost("register", Name = "register")]
         [ProducesResponseType(typeof(UserRegistrationResponseDTO), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> RegisterUser([FromBody] Dictionary<string, string> body)
+        // Change the parameter to expect your Request DTO directly
+        public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationRequestDTO request)
         {
-            try
-            {
+            // No more dictionary parsing! 
+            var result = await userService.RegisterStudent(request);
 
-                var firstName = body["firstName"];
-                var lastName = body["lastName"];
-                var dob = body["dateOfBirth"];
-                var email = body["email"];
-                var password = body["password"];
-                var school = body["school"];
-                var result = await userService.RegisterStudent(new UserRegistrationRequestDTO
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    DateOfBirth = dob != null ? DateOnly.Parse(dob) : null,
-                    Email = email,
-                    Password = password,
-                    School = school
-                });
-                if (result.Succeeded)
-                {
-                    return Ok(new UserRegistrationResponseDTO
-                    {
-                        Message = ["User created successfully"]
-                    });
-                }
-                return StatusCode(400, new UserRegistrationResponseDTO
-                {
-                    Message = result.Errors.Select(error => error.Description)
-                });
-            }
-            catch (KeyNotFoundException e)
+            if (result.Succeeded)
             {
-                return StatusCode(400, new UserRegistrationResponseDTO
+                return Ok(new UserRegistrationResponseDTO
                 {
-                    Message = [e.Message],
+                    Message = ["User created successfully"]
                 });
             }
+
+            return StatusCode(400, new UserRegistrationResponseDTO
+            {
+                Message = result.Errors.Select(error => error.Description).ToList()
+            });
         }
 
         [AllowAnonymous]
@@ -150,10 +129,12 @@ namespace CodeyBE.API.Controllers
         {
             var email = body["email"];
             var password = body["password"];
+            var courseId = int.Parse(body["courseId"]);
             var result = await userService.RegisterCreator(new UserRegistrationRequestDTO
             {
                 Email = email,
-                Password = password
+                Password = password,
+                CourseId = courseId
             });
             if (result.Succeeded)
             {
@@ -174,6 +155,7 @@ namespace CodeyBE.API.Controllers
         public async Task<IActionResult> RegisterTeacher([FromBody] Dictionary<string, string> body)
         {
             string firstName, lastName, email, password, school;
+            int courseId;
             try
             {
                 firstName = body["firstName"];
@@ -181,6 +163,7 @@ namespace CodeyBE.API.Controllers
                 email = body["email"];
                 password = body["password"];
                 school = body["school"];
+                courseId = int.Parse(body["courseId"]);
             }
             catch (KeyNotFoundException e)
             {
@@ -193,7 +176,8 @@ namespace CodeyBE.API.Controllers
                 LastName = lastName,
                 Email = email,
                 Password = password,
-                School = school
+                School = school,
+                CourseId = courseId
             });
             if (!result.Succeeded)
             {
