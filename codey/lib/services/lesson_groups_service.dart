@@ -96,7 +96,7 @@ class LessonGroupsServiceV1 implements LessonGroupsService {
     required bool adaptive,
   }) async {
     _lessonGroupsRepository.invalidateCache();
-    int courseId = (await _userService.userStream.first).courseId;
+    int courseId = (await _userService.userStream.first).course.id;
     var dto = LessonGroupCreationDto(
       name: name,
       tips: tips,

@@ -1,10 +1,13 @@
 import 'package:codey/auth/authenticated_client.dart';
+import 'package:http/http.dart' as http;
 import 'package:codey/models/entities/app_user.dart';
+import 'package:codey/repositories/courses_repository.dart';
 import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/repositories/lesson_groups_repository.dart';
 import 'package:codey/repositories/lessons_repository.dart';
 import 'package:codey/services/admin_functions_service.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
@@ -81,6 +84,13 @@ Future main() async {
           create: (context) => UserInteractionServiceImpl(
             context.read<AuthenticatedClient>(),
           ),
+        ),
+        Provider<CoursesRepository>(
+          create: (context) => CoursesRepository1(http.Client()),
+        ),
+        Provider<CoursesService>(
+          create: (context) =>
+              CoursesServiceV1(context.read<CoursesRepository>()),
         ),
       ],
       child: const MyApp(),
@@ -248,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   key: ValueKey(user),
                   onLogoutSuper: onLogout,
                   user: user,
-                  courseId: user.courseId,
+                  course: user.course,
                 );
               }
               return const Scaffold(

@@ -26,7 +26,7 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   void initState() {
     super.initState();
     context.read<UserService>().userStream.first.then((user) => setState(() {
-          courseId = user.courseId;
+          courseId = user.course.id;
         }));
   }
 

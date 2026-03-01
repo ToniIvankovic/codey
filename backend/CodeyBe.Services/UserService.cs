@@ -4,6 +4,7 @@ using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Enumerations;
 using CodeyBE.Contracts.Exceptions;
+using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
@@ -21,9 +22,11 @@ namespace CodeyBe.Services
         ILessonsService lessonsService,
         IExercisesService exercisesService,
         ILogsService logsService,
-        ILessonGroupsService lessonGroupsService) : IUserService
+        ILessonGroupsService lessonGroupsService,
+        IUsersRepository usersRepository) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IUsersRepository _usersRepository = usersRepository;
         private static readonly int SINGLE_QUEST_XP = 40;
         private static readonly int XP_SOLVED_OLD = 40;
         private static readonly int XP_SOLVED_NEW = 100;
@@ -132,7 +135,17 @@ namespace CodeyBe.Services
 
         public async Task<ApplicationUser?> GetUser(ClaimsPrincipal user)
         {
-            return await _userManager.FindByEmailAsync(user.FindFirst(ClaimTypes.Email)?.Value ?? throw new EntityNotFoundException());
+            return await _usersRepository.FindByEmailAsync(user.FindFirst(ClaimTypes.Email)?.Value ?? throw new EntityNotFoundException());
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _usersRepository.GetAllAsync();
+        }
+
+        public async Task<ApplicationUser?> FindByUsernameAsync(string username)
+        {
+            return await _usersRepository.FindByUsernameAsync(username);
         }
 
         public async Task<int> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport)

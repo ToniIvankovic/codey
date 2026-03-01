@@ -42,7 +42,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
       });
     });
     context.read<UserService>().userStream.first.then((user) => setState(() {
-          courseId = user.courseId;
+          courseId = user.course.id;
         }));
   }
 

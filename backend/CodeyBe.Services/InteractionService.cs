@@ -4,21 +4,14 @@ using CodeyBE.Contracts.Entities.Users;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeyBe.Services
 {
-    public class InteractionService(UserManager<ApplicationUser> userManager,
+    public class InteractionService(
         IUserService userService,
         IClassesRepository classesRepository) : IInteractionService
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IUserService _userService = userService;
         private readonly IClassesRepository _classesRepository = classesRepository;
 
@@ -58,7 +51,7 @@ namespace CodeyBe.Services
         {
             foreach (string studentUsername in StudentUsernames)
             {
-                ApplicationUser? student = await _userManager.FindByNameAsync(studentUsername)
+                ApplicationUser? student = await _userService.FindByUsernameAsync(studentUsername)
                     ?? throw new EntityNotFoundException($"Student {studentUsername} not found in the database");
                 if (student.School != teacher.School)
                 {
@@ -89,9 +82,8 @@ namespace CodeyBe.Services
         {
             ApplicationUser? teacher = await _userService.GetUser(teacherCP)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
-            var allStudents = _userManager.Users.Where(user => user.Roles.Contains("STUDENT"));
-            var studentsForTeacher = allStudents.Where(user => teacher.School == user.School);
-            return studentsForTeacher;
+            var allUsers = await _userService.GetAllUsersAsync();
+            return allUsers.Where(user => user.Roles.Contains("STUDENT") && user.School == teacher.School);
         }
         public async Task<IEnumerable<ApplicationUser>> GetStudentByQuery(ClaimsPrincipal teacherCP, string? query)
         {
@@ -125,7 +117,7 @@ namespace CodeyBe.Services
         }
         public async Task<Class?> GetClassForStuedntByTeacher(ApplicationUser teacher, string studentUsername)
         {
-            ApplicationUser? student = await _userManager.FindByNameAsync(studentUsername)
+            ApplicationUser? student = await _userService.FindByUsernameAsync(studentUsername)
                 ?? throw new EntityNotFoundException("Student not found in the database");
             if (student.School != teacher.School)
             {
@@ -141,14 +133,13 @@ namespace CodeyBe.Services
                 ?? throw new EntityNotFoundException("Student not found in the database");
             try
             {
-
                 Class? _class = await GetClassForStudentSelf(userStudent, student.UserName!)
                     ?? throw new EntityNotFoundException("Student is not in any class");
-                return ProduceLeaderboardForClass(_class);
+                return await ProduceLeaderboardForClass(_class);
             }
             catch (EntityNotFoundException)
             {
-                return ProduceLeaderboardForSchool(student.School!);
+                return await ProduceLeaderboardForSchool(student.School!);
             }
         }
 
@@ -162,15 +153,16 @@ namespace CodeyBe.Services
             {
                 throw new UnauthorizedAccessException("Teacher is not allowed to access this class");
             }
-            return ProduceLeaderboardForClass(_class);
+            return await ProduceLeaderboardForClass(_class);
         }
 
-        private Leaderboard ProduceLeaderboardForClass(Class @class)
+        private async Task<Leaderboard> ProduceLeaderboardForClass(Class @class)
         {
+            var allUsers = await _userService.GetAllUsersAsync();
             return new Leaderboard
             {
                 ClassId = @class.PrivateId,
-                Students = _userManager.Users
+                Students = allUsers
                     .Where(user => @class.Students.Contains(user.UserName!))
                     .OrderByDescending(student => student.TotalXP)
                     .Select(UserDataDTO.FromUser)
@@ -178,12 +170,13 @@ namespace CodeyBe.Services
             };
         }
 
-        private Leaderboard ProduceLeaderboardForSchool(string school)
+        private async Task<Leaderboard> ProduceLeaderboardForSchool(string school)
         {
+            var allUsers = await _userService.GetAllUsersAsync();
             return new Leaderboard
             {
                 ClassId = 0,
-                Students = _userManager.Users
+                Students = allUsers
                     .Where(user => user.School == school && user.Roles.Contains("STUDENT"))
                     .OrderByDescending(student => student.TotalXP)
                     .Select(UserDataDTO.FromUser)

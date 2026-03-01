@@ -10,13 +10,13 @@ import 'student_gamification_screen.dart';
 class StudentHomeScreen extends StatefulWidget {
   final VoidCallback onLogoutSuper;
   final AppUser user;
-  final int courseId;
+  final Course course;
 
   const StudentHomeScreen({
     super.key,
     required this.onLogoutSuper,
     required this.user,
-    required this.courseId
+    required this.course,
   });
 
   @override
@@ -39,7 +39,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                child: Text(widget.courseId.toString()),
+                child: Text(widget.course.name),
               ),
               if (widget.user.gamificationEnabled) ...[
                 Row(

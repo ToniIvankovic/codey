@@ -1,5 +1,6 @@
 import 'package:codey/models/entities/course.dart';
 import 'package:codey/services/auth_service.dart';
+import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,12 +43,13 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
     );
-    setState(() {
-      courses.addAll([
-        Course(id: 10001, name: "DMM"),
-        Course(id: 10002, name: "Python"),
-      ]);
-    });
+    context.read<CoursesService>().getAllCourses().then(
+      (value) {
+        setState(() {
+          courses.addAll(value);
+        });
+      },
+    );
   }
 
   @override

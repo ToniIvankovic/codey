@@ -18,6 +18,8 @@ namespace CodeyBE.Contracts.Services
         public Task<IdentityResult> RegisterTeacher(UserRegistrationRequestDTO user);
         public Task<JWTTokenDTO> LoginUser(UserLoginRequestDTO user);
         public Task<ApplicationUser?> GetUser(ClaimsPrincipal user);
+        public Task<List<ApplicationUser>> GetAllUsersAsync();
+        public Task<ApplicationUser?> FindByUsernameAsync(string username);
         public Task<int> EndLessonAsync(ClaimsPrincipal user, EndOfLessonReport lessonReport);
         public Task<ISet<Quest>> GenerateDailyQuestsForUser(ApplicationUser applicationUser);
         public Task ChangePassword(ClaimsPrincipal user, string oldPassword, string newPassword);

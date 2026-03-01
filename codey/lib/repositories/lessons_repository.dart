@@ -141,7 +141,7 @@ class LessonsRepository1 implements LessonsRepository {
     List<int> exerciseIds,
   ) async {
     var apiUri = Uri.parse('${dotenv.env["API_BASE"]}/lessons');
-    var courseId = (await _userService.userStream.first).courseId;
+    var courseId = (await _userService.userStream.first).course.id;
     var dto = LessonCreationDto(
       name: name,
       specificTips: tips,
@@ -197,7 +197,7 @@ class LessonsRepository1 implements LessonsRepository {
     List<int> exerciseIds,
   ) async {
     invalidateCache(id);
-    var courseId = (await _userService.userStream.first).courseId;
+    var courseId = (await _userService.userStream.first).course.id;
     var dto = LessonCreationDto(
       name: name,
       specificTips: tips,

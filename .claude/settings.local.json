@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(xargs grep:*)",
+      "Bash(flutter analyze:*)",
+      "mcp__code-search__advanced-search"
+    ]
+  }
+}

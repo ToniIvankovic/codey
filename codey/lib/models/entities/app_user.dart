@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/quest.dart';
 
 class AppUser {
@@ -19,7 +20,7 @@ class AppUser {
   final int highestStreak;
   final bool gamificationEnabled;
   final List<MapEntry<DateTime, int>> xpHistory;
-  final int courseId;
+  final Course course;
 
   AppUser({
     this.firstName,
@@ -40,7 +41,7 @@ class AppUser {
     required this.highestStreak,
     required this.gamificationEnabled,
     required this.xpHistory,
-    required this.courseId,
+    required this.course,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -74,7 +75,7 @@ class AppUser {
                 entry['value'] as int,
               ))
           .toList(),
-      courseId: json['courseId'],
+      course: Course.fromJson(json['course']),
     );
   }
 }

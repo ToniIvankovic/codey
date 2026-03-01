@@ -25,6 +25,15 @@ namespace CodeyBE.Contracts.Entities.Users
         public int GamificationGroup { get; set; }
         [BsonElement("courseId")]
         public int CourseId { get; set; }
+        [BsonIgnore]
+        private Course? _course;
+
+        [BsonIgnore]
+        public Course Course
+        {
+            get => _course ?? throw new InvalidOperationException("Course was not initialized.");
+            set => _course = value;
+        }
 
         public int CalculateTotalXP()
         {
