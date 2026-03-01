@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:codey/models/DTOs/lesson_creation_DTO.dart';
+import 'package:codey/models/DTOs/lesson_creation_dto.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';

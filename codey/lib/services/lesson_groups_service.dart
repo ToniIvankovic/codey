@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:codey/models/DTOs/lesson_creation_DTO.dart';
 import 'package:codey/models/DTOs/lesson_group_creation_dto.dart';
 import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/services/user_service.dart';
