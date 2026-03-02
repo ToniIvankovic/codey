@@ -9,6 +9,7 @@ import 'package:rxdart/rxdart.dart';
 
 abstract class UserService {
   Stream<AppUser> get userStream;
+  Stream<void> get courseChanged;
   Future<void> initializeUser();
   void logout();
   void updateUser(AppUser user);
@@ -17,6 +18,7 @@ abstract class UserService {
     required String lastName,
     required DateTime dateOfBirth,
   });
+  Future<AppUser> switchCourse(int courseId);
 }
 
 class UserService1 implements UserService {
@@ -24,6 +26,7 @@ class UserService1 implements UserService {
   final AuthService _authService;
   final http.Client _authenticatedClient;
   late BehaviorSubject<AppUser> _userSubject;
+  final PublishSubject<void> _courseChangedSubject = PublishSubject<void>();
 
   UserService1(this._authService, this._authenticatedClient) {
     initializeUser();
@@ -31,6 +34,9 @@ class UserService1 implements UserService {
 
   @override
   Stream<AppUser> get userStream => _userSubject.stream;
+
+  @override
+  Stream<void> get courseChanged => _courseChangedSubject.stream;
 
   @override
   void updateUser(AppUser user) {
@@ -82,6 +88,24 @@ class UserService1 implements UserService {
       throw Exception('Failed to change user data');
     }
 
+    var user = AppUser.fromJson(jsonDecode(response.body));
+    updateUser(user);
+    return user;
+  }
+
+  @override
+  Future<AppUser> switchCourse(int courseId) async {
+    var response = await _authenticatedClient.put(
+      Uri.parse('$_userEndpoint/course'),
+      body: json.encode({'courseId': courseId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to switch course');
+    }
+
+    _courseChangedSubject.add(null);
     var user = AppUser.fromJson(jsonDecode(response.body));
     updateUser(user);
     return user;

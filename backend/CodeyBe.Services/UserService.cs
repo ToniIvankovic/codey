@@ -23,7 +23,8 @@ namespace CodeyBe.Services
         IExercisesService exercisesService,
         ILogsService logsService,
         ILessonGroupsService lessonGroupsService,
-        IUsersRepository usersRepository) : IUserService
+        IUsersRepository usersRepository,
+        ICoursesService coursesService) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IUsersRepository _usersRepository = usersRepository;
@@ -87,8 +88,9 @@ namespace CodeyBe.Services
             return result;
         }
 
-        public async Task<IdentityResult> RegisterCreator(UserRegistrationRequestDTO user)
+        public async Task<IdentityResult> RegisterCreator(StaffRegistrationRequestDTO user)
         {
+            var firstCourse = (await coursesService.GetAllCoursesAsync()).First();
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
                 FirstName = user.FirstName,
@@ -104,14 +106,14 @@ namespace CodeyBe.Services
                         ClaimValue = user.Email
                     },
                 ],
-                CourseId = user.CourseId,
+                CourseId = firstCourse.PrivateId,
             }, user.Password);
             return result;
         }
 
-        public async Task<IdentityResult> RegisterTeacher(UserRegistrationRequestDTO user)
+        public async Task<IdentityResult> RegisterTeacher(StaffRegistrationRequestDTO user)
         {
-
+            var firstCourse = (await coursesService.GetAllCoursesAsync()).First();
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
                 FirstName = user.FirstName,
@@ -128,7 +130,7 @@ namespace CodeyBe.Services
                     },
                 ],
                 School = user.School,
-                CourseId = user.CourseId,
+                CourseId = firstCourse.PrivateId,
             }, user.Password);
             return result;
         }
@@ -397,6 +399,16 @@ namespace CodeyBe.Services
             ApplicationUser? applicationUser = await GetUser(user)
                 ?? throw new EntityNotFoundException("User not found");
             return applicationUser.CourseId;
+        }
+
+        public async Task<ApplicationUser> SwitchCourseAsync(ClaimsPrincipal user, int courseId)
+        {
+            ApplicationUser applicationUser = await GetUser(user)
+                ?? throw new EntityNotFoundException("User not found");
+            await coursesService.GetCourseByIdAsync(courseId);
+            applicationUser.CourseId = courseId;
+            await UpdateUser(applicationUser);
+            return (await GetUser(user))!;
         }
     }
 }

@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
+import 'package:codey/services/session_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:rxdart/rxdart.dart';
 import '../models/entities/exercise.dart';
 
 abstract class ExercisesRepository {
@@ -21,15 +25,24 @@ class ExercisesRepository1 implements ExercisesRepository {
       Uri.parse('${dotenv.env["API_BASE"]}/exercises/lesson/$lessonId');
   static final Uri _apiAdaptiveUrl =
       Uri.parse('${dotenv.env["API_BASE"]}/exercises/lesson/adaptive');
-  final Map<int, List<Exercise>> cachedLessonExercises = {};
   final http.Client _authenticatedClient;
+  final Map<int, List<Exercise>> _exercisesCache = {};
 
-  ExercisesRepository1(this._authenticatedClient);
+  ExercisesRepository1(
+    this._authenticatedClient,
+    UserService userService,
+    SessionService sessionService,
+  ) {
+    Rx.merge([
+      userService.courseChanged,
+      sessionService.logoutStream,
+    ]).listen((_) => invalidateCache(null));
+  }
 
   @override
   Future<List<Exercise>> getExercisesForLesson(Lesson lesson) {
-    if (cachedLessonExercises.containsKey(lesson.id)) {
-      return Future.value(List.of(cachedLessonExercises[lesson.id]!));
+    if (_exercisesCache.containsKey(lesson.id)) {
+      return Future.value(List.of(_exercisesCache[lesson.id]!));
     }
     return _fetchExercises(lesson);
   }
@@ -62,7 +75,7 @@ class ExercisesRepository1 implements ExercisesRepository {
       }
     }
     if (!lesson.adaptive) {
-      cachedLessonExercises[lesson.id] = exercises;
+      _exercisesCache[lesson.id] = exercises;
     }
     return List.of(exercises);
   }
@@ -82,9 +95,9 @@ class ExercisesRepository1 implements ExercisesRepository {
   @override
   void invalidateCache(int? id) {
     if (id != null) {
-      cachedLessonExercises.remove(id);
+      _exercisesCache.remove(id);
     } else {
-      cachedLessonExercises.clear();
+      _exercisesCache.clear();
     }
   }
 

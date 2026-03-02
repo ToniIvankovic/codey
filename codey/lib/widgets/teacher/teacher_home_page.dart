@@ -1,14 +1,11 @@
+import 'package:codey/services/session_service.dart';
 import 'package:codey/widgets/student/profile_data/change_password_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'view_classes_screen.dart';
 
 class TeacherHomePage extends StatelessWidget {
-  final void Function() onLogoutSuper;
-
-  const TeacherHomePage({
-    Key? key,
-    required this.onLogoutSuper,
-  }) : super(key: key);
+  const TeacherHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +69,7 @@ class TeacherHomePage extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      onLogoutSuper();
+                      context.read<SessionService>().logout();
                     },
                     child: Text(
                       'Odjava',

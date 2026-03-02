@@ -125,17 +125,9 @@ namespace CodeyBE.API.Controllers
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/creator", Name = "registerCreator")]
         [ProducesResponseType(typeof(UserRegistrationResponseDTO), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> RegisterCreator([FromBody] Dictionary<string, string> body)
+        public async Task<IActionResult> RegisterCreator([FromBody] StaffRegistrationRequestDTO request)
         {
-            var email = body["email"];
-            var password = body["password"];
-            var courseId = int.Parse(body["courseId"]);
-            var result = await userService.RegisterCreator(new UserRegistrationRequestDTO
-            {
-                Email = email,
-                Password = password,
-                CourseId = courseId
-            });
+            var result = await userService.RegisterCreator(request);
             if (result.Succeeded)
             {
                 return Ok(new UserRegistrationResponseDTO
@@ -152,33 +144,9 @@ namespace CodeyBE.API.Controllers
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/teacher", Name = "registerTeacher")]
         [ProducesResponseType(typeof(UserRegistrationResponseDTO), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> RegisterTeacher([FromBody] Dictionary<string, string> body)
+        public async Task<IActionResult> RegisterTeacher([FromBody] StaffRegistrationRequestDTO request)
         {
-            string firstName, lastName, email, password, school;
-            int courseId;
-            try
-            {
-                firstName = body["firstName"];
-                lastName = body["lastName"];
-                email = body["email"];
-                password = body["password"];
-                school = body["school"];
-                courseId = int.Parse(body["courseId"]);
-            }
-            catch (KeyNotFoundException e)
-            {
-                return StatusCode(400, e.Message);
-            }
-
-            var result = await userService.RegisterTeacher(new UserRegistrationRequestDTO
-            {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
-                Password = password,
-                School = school,
-                CourseId = courseId
-            });
+            var result = await userService.RegisterTeacher(request);
             if (!result.Succeeded)
             {
                 return StatusCode(400, new UserRegistrationResponseDTO
@@ -190,6 +158,23 @@ namespace CodeyBE.API.Controllers
             {
                 Message = ["User created successfully"]
             });
+        }
+
+        [Authorize(Roles = "CREATOR")]
+        [HttpPut("course", Name = "switchCourse")]
+        [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> SwitchCourse([FromBody] Dictionary<string, int> body)
+        {
+            try
+            {
+                var courseId = body["courseId"];
+                var updatedUser = await userService.SwitchCourseAsync(User, courseId);
+                return new OkObjectResult(await ProduceUserDataDTO(updatedUser));
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(404, e.Message);
+            }
         }
 
         [HttpPost("change-password", Name = "changePassword")]

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:codey/auth/authenticated_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:codey/models/entities/app_user.dart';
@@ -39,31 +41,46 @@ Future main() async {
           create: (context) => AuthenticatedClient(context.read<AuthService>()),
         ),
         Provider<UserService>(
-            create: (context) => UserService1(context.read<AuthService>(),
-                context.read<AuthenticatedClient>())),
+          create: (context) => UserService1(
+            context.read<AuthService>(),
+            context.read<AuthenticatedClient>(),
+          ),
+        ),
+        Provider<SessionService>(
+          create: (context) => SessionService1(
+            context.read<AuthService>(),
+            context.read<UserService>(),
+          ),
+        ),
         Provider<AdminFunctionsService>(
           create: (context) =>
               AdminFunctionsServiceImpl(context.read<AuthenticatedClient>()),
         ),
         Provider<ExercisesRepository>(
-          create: (context) =>
-              ExercisesRepository1(context.read<AuthenticatedClient>()),
+          create: (context) => ExercisesRepository1(
+            context.read<AuthenticatedClient>(),
+            context.read<UserService>(),
+            context.read<SessionService>(),
+          ),
         ),
         Provider<LessonGroupsRepository>(
-          create: (context) =>
-              LessonGroupsRepository1(context.read<AuthenticatedClient>()),
+          create: (context) => LessonGroupsRepository1(
+            context.read<AuthenticatedClient>(),
+            context.read<UserService>(),
+            context.read<SessionService>(),
+          ),
         ),
         Provider<LessonGroupsService>(
           create: (context) => LessonGroupsServiceV1(
-              context.read<LessonGroupsRepository>(),
-              context.read<AuthenticatedClient>(),
-              context.read<UserService>()),
+              context.read<LessonGroupsRepository>()),
         ),
         Provider<LessonsRepository>(
           create: (context) => LessonsRepository1(
-              context.read<AuthenticatedClient>(),
-              context.read<ExercisesRepository>(),
-              context.read<UserService>()),
+            context.read<AuthenticatedClient>(),
+            context.read<ExercisesRepository>(),
+            context.read<UserService>(),
+            context.read<SessionService>(),
+          ),
         ),
         Provider<LessonsService>(
           create: (context) =>
@@ -75,10 +92,6 @@ Future main() async {
             context.read<AuthenticatedClient>(),
             context.read<UserService>(),
           ),
-        ),
-        Provider<SessionService>(
-          create: (context) => SessionService1(
-              context.read<AuthService>(), context.read<UserService>()),
         ),
         Provider<UserInteractionService>(
           create: (context) => UserInteractionServiceImpl(
@@ -103,7 +116,7 @@ class MyApp extends StatelessWidget {
   final colorScheme4 = const ColorScheme(
     surface: Color(0xffffffff),
     onSurface: Color(0xff1d1d1d),
-    primary: Color(0xff389c9a),
+    primary: Color.fromARGB(255, 20, 137, 135),
     secondary: Color(0xfffedb71),
     inverseSurface: Color(0xfff8f8f8),
     onInverseSurface: Color(0xff1d1d1d),
@@ -111,7 +124,7 @@ class MyApp extends StatelessWidget {
     errorContainer: Color.fromARGB(255, 242, 194, 196),
     inversePrimary: Color(0xffcbf3f0),
     primaryContainer: Color(0xffcbf3f0),
-    onPrimaryContainer: Color(0xff389c9a),
+    onPrimaryContainer: Color.fromARGB(255, 20, 137, 135),
     onPrimary: Color(0xfff8f8f8),
     onSecondary: Color(0xff1d1d1d),
     onError: Color(0xfff8f8f8),
@@ -121,9 +134,9 @@ class MyApp extends StatelessWidget {
   final colorScheme4Dark = const ColorScheme(
     surface: Color.fromARGB(255, 40, 48, 47),
     onSurface: Color.fromARGB(255, 177, 211, 209),
-    primary: Color(0xff389c9a),
+    primary: Color.fromARGB(255, 20, 137, 135),
     secondary: Color(0xfffedb71),
-    error: Color.fromARGB(255, 189, 78, 82),
+    error: Color.fromARGB(255, 235, 93, 93),
     errorContainer: Color.fromARGB(255, 139, 47, 50),
     onErrorContainer: Color.fromARGB(255, 255, 209, 210),
     inversePrimary: Color.fromARGB(255, 23, 60, 53),
@@ -144,10 +157,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: colorScheme4,
         useMaterial3: true,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme4.primary,
+            foregroundColor: colorScheme4.onPrimary,
+          ),
+        ),
       ),
       darkTheme: ThemeData(
         colorScheme: colorScheme4Dark,
         useMaterial3: true,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme4Dark.primary,
+            foregroundColor: colorScheme4Dark.onPrimary,
+          ),
+        ),
       ),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
@@ -166,7 +191,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool loggedIn = false;
+  StreamSubscription<void>? _loginSub;
+  StreamSubscription<void>? _logoutSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final sessionService = context.read<SessionService>();
+    _loginSub = sessionService.loginStream.listen((_) {
+      if (mounted) setState(() {});
+    });
+    _logoutSub = sessionService.logoutStream.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _loginSub?.cancel();
+    _logoutSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,14 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
             debugPrint('AuthService.token error: ${snapshot.error}');
             debugPrint('${snapshot.stackTrace}');
           }
-          return AuthScreen(
-            onLogin: () => setState(() => loggedIn = true),
-          );
-        }
-        onLogout() {
-          context.read<SessionService>().logout();
-          context.read<LessonGroupsRepository>().invalidateCache();
-          setState(() => loggedIn = false);
+          return const AuthScreen();
         }
 
         return StreamBuilder<AppUser>(
@@ -216,7 +254,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: CircularProgressIndicator(),
                       ),
                       ElevatedButton(
-                        onPressed: () => onLogout(),
+                        onPressed: () =>
+                            context.read<SessionService>().logout(),
                         child: const Text("Odjava"),
                       )
                     ],
@@ -228,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 debugPrint('UserService.userStream error: ${snapshot.error}');
                 debugPrint('${snapshot.stackTrace}');
               }
-              onLogout();
+              context.read<SessionService>().logout();
               return const Scaffold(
                 body: Center(
                   child: Text('Greška: korisnik nije pronađen'),
@@ -238,25 +277,19 @@ class _MyHomePageState extends State<MyHomePage> {
               final user = snapshot.data!;
 
               if (user.roles.contains("ADMIN")) {
-                return AdminHomePage(
-                  onLogoutSuper: onLogout,
-                );
+                return const AdminHomePage();
               }
               if (user.roles.contains("CREATOR")) {
                 return CreatorHomePage(
                   title: widget.title,
-                  onLogoutSuper: onLogout,
                 );
               }
               if (user.roles.contains("TEACHER")) {
-                return TeacherHomePage(
-                  onLogoutSuper: onLogout,
-                );
+                return const TeacherHomePage();
               }
               if (user.roles.contains("STUDENT")) {
                 return StudentHomeScreen(
                   key: ValueKey(user),
-                  onLogoutSuper: onLogout,
                   user: user,
                   course: user.course,
                 );

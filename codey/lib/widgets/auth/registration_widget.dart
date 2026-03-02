@@ -412,8 +412,8 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
             Text(
               errorMessage!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.red,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           if (waitingResponse)

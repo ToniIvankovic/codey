@@ -4,7 +4,6 @@ class LessonGroupCreationDto {
   String name;
   String? tips;
   List<int> lessons;
-  int order;
   bool adaptive;
   int courseId;
 
@@ -12,7 +11,6 @@ class LessonGroupCreationDto {
     required this.name,
     this.tips,
     this.lessons = const [],
-    this.order = 0,
     this.adaptive = false,
     required this.courseId,
   });
@@ -22,7 +20,6 @@ class LessonGroupCreationDto {
       'name': name,
       'tips': tips,
       'lessons': lessons,
-      'order': order,
       'adaptive': adaptive,
       'courseId': courseId,
     };
@@ -33,7 +30,6 @@ class LessonGroupCreationDto {
       name: lessonGroup.name,
       tips: lessonGroup.tips,
       lessons: lessonGroup.lessons,
-      order: lessonGroup.order,
       adaptive: lessonGroup.adaptive,
       courseId: lessonGroup.courseId,
     );

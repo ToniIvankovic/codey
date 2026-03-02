@@ -38,7 +38,6 @@ class LessonsServiceV1 implements LessonsService {
 
   @override
   void deleteLesson(Lesson lesson) {
-    _lessonsRepository.invalidateCache(lesson.id);
     _lessonsRepository.deleteLesson(lesson);
   }
 

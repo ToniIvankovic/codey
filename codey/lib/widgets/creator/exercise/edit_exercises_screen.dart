@@ -198,7 +198,7 @@ class _EditExercisesScreenState extends State<EditExercisesScreen> {
                                             .abs() <
                                         1
                                     ? null
-                                    : Colors.red),
+                                    : Theme.of(context).colorScheme.error),
                           )
                         ]
                       ],

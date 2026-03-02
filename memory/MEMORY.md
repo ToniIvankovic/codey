@@ -13,5 +13,8 @@ Gamified programming learning platform — Flutter frontend + .NET 8 backend + M
 - Frontend entry: `codey/lib/main.dart`
 - JWT client: `codey/lib/auth/authenticated_client.dart`
 
+## Git Workflow
+- Always use `--no-ff` when merging branches — never allow fast-forward merges, even when possible
+
 ## User Preferences
 - No specific preferences recorded yet.

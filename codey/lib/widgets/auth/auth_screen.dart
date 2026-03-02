@@ -5,8 +5,7 @@ import 'package:codey/widgets/auth/registration_widget.dart';
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
-  final VoidCallback onLogin;
-  const AuthScreen({Key? key, required this.onLogin}) : super(key: key);
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -37,9 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         style: Theme.of(context).textTheme.displaySmall),
                   ),
                   if (showLogin)
-                    LoginWidget(
-                      onLogin: widget.onLogin,
-                    )
+                    const LoginWidget()
                   else
                     RegistrationWidget(
                       onRegistration: () {

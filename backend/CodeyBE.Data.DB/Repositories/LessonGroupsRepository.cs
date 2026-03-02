@@ -34,10 +34,11 @@ namespace CodeyBE.Data.DB.Repositories
                 .AsQueryable()
                 .OrderByDescending(lessonGroup => lessonGroup.PrivateId)
                 .FirstOrDefault()!.PrivateId;
-            int newOrder = lessonGroup.Order ?? _collection
+            int newOrder = (_collection
                 .AsQueryable()
-                .OrderByDescending(lessonGroup => lessonGroup.Order)
-                .FirstOrDefault()!.Order + 1;
+                .Where(lg => lg.CourseId == lessonGroup.CourseId)
+                .OrderByDescending(lg => lg.Order)
+                .FirstOrDefault()?.Order ?? 0) + 1;
             int newId = lastId + 1;
             if (lessonGroup.Adaptive ?? false)
             {

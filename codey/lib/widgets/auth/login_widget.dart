@@ -4,8 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class LoginWidget extends StatefulWidget {
-  final VoidCallback onLogin;
-  const LoginWidget({Key? key, required this.onLogin}) : super(key: key);
+  const LoginWidget({Key? key}) : super(key: key);
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
@@ -63,8 +62,8 @@ class _LoginWidgetState extends State<LoginWidget> {
         if (errorMessage != null)
           Text(
             errorMessage!,
-            style: const TextStyle(
-              color: Colors.red,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
         if (waitingResponse)
@@ -84,10 +83,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 sessionService
                     .login(username: email, password: password)
                     .then((value) {
-                  widget.onLogin();
-                  setState(() {
-                    waitingResponse = false;
-                  });
+                  if (mounted) setState(() { waitingResponse = false; });
                 }).onError((error, stackTrace) {
                   setState(() {
                     waitingResponse = false;

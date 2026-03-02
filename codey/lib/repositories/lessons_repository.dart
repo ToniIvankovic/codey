@@ -6,9 +6,11 @@ import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/repositories/exercises_repository.dart';
+import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:rxdart/rxdart.dart';
 
 abstract class LessonsRepository {
   Future<List<Lesson>> getLessonsForGroup(LessonGroup lessonGroup);
@@ -25,13 +27,22 @@ class LessonsRepository1 implements LessonsRepository {
   static final Uri _apiUriAll =
       Uri.parse('${dotenv.env["API_BASE"]}/lessons/all');
 
-  final Map<int, Lesson> _cache = {};
   final http.Client _authenticatedClient;
   final ExercisesRepository _exercisesRepository;
   final UserService _userService;
+  final Map<int, Lesson> _lessonCache = {};
 
   LessonsRepository1(
-      this._authenticatedClient, this._exercisesRepository, this._userService);
+    this._authenticatedClient,
+    this._exercisesRepository,
+    this._userService,
+    SessionService sessionService,
+  ) {
+    Rx.merge([
+      _userService.courseChanged,
+      sessionService.logoutStream,
+    ]).listen((_) => invalidateCache(null));
+  }
 
   @override
   Future<List<Lesson>> getLessonsForGroup(LessonGroup lessonGroup) async {
@@ -53,12 +64,10 @@ class LessonsRepository1 implements LessonsRepository {
         data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
     if (!lessonGroup.adaptive) {
       for (var lesson in lessons) {
-        _cache[lesson.id] = lesson;
+        _lessonCache[lesson.id] = lesson;
       }
     }
     return lessons;
-    // List<int> lessonIds = lessonGroup.lessons;
-    // return getLessonsByIds(lessonIds);
   }
 
   @override
@@ -78,9 +87,9 @@ class LessonsRepository1 implements LessonsRepository {
     final List<dynamic> data = json.decode(response.body);
     final lessons =
         data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
-    invalidateCache(null);
+    _lessonCache.clear();
     for (var lesson in lessons) {
-      _cache[lesson.id] = lesson;
+      _lessonCache[lesson.id] = lesson;
     }
     return lessons;
   }
@@ -90,8 +99,8 @@ class LessonsRepository1 implements LessonsRepository {
     final lessons = <Lesson>[];
     final lessonsToFetch = <int>[];
     for (var id in lessonIds) {
-      if (_cache.containsKey(id)) {
-        lessons.add(_cache[id]!);
+      if (_lessonCache.containsKey(id)) {
+        lessons.add(_lessonCache[id]!);
       } else {
         lessonsToFetch.add(id);
       }
@@ -116,7 +125,7 @@ class LessonsRepository1 implements LessonsRepository {
           data.map((lessonJson) => Lesson.fromJson(lessonJson)).toList();
       lessons.addAll(fetchedLessons);
       for (var lesson in fetchedLessons) {
-        _cache[lesson.id] = lesson;
+        _lessonCache[lesson.id] = lesson;
       }
     }
 
@@ -126,10 +135,10 @@ class LessonsRepository1 implements LessonsRepository {
   @override
   void invalidateCache(int? lessonId) {
     if (lessonId == null) {
-      _cache.clear();
+      _lessonCache.clear();
       _exercisesRepository.invalidateCache(null);
     } else {
-      _cache.remove(lessonId);
+      _lessonCache.remove(lessonId);
       _exercisesRepository.invalidateCache(lessonId);
     }
   }
@@ -168,7 +177,7 @@ class LessonsRepository1 implements LessonsRepository {
 
     final Map<String, dynamic> data = json.decode(response.body);
     final lesson = Lesson.fromJson(data);
-    _cache[lesson.id] = lesson;
+    _lessonCache[lesson.id] = lesson;
     return lesson;
   }
 
@@ -223,7 +232,7 @@ class LessonsRepository1 implements LessonsRepository {
 
     final Map<String, dynamic> data = json.decode(response.body);
     final lesson = Lesson.fromJson(data);
-    _cache[lesson.id] = lesson;
+    _lessonCache[lesson.id] = lesson;
     return lesson;
   }
 }

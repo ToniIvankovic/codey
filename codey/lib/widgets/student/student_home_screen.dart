@@ -1,20 +1,20 @@
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
+import 'package:codey/services/session_service.dart';
 import 'package:codey/widgets/student/profile_data/student_profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'lesson_groups/lesson_groups_list_widget.dart';
 import 'student_gamification_screen.dart';
 
 class StudentHomeScreen extends StatefulWidget {
-  final VoidCallback onLogoutSuper;
   final AppUser user;
   final Course course;
 
   const StudentHomeScreen({
     super.key,
-    required this.onLogoutSuper,
     required this.user,
     required this.course,
   });
@@ -115,7 +115,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
-                              widget.onLogoutSuper();
+                              context.read<SessionService>().logout();
                             },
                             child: const Text('Odjavi se'),
                           ),
@@ -155,7 +155,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       );
     } on UnauthenticatedException catch (e) {
       //TODO Does this ever run?
-      widget.onLogoutSuper();
+      context.read<SessionService>().logout();
       return Text('Greška: $e');
     }
   }
