@@ -36,40 +36,45 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   List<ListItem>? data;
 
   @override
-  Widget build(BuildContext context) {
-    var lessonGroupsService = context.read<LessonGroupsService>();
-    if (data == null) {
-      lessonGroupsService.getAllLessonGroups().then((value) {
-        List<LessonGroup> lessonGroups = value;
+  void initState() {
+    super.initState();
+    context.read<LessonGroupsService>().getAllLessonGroups().then((groups) {
+      if (mounted) {
         setState(() {
-          data = lessonGroups
-              .map<ListItem>(
-                (item) => ListItem(
-                  lessonGroup: item,
-                  clickable: item.order <=
-                      (widget.user.nextLessonGroupId == null
-                          ? 0
-                          : (lessonGroups
-                              .where((lessonGroup) =>
-                                  lessonGroup.id ==
-                                  widget.user.nextLessonGroupId)
-                              .first
-                              .order)),
-                  finished: widget.user.highestLessonGroupId == null
-                      ? false
-                      : item.order <=
-                          (lessonGroups
-                              .where((lessonGroup) =>
-                                  lessonGroup.id ==
-                                  widget.user.highestLessonGroupId)
-                              .first
-                              .order),
-                  isExpanded: false,
-                ),
-              )
-              .toList();
+          data = _buildListItems(groups);
         });
-      });
+      }
+    });
+  }
+
+  List<ListItem> _buildListItems(List<LessonGroup> lessonGroups) {
+    final nextGroupOrder = widget.user.nextLessonGroupId == null
+        ? 0
+        : lessonGroups
+            .where((lg) => lg.id == widget.user.nextLessonGroupId)
+            .first
+            .order;
+
+    final highestGroupOrder = widget.user.highestLessonGroupId == null
+        ? null
+        : lessonGroups
+            .where((lg) => lg.id == widget.user.highestLessonGroupId)
+            .first
+            .order;
+
+    return lessonGroups.map<ListItem>((item) {
+      return ListItem(
+        lessonGroup: item,
+        clickable: item.order <= nextGroupOrder,
+        finished: highestGroupOrder != null && item.order <= highestGroupOrder,
+        isExpanded: false,
+      );
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (data == null) {
       return const Center(
         child: CircularProgressIndicator(
           strokeWidth: 5,

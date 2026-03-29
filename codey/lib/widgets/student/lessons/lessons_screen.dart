@@ -26,19 +26,21 @@ class LessonsScreen extends StatefulWidget {
 
 class _LessonsScreenState extends State<LessonsScreen> {
   bool lessonGroupFinished = false;
+  late Future<List<Lesson>> _lessonsFuture;
+  late Stream<AppUser?> _user$;
 
   @override
   void initState() {
     super.initState();
     lessonGroupFinished = widget.lessonGroupFinished;
+    _lessonsFuture = context
+        .read<LessonsService>()
+        .getLessonsForGroup(widget.lessonGroup);
+    _user$ = context.read<UserService>().userStream;
   }
 
   @override
   Widget build(BuildContext context) {
-    LessonsService lessonsService = Provider.of<LessonsService>(context);
-    Future<List<Lesson>> lessonsFuture =
-        lessonsService.getLessonsForGroup(widget.lessonGroup);
-    Stream<AppUser?> user$ = context.read<UserService>().userStream;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +86,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: FutureBuilder<List<Lesson>>(
-        future: lessonsFuture,
+        future: _lessonsFuture,
         builder: (BuildContext context, AsyncSnapshot<List<Lesson>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -109,7 +111,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
             var lessons = snapshot.data!;
 
             return StreamBuilder<AppUser?>(
-              stream: user$,
+              stream: _user$,
               builder:
                   (BuildContext context, AsyncSnapshot<AppUser?> userSnapshot) {
                 if (userSnapshot.connectionState == ConnectionState.waiting) {
