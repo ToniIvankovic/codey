@@ -13,10 +13,27 @@ class PickLessonScreen extends StatefulWidget {
 }
 
 class _PickLessonScreenState extends State<PickLessonScreen> {
+  List<Lesson>? _lessons;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<LessonsService>().getAllLessons().then((all) {
+      if (!mounted) return;
+      setState(() {
+        _lessons = all.reversed
+            .where((l) => !widget.existingLessons.map((e) => e.id).contains(l.id))
+            .toList();
+      });
+    }).catchError((error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final lessonsService = context.read<LessonsService>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pick a lesson'),
@@ -26,55 +43,45 @@ class _PickLessonScreenState extends State<PickLessonScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Expanded(
-              child: FutureBuilder(
-                  future: lessonsService.getAllLessons(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Lesson>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-                    final lessons = snapshot.data!.reversed.toList();
-                    lessons.removeWhere((lesson) => widget.existingLessons
-                        .map((lesson) => lesson.id)
-                        .contains(lesson.id));
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextButton.icon(
-                            onPressed: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return const CreateLessonScreen();
-                              })).then((value) {
-                                if (value != null) {
-                                  setState(() {
-                                    lessons.insert(0, value as Lesson);
-                                  });
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add a new lesson')),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: lessons.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                title: Text(
-                                    "${lessons[index].name} (${lessons[index].id})"),
-                                onTap: () {
-                                  Navigator.pop(context, lessons[index]);
+              child: _error != null
+                  ? Center(child: Text('Error: $_error'))
+                  : _lessons == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return const CreateLessonScreen();
+                                })).then((value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _lessons!.insert(0, value as Lesson);
+                                    });
+                                  }
+                                });
+                              },
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add a new lesson'),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: _lessons!.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return ListTile(
+                                    title: Text(
+                                        "${_lessons![index].name} (${_lessons![index].id})"),
+                                    onTap: () {
+                                      Navigator.pop(context, _lessons![index]);
+                                    },
+                                  );
                                 },
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    );
-                  }),
             )
           ],
         ),

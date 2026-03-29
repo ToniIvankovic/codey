@@ -20,6 +20,7 @@ import 'package:codey/widgets/student/student_home_screen.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/auth/auth_screen.dart';
 import 'package:codey/widgets/teacher/teacher_home_page.dart';
+import 'package:codey/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
@@ -111,67 +112,13 @@ Future main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final colorScheme4 = const ColorScheme(
-    surface: Color(0xffffffff),
-    onSurface: Color(0xff1d1d1d),
-    primary: Color.fromARGB(255, 20, 137, 135),
-    secondary: Color(0xfffedb71),
-    inverseSurface: Color(0xfff8f8f8),
-    onInverseSurface: Color(0xff1d1d1d),
-    error: Color.fromARGB(255, 233, 76, 76),
-    errorContainer: Color.fromARGB(255, 242, 194, 196),
-    inversePrimary: Color(0xffcbf3f0),
-    primaryContainer: Color(0xffcbf3f0),
-    onPrimaryContainer: Color.fromARGB(255, 20, 137, 135),
-    onPrimary: Color(0xfff8f8f8),
-    onSecondary: Color(0xff1d1d1d),
-    onError: Color(0xfff8f8f8),
-    onErrorContainer: Color.fromARGB(255, 209, 66, 66),
-    brightness: Brightness.light,
-  );
-  final colorScheme4Dark = const ColorScheme(
-    surface: Color.fromARGB(255, 40, 48, 47),
-    onSurface: Color.fromARGB(255, 177, 211, 209),
-    primary: Color.fromARGB(255, 20, 137, 135),
-    secondary: Color(0xfffedb71),
-    error: Color.fromARGB(255, 235, 93, 93),
-    errorContainer: Color.fromARGB(255, 139, 47, 50),
-    onErrorContainer: Color.fromARGB(255, 255, 209, 210),
-    inversePrimary: Color.fromARGB(255, 23, 60, 53),
-    primaryContainer: Color.fromARGB(255, 41, 100, 95),
-    onPrimaryContainer: Color(0xffcbf3f0),
-    onPrimary: Color(0xfff8f8f8),
-    onSecondary: Color(0xff1d1d1d),
-    inverseSurface: Color.fromARGB(255, 58, 59, 59),
-    onInverseSurface: Color.fromARGB(255, 177, 211, 209),
-    onError: Color(0xfff8f8f8),
-    brightness: Brightness.dark,
-  );
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Codey',
-      theme: ThemeData(
-        colorScheme: colorScheme4,
-        useMaterial3: true,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme4.primary,
-            foregroundColor: colorScheme4.onPrimary,
-          ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: colorScheme4Dark,
-        useMaterial3: true,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme4Dark.primary,
-            foregroundColor: colorScheme4Dark.onPrimary,
-          ),
-        ),
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Codey'),
@@ -191,17 +138,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   StreamSubscription<void>? _loginSub;
   StreamSubscription<void>? _logoutSub;
+  late Future<String?> _tokenFuture;
+
+  void _refreshToken() {
+    if (mounted) {
+      setState(() {
+        _tokenFuture = context.read<AuthService>().token;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _tokenFuture = context.read<AuthService>().token;
     final sessionService = context.read<SessionService>();
-    _loginSub = sessionService.loginStream.listen((_) {
-      if (mounted) setState(() {});
-    });
-    _logoutSub = sessionService.logoutStream.listen((_) {
-      if (mounted) setState(() {});
-    });
+    _loginSub = sessionService.loginStream.listen((_) => _refreshToken());
+    _logoutSub = sessionService.logoutStream.listen((_) => _refreshToken());
   }
 
   @override
@@ -214,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: context.read<AuthService>().token,
+      future: _tokenFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

@@ -1,4 +1,5 @@
-import 'package:codey/models/entities/app_user.dart';
+import 'dart:async';
+
 import 'package:codey/models/entities/leaderboard.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/services/user_service.dart';
@@ -23,28 +24,35 @@ class LeaderboardWidget extends StatefulWidget {
 class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   Leaderboard? leaderboard;
   bool leaderboardLoading = false;
+  String? _currentUserEmail;
+  StreamSubscription? _userSub;
 
   @override
   void initState() {
     super.initState();
     leaderboardLoading = true;
+    _userSub = context.read<UserService>().userStream.listen((user) {
+      if (mounted) setState(() => _currentUserEmail = user.email);
+    });
     fetchLeaderboard().then((value) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         leaderboard = value;
         leaderboardLoading = false;
       });
     }).catchError((onError) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
         leaderboard = null;
         leaderboardLoading = false;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _userSub?.cancel();
+    super.dispose();
   }
 
   Future<Leaderboard> fetchLeaderboard() async {
@@ -116,49 +124,42 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: StreamBuilder<AppUser>(
-                      stream: context.read<UserService>().userStream,
-                      builder: (context, snapshot) {
-                        String? userName;
-                        if (snapshot.hasData) {
-                          userName = snapshot.data!.email;
-                        }
-                        final isSelf = userName == student.email;
-                        final nameStyle = TextStyle(
-                          color: Theme.of(context).colorScheme.onSecondary,
-                          fontWeight:
-                              isSelf ? FontWeight.bold : FontWeight.normal,
-                        );
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("${i + 1}. ", style: nameStyle),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${student.firstName} ${student.lastName}:",
-                                    overflow: TextOverflow.clip,
-                                    style: nameStyle,
-                                  ),
-                                  if (!isWide)
-                                    Text(
-                                      student.course.shortName,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSecondary
-                                            .withOpacity(0.6),
-                                        fontSize: 12.0,
-                                      ),
-                                    ),
-                                ],
+                  child: Builder(builder: (context) {
+                    final isSelf = _currentUserEmail == student.email;
+                    final nameStyle = TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      fontWeight: isSelf ? FontWeight.bold : FontWeight.normal,
+                    );
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("${i + 1}. ", style: nameStyle),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${student.firstName} ${student.lastName}:",
+                                overflow: TextOverflow.clip,
+                                style: nameStyle,
                               ),
-                            ),
-                          ],
-                        );
-                      }),
+                              if (!isWide)
+                                Text(
+                                  student.course.shortName,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary
+                                        .withOpacity(0.6),
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
                 ),
                 if (student.streak > 0) ...[
                   Text(

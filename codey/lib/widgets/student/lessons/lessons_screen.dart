@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
@@ -27,21 +29,34 @@ class LessonsScreen extends StatefulWidget {
 class _LessonsScreenState extends State<LessonsScreen> {
   bool lessonGroupFinished = false;
   late Future<List<Lesson>> _lessonsFuture;
-  late Stream<AppUser?> _user$;
+  AppUser? _user;
+  StreamSubscription? _userSub;
 
   @override
   void initState() {
     super.initState();
     lessonGroupFinished = widget.lessonGroupFinished;
-    _lessonsFuture = context
-        .read<LessonsService>()
-        .getLessonsForGroup(widget.lessonGroup);
-    _user$ = context.read<UserService>().userStream;
+    _lessonsFuture =
+        context.read<LessonsService>().getLessonsForGroup(widget.lessonGroup);
+    _userSub = context.read<UserService>().userStream.listen((user) {
+      if (!mounted) return;
+      setState(() {
+        _user = user;
+        if (user.highestLessonGroupId == widget.lessonGroup.id) {
+          lessonGroupFinished = true;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _userSub?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -97,158 +112,116 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     padding: EdgeInsets.all(10.0),
                     child: Text("Učitavanje lekcija u cjelini..."),
                   ),
-                  CircularProgressIndicator(
-                    strokeWidth: 5,
-                  ),
+                  CircularProgressIndicator(strokeWidth: 5),
                 ],
               ),
             );
           } else if (snapshot.hasError) {
             return Text('Pogreška: ${snapshot.error}');
-          } else if (snapshot.data == null) {
-            return const Text('Nema podataka');
-          } else {
-            var lessons = snapshot.data!;
+          } else if (snapshot.data == null || _user == null) {
+            return const Center(
+                child: CircularProgressIndicator(strokeWidth: 5));
+          }
 
-            return StreamBuilder<AppUser?>(
-              stream: _user$,
-              builder:
-                  (BuildContext context, AsyncSnapshot<AppUser?> userSnapshot) {
-                if (userSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+          final lessons = snapshot.data!;
+          final user = _user!;
+
+          return SingleChildScrollView(
+            child: Center(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight:
+                      MediaQuery.of(context).size.height - kToolbarHeight,
+                  maxWidth: 600,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 50.0, vertical: 15.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (lessonGroupFinished) ...[
                         Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Text("Učitavanje podataka o korisniku..."),
-                        ),
-                        CircularProgressIndicator(
-                          strokeWidth: 5,
-                        ),
-                      ],
-                    ),
-                  );
-                } else if (userSnapshot.hasError) {
-                  return Text('Pogreška: ${userSnapshot.error}');
-                } else if (userSnapshot.data == null) {
-                  return const Text('Nema podataka o korisniku');
-                } else {
-                  AppUser user = userSnapshot.data!;
-                  if (user.highestLessonGroupId == widget.lessonGroup.id &&
-                      !lessonGroupFinished) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      setState(() {
-                        lessonGroupFinished = true;
-                      });
-                    });
-                  }
-                  return SingleChildScrollView(
-                    child: Center(
-                      child: Container(
-                        constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height -
-                              kToolbarHeight,
-                          maxWidth: 600,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50.0, vertical: 15.0),
+                          padding: const EdgeInsets.symmetric(vertical: 30),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (lessonGroupFinished) ...[
+                              Icon(
+                                Icons.check_circle_outline,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 50,
+                              ),
+                              Text(
+                                "Cjelina dovršena",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              if (lessonGroupFinished)
                                 Padding(
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 30),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle_outline,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        size: 50,
-                                      ),
-                                      Text(
-                                        "Cjelina dovršena",
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                      if (lessonGroupFinished)
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: ElevatedButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: const Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text("Dalje"),
-                                                Icon(Icons.arrow_forward),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                const Text("Riješi lekcije ponovno:")
-                              ],
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: lessons.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var lesson = lessons[index];
-                                  bool isClickable;
-                                  // Lesson group not already solved
-                                  if (!lessonGroupFinished) {
-                                    isClickable = widget.lessonGroup.lessons
-                                            .indexOf(lesson.id) <=
-                                        widget.lessonGroup.lessons
-                                            .indexOf(user.nextLessonId ?? 0);
-                                  } else {
-                                    isClickable = true;
-                                  }
-                                  return _generateSingleLessonItem(
-                                    lesson: lesson,
-                                    nextLessonId: user.nextLessonId,
-                                    context: context,
-                                    isClickable: isClickable,
-                                    lastLessonId: lessons.last.id,
-                                  );
-                                },
-                              ),
-                              if (!lessonGroupFinished)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 50.0),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 10.0, horizontal: 30.0),
-                                    child: Text(
-                                      "(Dovrši sve lekcije iznad za nastavak)",
-                                      overflow: TextOverflow.clip,
-                                      textAlign: TextAlign.center,
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("Dalje"),
+                                        Icon(Icons.arrow_forward),
+                                      ],
                                     ),
                                   ),
-                                )
+                                ),
                             ],
                           ),
                         ),
+                        const Text("Riješi lekcije ponovno:")
+                      ],
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: lessons.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          var lesson = lessons[index];
+                          bool isClickable;
+                          if (!lessonGroupFinished) {
+                            isClickable =
+                                widget.lessonGroup.lessons.indexOf(lesson.id) <=
+                                    widget.lessonGroup.lessons
+                                        .indexOf(user.nextLessonId ?? 0);
+                          } else {
+                            isClickable = true;
+                          }
+                          return _generateSingleLessonItem(
+                            lesson: lesson,
+                            nextLessonId: user.nextLessonId,
+                            context: context,
+                            isClickable: isClickable,
+                            lastLessonId: lessons.last.id,
+                          );
+                        },
                       ),
-                    ),
-                  );
-                }
-              },
-            );
-          }
+                      if (!lessonGroupFinished)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 50.0),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 30.0),
+                            child: Text(
+                              "(Dovrši sve lekcije iznad za nastavak)",
+                              overflow: TextOverflow.clip,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
         },
       ),
     );
@@ -261,12 +234,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
     required bool isClickable,
     required int lastLessonId,
   }) {
-    return
-        // Border.all(
-        //   color: lesson.id == nextLessonId && !lessonGroupFinished
-        //       ? Theme.of(context).colorScheme.primary
-        //       : Colors.transparent,
-        Builder(builder: (context) {
+    return Builder(builder: (context) {
       Border border;
       Color? color;
       bool solved = false;
@@ -339,15 +307,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                         ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                if(solved)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 3, 0, 0),
-                  child: Icon(
-                    Icons.refresh,
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                    size: 20,
+                if (solved)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 3, 0, 0),
+                    child: Icon(
+                      Icons.refresh,
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                      size: 20,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
