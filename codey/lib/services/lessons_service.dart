@@ -11,6 +11,8 @@ abstract class LessonsService {
   Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds);
 }
 
+// Intentionally thin — currently delegates directly to the repository.
+// Validation, cross-cutting logic, or orchestration for lessons belongs here.
 class LessonsServiceV1 implements LessonsService {
   final LessonsRepository _lessonsRepository;
 
@@ -42,10 +44,7 @@ class LessonsServiceV1 implements LessonsService {
   }
 
   @override
-  Future<Lesson> createLesson(
-      String name, String? tips, List<int> exerciseIds) async {
-    final lesson =
-        await _lessonsRepository.createLesson(name, tips, exerciseIds);
-    return lesson;
+  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds) {
+    return _lessonsRepository.createLesson(name, tips, exerciseIds);
   }
 }

@@ -15,6 +15,8 @@ abstract class LessonGroupsService {
   Future<void> deleteLessonGroup(int id);
 }
 
+// Intentionally thin — currently delegates directly to the repository.
+// Validation, cross-cutting logic, or orchestration for lesson groups belongs here.
 class LessonGroupsServiceV1 implements LessonGroupsService {
   final LessonGroupsRepository _lessonGroupsRepository;
 
