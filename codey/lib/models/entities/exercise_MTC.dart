@@ -3,21 +3,21 @@
 import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
-class ExerciseLA extends Exercise {
-  List<String>? answerOptions;
-  List<String> correctAnswers = [];
+class ExerciseMTC extends Exercise {
+  List<String> leftItems;
+  List<String> rightItems;
 
-  ExerciseLA({
+  ExerciseMTC({
     required id,
     required difficulty,
     String? statement,
     String? statementOutput,
     String? specificTip,
-    this.answerOptions,
-    required this.correctAnswers,
+    required this.leftItems,
+    required this.rightItems,
     required courseId,
   }) : super(
-          type: ExerciseType.LA,
+          type: ExerciseType.MTC,
           id: id,
           difficulty: difficulty,
           statement: statement,
@@ -26,20 +26,15 @@ class ExerciseLA extends Exercise {
           courseId: courseId,
         );
 
-  factory ExerciseLA.fromJson(Map<String, dynamic> json) {
-    final List<String>? options = json['answerOptionsList'] != null
-        ? List<String>.from(json['answerOptionsList'][0])
-        : null;
-    return ExerciseLA(
+  factory ExerciseMTC.fromJson(Map<String, dynamic> json) {
+    return ExerciseMTC(
       id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
-      answerOptions: options,
-      correctAnswers: json['correctAnswers'] != null
-          ? List<String>.from(json['correctAnswers'])
-          : [],
+      leftItems: List<String>.from(json['answerOptionsList'][0]),
+      rightItems: List<String>.from(json['answerOptionsList'][1]),
       courseId: json['courseId'],
     );
   }
@@ -52,20 +47,19 @@ class ExerciseLA extends Exercise {
         'statement': statement,
         'statementOutput': statementOutput,
         'specificTip': specificTip,
-        'answerOptionsList': answerOptions != null ? [answerOptions] : null,
-        'correctAnswers': correctAnswers,
+        'answerOptionsList': [leftItems, rightItems],
         'courseId': courseId,
       };
 
-  factory ExerciseLA.fromExercise(ExerciseLA other) {
-    return ExerciseLA(
+  factory ExerciseMTC.fromExercise(ExerciseMTC other) {
+    return ExerciseMTC(
       id: other.id,
       difficulty: other.difficulty,
       statement: other.statement,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
-      answerOptions: other.answerOptions,
-      correctAnswers: other.correctAnswers,
+      leftItems: other.leftItems,
+      rightItems: other.rightItems,
       courseId: other.courseId,
     );
   }

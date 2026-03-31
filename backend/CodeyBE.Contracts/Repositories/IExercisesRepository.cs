@@ -22,6 +22,8 @@ namespace CodeyBE.Contracts.Repositories
                 ExerciseTypes.SHORT_ANSWER => new ExerciseSA(exercise),
                 ExerciseTypes.LONG_ANSWER => new ExerciseLA(exercise),
                 ExerciseTypes.SHORT_CODE_WRITING => new ExerciseSCW(exercise),
+                ExerciseTypes.ORDER_REARRANGE_CODE => new ExerciseORC(exercise),
+                ExerciseTypes.MATCH => new ExerciseMTC(exercise),
                 _ => new Exercise(exercise),
             };
         }

@@ -1,12 +1,16 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_MTC.dart';
+import 'package:codey/models/entities/exercise_ORC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/exercise_type.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_LA_component.dart';
+import 'package:codey/widgets/creator/exercise/exercise_creation_MTC_component.dart';
+import 'package:codey/widgets/creator/exercise/exercise_creation_ORC_component.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_SCW_component.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
@@ -36,6 +40,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
   ExerciseType? type;
   String? statementOutput;
   String? specificTip;
+  //TODO: consider creating a class for this, to avoid using dynamic and string keys
   dynamic innerFields;
   int? courseId;
 
@@ -85,7 +90,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statementOutput: statementOutput,
         specificTip: specificTip,
         correctAnswers: innerFields['correctAnswers'].cast<String>(),
-        answerOptions: innerFields['answerOptions'].cast<String, String>(),
+        answerOptions: (innerFields['answerOptionsList'][0] as List).cast<String>(),
         courseId: courseId,
       );
     } else if (type == ExerciseType.SCW) {
@@ -100,6 +105,27 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         correctAnswers: innerFields['correctAnswers'],
         courseId: courseId,
       );
+    } else if (type == ExerciseType.ORC) {
+      return ExerciseORC(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementOutput: statementOutput,
+        specificTip: specificTip,
+        answerOptions: (innerFields['answerOptionsList'][0] as List).cast<String>(),
+        courseId: courseId,
+      );
+    } else if (type == ExerciseType.MTC) {
+      return ExerciseMTC(
+        id: widget.existingExercise?.id ?? 0,
+        difficulty: difficulty,
+        statement: statement,
+        statementOutput: statementOutput,
+        specificTip: specificTip,
+        leftItems: (innerFields['answerOptionsList'][0] as List).cast<String>(),
+        rightItems: (innerFields['answerOptionsList'][1] as List).cast<String>(),
+        courseId: courseId,
+      );
     } else {
       throw Exception('Invalid exercise type');
     }
@@ -111,7 +137,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     if (type == ExerciseType.MC) {
       exerciseCreationComponent = ExerciseCreationMCComponent(
           formKey: _formKey,
-          existingExercise: widget.existingExercise as ExerciseMC?,
+          existingExercise: widget.existingExercise is ExerciseMC ? widget.existingExercise as ExerciseMC : null,
           onChange: (innerFields) {
             setState(() {
               this.innerFields = innerFields;
@@ -120,7 +146,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.SA) {
       exerciseCreationComponent = ExerciseCreationSAComponent(
           formKey: _formKey,
-          existingExercise: widget.existingExercise as ExerciseSA?,
+          existingExercise: widget.existingExercise is ExerciseSA ? widget.existingExercise as ExerciseSA : null,
           onChange: (innerFields) {
             setState(() {
               this.innerFields = innerFields;
@@ -139,6 +165,24 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
       exerciseCreationComponent = ExerciseCreationSCWComponent(
           formKey: _formKey,
           existingExercise: widget.existingExercise,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
+    } else if (type == ExerciseType.ORC) {
+      exerciseCreationComponent = ExerciseCreationORCComponent(
+          formKey: _formKey,
+          existingExercise: widget.existingExercise is ExerciseORC ? widget.existingExercise as ExerciseORC : null,
+          onChange: (innerFields) {
+            setState(() {
+              this.innerFields = innerFields;
+            });
+          });
+    } else if (type == ExerciseType.MTC) {
+      exerciseCreationComponent = ExerciseCreationMTCComponent(
+          formKey: _formKey,
+          existingExercise: widget.existingExercise is ExerciseMTC ? widget.existingExercise as ExerciseMTC : null,
           onChange: (innerFields) {
             setState(() {
               this.innerFields = innerFields;

@@ -12,5 +12,7 @@ namespace CodeyBE.Contracts.Enumerations
         public const string SHORT_ANSWER = "SA";
         public const string LONG_ANSWER = "LA";
         public const string SHORT_CODE_WRITING = "SCW";
+        public const string ORDER_REARRANGE_CODE = "ORC";
+        public const string MATCH = "MTC";
     }
 }

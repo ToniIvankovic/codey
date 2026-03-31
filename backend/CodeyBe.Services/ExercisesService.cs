@@ -2,6 +2,7 @@
 using CodeyBE.Contracts.Entities;
 using CodeyBE.Contracts.Entities.Logs;
 using CodeyBE.Contracts.Entities.Users;
+using CodeyBE.Contracts.Enumerations;
 using CodeyBE.Contracts.Exceptions;
 using CodeyBE.Contracts.Repositories;
 using CodeyBE.Contracts.Services;
@@ -64,14 +65,15 @@ namespace CodeyBe.Services
         }
         private static void DeserializeCorrectAnswers(ExerciseCreationDTO exercise)
         {
-            if (exercise.Type == "SCW")
+            if (exercise.Type == ExerciseTypes.SHORT_CODE_WRITING)
             {
                 exercise.CorrectAnswers = DeserializeJsonListListString(exercise.CorrectAnswers!);
             }
-            else if (exercise.Type == "SA" || exercise.Type == "LA")
+            else if (exercise.Type == ExerciseTypes.SHORT_ANSWER || exercise.Type == ExerciseTypes.LONG_ANSWER)
             {
                 exercise.CorrectAnswers = DeserializeJsonListString(exercise.CorrectAnswers!);
             }
+            // ORC and MTC do not use CorrectAnswers
         }
 
         private static List<dynamic> DeserializeJsonListListString(List<dynamic> answers)
@@ -88,7 +90,6 @@ namespace CodeyBe.Services
             IEnumerable<dynamic> castAnswers = answers.Select(answer => ((JsonElement)answer).GetString()!);
             return castAnswers.ToList();
         }
-
 
         private void ValidateExerciseCreationDTO(ExerciseCreationDTO dto)
         {
@@ -193,7 +194,7 @@ namespace CodeyBe.Services
              {
                  if (exercise is ExerciseLA exerciseLA)
                  {
-                     if (exerciseLA.AnswerOptions.IsNullOrEmpty() && exerciseLA.CorrectAnswers != null)
+                     if ((exerciseLA.AnswerOptionsList == null || exerciseLA.AnswerOptionsList.Count == 0) && exerciseLA.CorrectAnswers != null)
                          GenerateAnswerOptionsForExerciseLA(exerciseLA);
                  }
                  return exercise;
@@ -205,14 +206,14 @@ namespace CodeyBe.Services
         {
             var correctAnswer = (string)exercise.CorrectAnswers![0];
             var parts = AnswerSplitterLARegex().Split(correctAnswer);
-            exercise.AnswerOptions = [];
+            var pieces = new List<string>();
             for (int i = 0; i < parts.Length; i++)
             {
                 if (parts[i].IsNullOrEmpty())
                     continue;
-
-                exercise.AnswerOptions.Add(i.ToString(), parts[i]);
+                pieces.Add(parts[i]);
             }
+            exercise.AnswerOptionsList = [pieces];
         }
 
         [GeneratedRegex("(?<=[\\s\\n])|([\\(\\)])")]

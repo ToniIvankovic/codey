@@ -1,5 +1,7 @@
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_MTC.dart';
+import 'package:codey/models/entities/exercise_ORC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/exercise_statistics.dart';
@@ -37,6 +39,10 @@ abstract class Exercise {
         return ExerciseLA.fromJson(json);
       case 'SCW':
         return ExerciseSCW.fromJson(json);
+      case 'ORC':
+        return ExerciseORC.fromJson(json);
+      case 'MTC':
+        return ExerciseMTC.fromJson(json);
       default:
         throw Exception('Invalid exercise type');
     }
@@ -51,6 +57,10 @@ abstract class Exercise {
       return ExerciseLA.fromExercise(other as ExerciseLA);
     } else if (other.type == ExerciseType.SCW) {
       return ExerciseSCW.fromExercise(other as ExerciseSCW);
+    } else if (other.type == ExerciseType.ORC) {
+      return ExerciseORC.fromExercise(other as ExerciseORC);
+    } else if (other.type == ExerciseType.MTC) {
+      return ExerciseMTC.fromExercise(other as ExerciseMTC);
     } else {
       throw Exception('Invalid exercise type');
     }

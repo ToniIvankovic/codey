@@ -13,12 +13,12 @@ namespace CodeyBE.Contracts.DTOs
         {
             // Check requirements
             _ = new ExerciseLA(ex);
-            AnswerOptions = ex.AnswerOptions!;
+            AnswerOptionsList = ex.AnswerOptionsList!;
             CorrectAnswers = ex.CorrectAnswers!;
             StatementOutput = ex.StatementOutput;
         }
 
-        public Dictionary<string, string> AnswerOptions { get; set; }
+        public List<List<string>> AnswerOptionsList { get; set; }
         public List<dynamic> CorrectAnswers { get; set; }
         public string? StatementOutput { get; set; }
     }

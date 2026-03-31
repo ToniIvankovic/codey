@@ -3,21 +3,19 @@
 import 'package:codey/models/entities/exercise_type.dart';
 import 'exercise.dart';
 
-class ExerciseLA extends Exercise {
-  List<String>? answerOptions;
-  List<String> correctAnswers = [];
+class ExerciseORC extends Exercise {
+  List<String> answerOptions; // lines in correct order
 
-  ExerciseLA({
+  ExerciseORC({
     required id,
     required difficulty,
     String? statement,
     String? statementOutput,
     String? specificTip,
-    this.answerOptions,
-    required this.correctAnswers,
+    required this.answerOptions,
     required courseId,
   }) : super(
-          type: ExerciseType.LA,
+          type: ExerciseType.ORC,
           id: id,
           difficulty: difficulty,
           statement: statement,
@@ -26,20 +24,14 @@ class ExerciseLA extends Exercise {
           courseId: courseId,
         );
 
-  factory ExerciseLA.fromJson(Map<String, dynamic> json) {
-    final List<String>? options = json['answerOptionsList'] != null
-        ? List<String>.from(json['answerOptionsList'][0])
-        : null;
-    return ExerciseLA(
+  factory ExerciseORC.fromJson(Map<String, dynamic> json) {
+    return ExerciseORC(
       id: json['privateId'],
       difficulty: json['difficulty'],
       statement: json['statement'],
       statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
-      answerOptions: options,
-      correctAnswers: json['correctAnswers'] != null
-          ? List<String>.from(json['correctAnswers'])
-          : [],
+      answerOptions: List<String>.from(json['answerOptionsList'][0]),
       courseId: json['courseId'],
     );
   }
@@ -52,20 +44,18 @@ class ExerciseLA extends Exercise {
         'statement': statement,
         'statementOutput': statementOutput,
         'specificTip': specificTip,
-        'answerOptionsList': answerOptions != null ? [answerOptions] : null,
-        'correctAnswers': correctAnswers,
+        'answerOptionsList': [answerOptions],
         'courseId': courseId,
       };
 
-  factory ExerciseLA.fromExercise(ExerciseLA other) {
-    return ExerciseLA(
+  factory ExerciseORC.fromExercise(ExerciseORC other) {
+    return ExerciseORC(
       id: other.id,
       difficulty: other.difficulty,
       statement: other.statement,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
       answerOptions: other.answerOptions,
-      correctAnswers: other.correctAnswers,
       courseId: other.courseId,
     );
   }

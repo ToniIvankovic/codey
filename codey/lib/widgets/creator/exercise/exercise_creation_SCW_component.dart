@@ -45,7 +45,7 @@ class _ExerciseCreationSCWComponentState
   @override
   void initState() {
     super.initState();
-    if (widget.existingExercise != null) {
+    if (widget.existingExercise is ExerciseSCW) {
       final ExerciseSCW exercise = widget.existingExercise as ExerciseSCW;
       statementCode = exercise.statementCode;
       codeController.text = statementCode!;

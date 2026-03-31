@@ -5,6 +5,8 @@ import 'package:codey/models/entities/end_report.dart';
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_MTC.dart';
+import 'package:codey/models/entities/exercise_ORC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/models/entities/exercise_statistics.dart';
@@ -106,7 +108,7 @@ class ExercisesServiceV1 implements ExercisesService {
 
   @override
   Future<bool> checkAnswer(Exercise exercise, dynamic answer) async {
-    const int mcDelay = 30;
+    const int clientSideCheckDelay = 30;
     if (_isMockInProgress) {
       return _mockCheckAnswer(exercise, answer);
     }
@@ -120,11 +122,16 @@ class ExercisesServiceV1 implements ExercisesService {
       },
     );
     if (exercise is ExerciseMC) {
-      await Future.delayed(
-        const Duration(milliseconds: mcDelay),
-        () {},
-      );
+      await Future.delayed(const Duration(milliseconds: clientSideCheckDelay));
       correct = exercise.correctAnswer == answer;
+    } else if (exercise is ExerciseMTC) {
+      await Future.delayed(const Duration(milliseconds: clientSideCheckDelay));
+      correct = answer as bool;
+    } else if (exercise is ExerciseORC) {
+      await Future.delayed(const Duration(milliseconds: clientSideCheckDelay));
+      final List<int> indices = answer as List<int>;
+      correct = indices.length == exercise.answerOptions.length &&
+          List.generate(indices.length, (i) => indices[i] == i).every((e) => e);
     } else if (exercise is ExerciseSA ||
         exercise is ExerciseLA ||
         exercise is ExerciseSCW) {
@@ -226,7 +233,6 @@ class ExercisesServiceV1 implements ExercisesService {
   }
 
   Future<bool> _mockCheckAnswer(Exercise exercise, answer) {
-    //TODO: consider moving this check to backend
     if (exercise is ExerciseMC) {
       return Future.value(exercise.correctAnswer == answer);
     } else if (exercise is ExerciseSA) {
@@ -245,6 +251,14 @@ class ExercisesServiceV1 implements ExercisesService {
         }
       }
       return Future.value(true);
+    } else if (exercise is ExerciseORC) {
+      final List<int> indices = answer;
+      final expected = List.generate(exercise.answerOptions.length, (i) => i);
+      return Future.value(indices.length == expected.length &&
+          List.generate(indices.length, (i) => indices[i] == expected[i])
+              .every((e) => e));
+    } else if (exercise is ExerciseMTC) {
+      return Future.value(answer as bool);
     } else {
       throw Exception('Unknown exercise type');
     }
@@ -279,6 +293,13 @@ class ExercisesServiceV1 implements ExercisesService {
       return exercise.correctAnswers[0];
     } else if (exercise is ExerciseSCW) {
       return exercise.correctAnswers?.map((e) => e[0]).toList();
+    } else if (exercise is ExerciseORC) {
+      return exercise.answerOptions.join('\n');
+    } else if (exercise is ExerciseMTC) {
+      return List.generate(
+        exercise.leftItems.length,
+        (i) => '${exercise.leftItems[i]} → ${exercise.rightItems[i]}',
+      ).join('\n');
     } else {
       throw Exception('Unknown exercise type');
     }
@@ -335,7 +356,7 @@ class ExercisesServiceV1 implements ExercisesService {
       return [
         '${exercise.type.toString()} (${exercise.id})',
         '${exercise.statement ?? ''} ${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''} '
-            '(${exercise.answerOptions?.values.join(",").replaceAll("\n", "↵")})'
+            '(${exercise.answerOptions?.join(",").replaceAll("\n", "↵")})'
       ];
     }
     if (exercise is ExerciseSCW) {
@@ -343,6 +364,18 @@ class ExercisesServiceV1 implements ExercisesService {
         '${exercise.type.toString()} (${exercise.id})',
         '${exercise.statement ?? ''} ${exercise.statementCode.replaceAll("\n", "↵")} '
             '${exercise.statementOutput?.replaceAll("\n", "↵") ?? ''}'
+      ];
+    }
+    if (exercise is ExerciseORC) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        '${exercise.statement ?? ''} (${exercise.answerOptions.join(" | ").replaceAll("\n", "↵")})',
+      ];
+    }
+    if (exercise is ExerciseMTC) {
+      return [
+        '${exercise.type.toString()} (${exercise.id})',
+        '${exercise.statement ?? ''} (${List.generate(exercise.leftItems.length, (i) => '${exercise.leftItems[i]} → ${exercise.rightItems[i]}').join(", ")})',
       ];
     }
     throw Exception('Unknown exercise type');

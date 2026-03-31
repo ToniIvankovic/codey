@@ -134,6 +134,14 @@ namespace CodeyBE.Data.DB.Repositories
             {
                 updates = updates.Unset(e => e.SpecificTip);
             }
+            if (exercise.AnswerOptionsList != null)
+            {
+                updates = updates.Set(e => e.AnswerOptionsList, exercise.AnswerOptionsList);
+            }
+            else
+            {
+                updates = updates.Unset(e => e.AnswerOptionsList);
+            }
 
             UpdateResult updateResult = await _collection.UpdateOneAsync(e => e.PrivateId == id, updates);
 

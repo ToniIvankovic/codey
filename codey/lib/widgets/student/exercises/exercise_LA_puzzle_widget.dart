@@ -28,14 +28,18 @@ class ExerciseLAPuzzleWidget extends StatefulWidget {
 class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
   static const pieceBorderRadius = 8.0;
   List<GestureDetector> answerParts = [];
-  List<MapEntry<String, dynamic>> answerOptions = [];
+  List<MapEntry<int, String>> answerOptions = [];
   int newlineTabCounter = 0;
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    answerOptions = widget.exercise.answerOptions!.entries.toList();
+    answerOptions = widget.exercise.answerOptions!
+        .asMap()
+        .entries
+        .map((e) => MapEntry(e.key, e.value))
+        .toList();
     answerOptions.shuffle();
   }
 
@@ -146,7 +150,6 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                   children: answerOptions.map((entry) {
                     //TODO: delete newline in code pieces?
                     final entryTextToDisplay = entry.value
-                        .toString()
                         .replaceAll('\n', '↵')
                         .replaceAll('\r', '↵')
                         .replaceAll(' ', '·');
@@ -179,13 +182,15 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                       ),
                     );
 
+                    final pieceKey = ValueKey(entry.key);
+
                     var detectorInAnswer = GestureDetector(
-                      key: ValueKey(entry.key),
+                      key: pieceKey,
                       onTap: () {
                         if (!widget.changesEnabled.value) return;
                         setState(() {
                           answerParts.removeWhere(
-                              (widget) => widget.key == ValueKey(entry.key));
+                              (widget) => widget.key == pieceKey);
                           updateAnswer();
                         });
                       },
@@ -193,12 +198,12 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                     );
 
                     var detectorInOptions = GestureDetector(
-                      key: ValueKey(entry.key),
+                      key: pieceKey,
                       onTap: () {
                         if (!widget.changesEnabled.value) return;
                         // If the key is present in answerParts, return without handling the tap
                         if (answerParts
-                            .any((piece) => piece.key == ValueKey(entry.key))) {
+                            .any((piece) => piece.key == pieceKey)) {
                           return;
                         }
 
@@ -209,7 +214,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
                       },
                       child: Opacity(
                         opacity: answerParts.any(
-                                (piece) => piece.key == ValueKey(entry.key))
+                                (piece) => piece.key == pieceKey)
                             ? 0.1
                             : 1.0,
                         child: codePiece,
@@ -386,7 +391,7 @@ class _ExerciseLAPuzzleWidgetState extends State<ExerciseLAPuzzleWidget> {
       if (piece.key.toString().contains('⇥')) {
         return '\t';
       }
-      return widget.exercise.answerOptions![(piece.key as ValueKey).value];
+      return widget.exercise.answerOptions![(piece.key as ValueKey).value as int];
     }).join();
     widget.onAnswerSelected(joinedAnswer);
   }

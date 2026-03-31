@@ -61,6 +61,11 @@ namespace CodeyBE.Contracts.Entities
         public string? SpecificTip { get; set; }
         [BsonElement("courseId")]
         public int CourseId { get; set; }
+
+        [BsonElement("answerOptionsList")]
+        [BsonIgnoreIfNull]
+        public List<List<string>>? AnswerOptionsList { get; set; }
+
         public Exercise(Exercise ex)
         {
             Id = ex.Id;
@@ -78,6 +83,7 @@ namespace CodeyBE.Contracts.Entities
             RaisesError = ex.RaisesError;
             SpecificTip = ex.SpecificTip;
             CourseId = ex.CourseId;
+            AnswerOptionsList = ex.AnswerOptionsList;
         }
 
         public Exercise(int id, ExerciseCreationDTO exerciseCreationDTO)
@@ -96,6 +102,7 @@ namespace CodeyBE.Contracts.Entities
             RaisesError = exerciseCreationDTO.RaisesError;
             SpecificTip = exerciseCreationDTO.SpecificTip;
             CourseId = exerciseCreationDTO.CourseId;
+            AnswerOptionsList = exerciseCreationDTO.AnswerOptionsList;
         }
 
         override public bool Equals(object? obj)
@@ -125,8 +132,41 @@ namespace CodeyBE.Contracts.Entities
             {
                 throw new Exception($"Missing field CorrectAnswers in exercise {ex.PrivateId} {ex.Type}");
             }
-            AnswerOptions = ex.AnswerOptions;
+            if (ex.AnswerOptionsList == null || ex.AnswerOptionsList.Count < 1)
+            {
+                throw new Exception($"Missing field AnswerOptionsList in exercise {ex.PrivateId} {ex.Type}");
+            }
             StatementOutput = ex.StatementOutput;
+        }
+    }
+
+    public class ExerciseORC : Exercise
+    {
+        public ExerciseORC(Exercise ex) : base(ex)
+        {
+            if (ex.Type != ExerciseTypes.ORDER_REARRANGE_CODE)
+            {
+                throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
+            }
+            if (ex.AnswerOptionsList == null || ex.AnswerOptionsList.Count < 1)
+            {
+                throw new Exception($"Missing field AnswerOptionsList in exercise {ex.PrivateId} {ex.Type}");
+            }
+        }
+    }
+
+    public class ExerciseMTC : Exercise
+    {
+        public ExerciseMTC(Exercise ex) : base(ex)
+        {
+            if (ex.Type != ExerciseTypes.MATCH)
+            {
+                throw new Exception($"Invalid exercise type conversion {ex.PrivateId} {ex.Type}");
+            }
+            if (ex.AnswerOptionsList == null || ex.AnswerOptionsList.Count != 2)
+            {
+                throw new Exception($"Missing or invalid AnswerOptionsList in exercise {ex.PrivateId} {ex.Type}");
+            }
         }
     }
 

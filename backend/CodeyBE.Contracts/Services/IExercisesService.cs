@@ -27,6 +27,8 @@ namespace CodeyBE.Contracts.Services
                 ExerciseTypes.SHORT_ANSWER => new ExerciseSA_DTO((ExerciseSA)exercise),
                 ExerciseTypes.LONG_ANSWER => new ExerciseLA_DTO((ExerciseLA)exercise),
                 ExerciseTypes.SHORT_CODE_WRITING => new ExerciseSCW_DTO((ExerciseSCW)exercise),
+                ExerciseTypes.ORDER_REARRANGE_CODE => new ExerciseORC_DTO((ExerciseORC)exercise),
+                ExerciseTypes.MATCH => new ExerciseMTC_DTO((ExerciseMTC)exercise),
                 _ => new ExerciseDTO(exercise),
             };
         }

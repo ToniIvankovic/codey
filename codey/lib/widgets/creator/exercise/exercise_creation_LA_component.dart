@@ -32,20 +32,18 @@ class _ExerciseCreationSAComponentState
     return {
       "correctAnswers":
           answers.where((element) => element != null).toList().cast<String>(),
-      "answerOptions": {
-        for (var i = 0; i < options.length; i++) i.toString(): options[i]
-      },
+      "answerOptionsList": [options],
     };
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.existingExercise != null) {
+    if (widget.existingExercise is ExerciseLA) {
       final ExerciseLA exercise = widget.existingExercise as ExerciseLA;
       answers = exercise.correctAnswers;
       answerKeys = List.generate(answers.length, (index) => index.toString());
-      options = List.of(exercise.answerOptions?.values.toList() ?? []);
+      options = List.of(exercise.answerOptions ?? []);
     }
   }
 

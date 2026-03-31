@@ -1,6 +1,8 @@
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_LA.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
+import 'package:codey/models/entities/exercise_MTC.dart';
+import 'package:codey/models/entities/exercise_ORC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
@@ -10,6 +12,8 @@ import 'package:provider/provider.dart';
 
 import 'exercise_LA_widget.dart';
 import 'exercise_MC_widget.dart';
+import 'exercise_MTC_widget.dart';
+import 'exercise_ORC_widget.dart';
 import 'exercise_SA_widget.dart';
 import 'exercise_SCW_widget.dart';
 
@@ -176,6 +180,39 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                   });
                                 },
                                 statementArea: _buildStaticStatementArea(),
+                              )
+                            else if (exercise is ExerciseORC)
+                              ExerciseORCWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                exercise: exercise! as ExerciseORC,
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    this.answer = answer;
+                                    enableCheck = true;
+                                  });
+                                },
+                                statementArea: _buildStaticStatementArea(),
+                              )
+                            else if (exercise is ExerciseMTC)
+                              ExerciseMTCWidget(
+                                key: ValueKey(exercise!.id + 100 * repeatCount),
+                                changesEnabled: childrenEnabledChanges,
+                                exercise: exercise! as ExerciseMTC,
+                                statementArea: _buildStaticStatementArea(),
+                                onAnswerSelected: (answer) {
+                                  setState(() {
+                                    childrenEnabledChanges.value = false;
+                                  });
+                                  widget.exercisesService
+                                      .checkAnswer(exercise!, answer)
+                                      .then((value) {
+                                    setState(() {
+                                      isCorrectResponse = value;
+                                      childrenSignalCorrect.value = value;
+                                    });
+                                  });
+                                },
                               ),
                             if (exercise!.specificTip != null)
                               Padding(
