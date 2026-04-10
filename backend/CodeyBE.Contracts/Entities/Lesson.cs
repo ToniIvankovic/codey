@@ -25,5 +25,8 @@ namespace CodeyBE.Contracts.Entities
         public bool? Adaptive { get; set; }
         [BsonElement("courseId")]
         public required int CourseId { get; set; }
+        [BsonElement("exerciseLimit")]
+        [BsonIgnoreIfNull]
+        public int? ExerciseLimit { get; set; }
     }
 }

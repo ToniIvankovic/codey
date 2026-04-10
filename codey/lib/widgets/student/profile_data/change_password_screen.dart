@@ -71,6 +71,8 @@ class ChangePasswordScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
+                      final navigator = Navigator.of(context);
+                      final messenger = ScaffoldMessenger.of(context);
                       context
                           .read<AuthService>()
                           .changePassword(
@@ -78,14 +80,14 @@ class ChangePasswordScreen extends StatelessWidget {
                             newPassword: newPwController.text,
                           )
                           .then((value) {
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        navigator.pop();
+                        messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Lozinka uspješno promijenjena'),
                           ),
                         );
                       }).catchError((error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: Text(error.toString()),
                           ),

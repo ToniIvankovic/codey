@@ -117,15 +117,17 @@ class _EditClassScreenState extends State<EditClassScreen> {
                     _selectedStudents,
                   )
                       .then((updatedClass) {
+                    if (!mounted) return;
                     Navigator.of(context).pop(updatedClass);
                     ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Promjene spremljene'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
+                      const SnackBar(
+                        content: Text('Promjene spremljene'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   }).catchError(
                     (error) {
+                      if (!mounted) return;
                       if (error is NoChangesException) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

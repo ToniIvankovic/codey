@@ -17,10 +17,9 @@ abstract class LessonsRepository {
   Future<List<Lesson>> getAllLessons();
   Future<List<Lesson>> getLessonsByIds(List<int> lessonIds);
   void invalidateCache(int? lessonId);
-  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds);
+  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds, {int? exerciseLimit});
   void deleteLesson(Lesson lesson);
-  Future<Lesson> updateLesson(
-      int id, String name, String? tips, List<int> exerciseIds);
+  Future<Lesson> updateLesson(int id, String name, String? tips, List<int> exerciseIds, {int? exerciseLimit});
 }
 
 class LessonsRepository1 implements LessonsRepository {
@@ -147,8 +146,9 @@ class LessonsRepository1 implements LessonsRepository {
   Future<Lesson> createLesson(
     String name,
     String? tips,
-    List<int> exerciseIds,
-  ) async {
+    List<int> exerciseIds, {
+    int? exerciseLimit,
+  }) async {
     var apiUri = Uri.parse('${dotenv.env["API_BASE"]}/lessons');
     var courseId = (await _userService.userStream.first).course.id;
     var dto = LessonCreationDto(
@@ -156,6 +156,7 @@ class LessonsRepository1 implements LessonsRepository {
       specificTips: tips,
       exerciseIds: exerciseIds,
       courseId: courseId,
+      exerciseLimit: exerciseLimit,
     );
     final response = await _authenticatedClient.post(
       apiUri,
@@ -203,8 +204,9 @@ class LessonsRepository1 implements LessonsRepository {
     int id,
     String name,
     String? tips,
-    List<int> exerciseIds,
-  ) async {
+    List<int> exerciseIds, {
+    int? exerciseLimit,
+  }) async {
     invalidateCache(id);
     var courseId = (await _userService.userStream.first).course.id;
     var dto = LessonCreationDto(
@@ -212,6 +214,7 @@ class LessonsRepository1 implements LessonsRepository {
       specificTips: tips,
       exerciseIds: exerciseIds,
       courseId: courseId,
+      exerciseLimit: exerciseLimit,
     );
     var response = await _authenticatedClient.put(
         Uri.parse('${dotenv.env["API_BASE"]}/lessons/$id'),

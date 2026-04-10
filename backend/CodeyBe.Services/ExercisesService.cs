@@ -20,12 +20,14 @@ namespace CodeyBe.Services
         IExercisesRepository exercisesRepository,
         ILessonsService lessonsService,
         ILessonGroupsService lessonGroupsService,
-        ILogsService logsService) : IExercisesService
+        ILogsService logsService,
+        ICoursesService coursesService) : IExercisesService
     {
         private readonly IExercisesRepository _exercisesRepository = exercisesRepository;
         private readonly ILessonsService _lessonsService = lessonsService;
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
         private readonly ILogsService _logsService = logsService;
+        private readonly ICoursesService _coursesService = coursesService;
 
         public async Task<IEnumerable<Exercise>> GetAllExercisesAsync(int courseId)
         {
@@ -103,22 +105,37 @@ namespace CodeyBe.Services
             await _exercisesRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId)
+        public async Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId, bool skipLimit = false)
         {
             Lesson lesson = await _lessonsService.GetLessonByIDAsync(lessonId)
                 ?? throw new EntityNotFoundException($"No lesson found with id {lessonId}");
             IEnumerable<int> exerciseIDs = lesson.Exercises;
-            IEnumerable<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs);
-            exercises = EnrichExercisesList(exercises);
+            List<Exercise> exercises = _exercisesRepository.GetExercisesByID(exerciseIDs).ToList();
+            exercises = EnrichExercisesList(exercises).ToList();
+
+            if (!skipLimit)
+            {
+                Course course = await _coursesService.GetCourseByIdAsync(lesson.CourseId);
+                int effectiveLimit = lesson.ExerciseLimit ?? course.DefaultExerciseLimit ?? -1;
+
+                if (effectiveLimit != -1 && exercises.Count > effectiveLimit)
+                {
+                    exercises = [.. exercises.OrderBy(_ => Random.Shared.Next())];
+                    exercises = [.. exercises.Take(effectiveLimit).OrderBy(ex => ex.Difficulty)];
+                }
+            }
+
             return exercises;
         }
 
         public async Task<IEnumerable<Exercise>> GetExercisesForAdaptiveLessonAsync(ApplicationUser user)
         {
-            const int N_EXERCISES = 15;
+            const int ADAPTIVE_FALLBACK_EXERCISES = 15;
             const double RATIO_EASIER = 0.3;
             int highestLessonGroup = (int)user.HighestLessonGroupId!;
             int courseId = user.CourseId;
+            Course course = await _coursesService.GetCourseByIdAsync(courseId);
+            int N_EXERCISES = (course.DefaultExerciseLimit is int limit && limit > 0) ? limit : ADAPTIVE_FALLBACK_EXERCISES;
             LessonGroup lessonGroup = await _lessonGroupsService.GetLessonGroupByIDAsync(highestLessonGroup)
                 ?? throw new EntityNotFoundException($"No lesson group found with id {highestLessonGroup}");
             List<LessonGroup> eligibleLessonGroups = [
@@ -261,6 +278,22 @@ namespace CodeyBe.Services
                     .ToList();
                 correctAnswers = exerciseSCW.CorrectAnswers!.Select(d => ((List<string>)d).Cast<string>().ToList()).ToList();
                 correct = ValidateAnswerSCW((IEnumerable<IEnumerable<string>>)correctAnswers, castAnswer);
+            }
+            else if (exercise is ExerciseORC exerciseORC)
+            {
+                castAnswer = answer.EnumerateArray()
+                    .Select(element => element.GetInt32())
+                    .ToList();
+                List<int> indices = castAnswer;
+                correct = indices.Count == exerciseORC.AnswerOptionsList!.Count &&
+                          indices.Select((v, i) => v == i).All(x => x);
+                correctAnswers = Enumerable.Range(0, exerciseORC.AnswerOptionsList!.Count).Cast<dynamic>();
+            }
+            else if (exercise is ExerciseMTC)
+            {
+                castAnswer = answer.GetBoolean();
+                correct = castAnswer;
+                correctAnswers = Enumerable.Empty<dynamic>();
             }
             else
             {

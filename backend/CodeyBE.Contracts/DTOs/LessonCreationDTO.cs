@@ -6,5 +6,6 @@
         public string? SpecificTips { get; set; }
         public IEnumerable<int> Exercises { get; set; } = new List<int>();
         public required int CourseId { get; set; }
+        public int? ExerciseLimit { get; set; }
     }
 }

@@ -15,5 +15,8 @@ namespace CodeyBE.Contracts.Entities
         public string ShortName { get; set; } = string.Empty;
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
+        [BsonElement("defaultExerciseLimit")]
+        [BsonIgnoreIfNull]
+        public int? DefaultExerciseLimit { get; set; }
     }
 }

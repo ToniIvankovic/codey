@@ -55,7 +55,8 @@ namespace CodeyBE.API.Controllers
             var appUser = await _userService.GetUser(user)
                 ?? throw new EntityNotFoundException("User not found");
             _loggingService.RequestedLesson(appUser, lessonId);
-            return (await _exercisesService.GetExercisesForLessonAsync(lessonId))
+            bool isCreator = User.IsInRole("CREATOR");
+            return (await _exercisesService.GetExercisesForLessonAsync(lessonId, skipLimit: isCreator))
                 .Select(exercise => IExercisesService.MapToSpecificExerciseDTOType(exercise))
                 .ToList<object>();
         }

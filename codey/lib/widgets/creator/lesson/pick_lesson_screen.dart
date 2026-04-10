@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/widgets/creator/lesson/create_lesson_screen.dart';
@@ -5,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PickLessonScreen extends StatefulWidget {
-  const PickLessonScreen({super.key, this.existingLessons = const <Lesson>[]});
+  const PickLessonScreen({super.key, this.existingLessons = const <Lesson>[], this.course});
   final List<Lesson> existingLessons;
+  final Course? course;
 
   @override
   State<PickLessonScreen> createState() => _PickLessonScreenState();
@@ -50,22 +52,23 @@ class _PickLessonScreenState extends State<PickLessonScreen> {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  return const CreateLessonScreen();
-                                })).then((value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _lessons!.insert(0, value as Lesson);
-                                    });
-                                  }
-                                });
-                              },
-                              icon: const Icon(Icons.add),
-                              label: const Text('Add a new lesson'),
-                            ),
+                            if (widget.course != null)
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return CreateLessonScreen(course: widget.course!);
+                                  })).then((value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        _lessons!.insert(0, value as Lesson);
+                                      });
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.add),
+                                label: const Text('Add a new lesson'),
+                              ),
                             Expanded(
                               child: ListView.builder(
                                 itemCount: _lessons!.length,

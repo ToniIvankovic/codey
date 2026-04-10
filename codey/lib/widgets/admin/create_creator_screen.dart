@@ -45,6 +45,7 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
                   .read<AdminFunctionsService>()
                   .registerCreator(email: email, password: password)
                   .then((value) {
+                if (!mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -53,6 +54,7 @@ class _CreateCreatorScreenState extends State<CreateCreatorScreen> {
                   ),
                 );
               }).catchError((error) {
+                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error: $error'),

@@ -116,6 +116,7 @@ class _CreateTeacherScreenState extends State<CreateTeacherScreen> {
                         : throw InvalidDataException('Please select a school'),
                   )
                   .then((value) {
+                if (!mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -124,6 +125,7 @@ class _CreateTeacherScreenState extends State<CreateTeacherScreen> {
                   ),
                 );
               }).catchError((error) {
+                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error: $error'),

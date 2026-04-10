@@ -31,7 +31,8 @@ namespace CodeyBE.Data.DB.Repositories
                 Name = lesson.Name,
                 Exercises = lesson.Exercises,
                 SpecificTips = lesson.SpecificTips,
-                CourseId = lesson.CourseId
+                CourseId = lesson.CourseId,
+                ExerciseLimit = lesson.ExerciseLimit
             });
             return (await GetByIdAsync(nextId))!;
         }
@@ -44,13 +45,19 @@ namespace CodeyBE.Data.DB.Repositories
                 Builders<Lesson>.Update.Unset(lesson => lesson.Exercises)
             );
 
+            UpdateDefinition<Lesson> updateDef = Builders<Lesson>.Update
+                .Set(lesson => lesson.Name, lessonCreationDTO.Name)
+                .Set(lesson => lesson.SpecificTips, lessonCreationDTO.SpecificTips)
+                .Set(lesson => lesson.Exercises, lessonCreationDTO.Exercises);
+
+            if (lessonCreationDTO.ExerciseLimit.HasValue)
+                updateDef = updateDef.Set(lesson => lesson.ExerciseLimit, lessonCreationDTO.ExerciseLimit);
+            else
+                updateDef = updateDef.Unset(lesson => lesson.ExerciseLimit);
+
             UpdateResult updateResult = await _collection.UpdateOneAsync(
                                 lesson => lesson.PrivateId == id,
-                                Builders<Lesson>.Update
-                                .Set(lesson => lesson.Name, lessonCreationDTO.Name)
-                                .Set(lesson => lesson.SpecificTips, lessonCreationDTO.SpecificTips)
-                                .Set(lesson => lesson.Exercises, lessonCreationDTO.Exercises)
-                                );
+                                updateDef);
             if (!updateResult.IsAcknowledged)
             {
                 throw new Exception("Update failed");

@@ -16,7 +16,7 @@ namespace CodeyBE.Contracts.Services
     {
         public Task<IEnumerable<Exercise>> GetAllExercisesAsync(int CourseId);
         public Task<Exercise?> GetExerciseByIDAsync(int id);
-        public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId);
+        public Task<IEnumerable<Exercise>> GetExercisesForLessonAsync(int lessonId, bool skipLimit = false);
 
         public Task<AnswerValidationResult> ValidateAnswer(int exerciseId, JsonElement answer);
         public static ExerciseDTO MapToSpecificExerciseDTOType(Exercise exercise)

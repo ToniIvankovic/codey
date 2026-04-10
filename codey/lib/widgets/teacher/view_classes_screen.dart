@@ -161,11 +161,13 @@ class _ViewClassesScreenState extends State<ViewClassesScreen> {
                 final userInteractionService =
                     context.read<UserInteractionService>();
                 userInteractionService.deleteClass(localClass.id).then((_) {
+                  if (!mounted) return;
                   setState(() {
                     _classes.remove(localClass);
                   });
                   Navigator.of(context).pop();
                 }).catchError((error) {
+                  if (!mounted) return;
                   if (error is NoChangesException) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

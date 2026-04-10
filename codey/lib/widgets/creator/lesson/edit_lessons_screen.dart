@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,11 @@ import 'create_lesson_screen.dart';
 import 'edit_single_lesson_screen.dart';
 
 class EditLessonsScreen extends StatefulWidget {
+  final Course course;
+
   const EditLessonsScreen({
     super.key,
+    required this.course,
   });
 
   @override
@@ -51,7 +55,7 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
                         Navigator.of(context)
                             .push(
                           MaterialPageRoute(
-                            builder: (context) => const CreateLessonScreen(),
+                            builder: (context) => CreateLessonScreen(course: widget.course),
                           ),
                         )
                             .then((value) {
@@ -130,7 +134,7 @@ class _EditLessonsScreenState extends State<EditLessonsScreen> {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                               builder: (context) =>
-                                  EditSingleLessonScreen(lesson),
+                                  EditSingleLessonScreen(lesson, course: widget.course),
                             ))
                                 .then(
                               (value) {

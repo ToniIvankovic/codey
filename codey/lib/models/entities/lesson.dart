@@ -5,6 +5,7 @@ class Lesson {
   String? specificTips;
   bool adaptive;
   int courseId;
+  int? exerciseLimit;
 
   Lesson({
     required this.id,
@@ -13,6 +14,7 @@ class Lesson {
     this.specificTips,
     this.adaptive = false,
     required this.courseId,
+    this.exerciseLimit,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Lesson {
       specificTips: json['specificTips'],
       adaptive: json['adaptive'] ?? false,
       courseId: json['courseId'],
+      exerciseLimit: json['exerciseLimit'],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/entities/lesson_group.dart';
@@ -14,8 +15,9 @@ import 'package:provider/provider.dart';
 
 class EditSingleLessonScreen extends StatefulWidget {
   final Lesson lesson;
+  final Course? course;
 
-  const EditSingleLessonScreen(this.lesson, {super.key});
+  const EditSingleLessonScreen(this.lesson, {super.key, this.course});
 
   @override
   State<EditSingleLessonScreen> createState() => _EditSingleLessonScreenState();
@@ -24,6 +26,7 @@ class EditSingleLessonScreen extends StatefulWidget {
 class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
   String? nameInitial;
   String? specificTipsInitial;
+  int? exerciseLimitInitial;
   List<Exercise> exercisesInitial = [];
   String? nameEdited;
   String? specificTipsEdited;
@@ -35,6 +38,13 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
   bool specificTipsEditable = false;
   bool exercisesEditable = false;
   int? expandedExerciseId;
+  late TextEditingController _limitController;
+
+  int? get _parsedLimit {
+    final text = _limitController.text.trim();
+    if (text.isEmpty) return null;
+    return int.tryParse(text);
+  }
 
   @override
   void initState() {
@@ -44,6 +54,10 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
     nameLocal = widget.lesson.name;
     specificTipsInitial = widget.lesson.specificTips;
     specificTipsLocal = widget.lesson.specificTips;
+    exerciseLimitInitial = widget.lesson.exerciseLimit;
+    _limitController = TextEditingController(
+      text: widget.lesson.exerciseLimit?.toString() ?? '',
+    );
     exerciseService.getAllExercisesForLesson(widget.lesson).then(
           (value) => setState(() {
             exercisesInitial = List.of(value);
@@ -53,12 +67,19 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
   }
 
   @override
+  void dispose() {
+    _limitController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final nameRow = _generateNameRow();
     final specificTipsRow = _generateSpecificTipsRow();
     final exercisesRow = _generateExercisesRow();
     final bool madeChanges = nameLocal != nameInitial ||
         specificTipsLocal != specificTipsInitial ||
+        _parsedLimit != exerciseLimitInitial ||
         !listEquals(exercisesLocal, exercisesInitial);
     final editInProgress =
         nameEditable || specificTipsEditable || exercisesEditable;
@@ -74,6 +95,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
               nameRow,
               specificTipsRow,
               exercisesRow,
+              _buildLimitRow(),
               ElevatedButton(
                 onPressed: madeChanges && !editInProgress
                     ? () {
@@ -84,8 +106,10 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                               nameLocal,
                               specificTipsLocal,
                               exercisesLocal.map((e) => e.id).toList(),
+                              exerciseLimit: _parsedLimit,
                             )
                             .then((value) {
+                          if (!mounted) return;
                           Navigator.pop(context, value);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -94,6 +118,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
                             ),
                           );
                         }).catchError((error) {
+                          if (!mounted) return;
                           if (error is NoChangesException) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -124,6 +149,38 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLimitRow() {
+    final poolSize = exercisesLocal.length;
+    final courseDefault = widget.course?.defaultExerciseLimit;
+    final effectiveLimit = _parsedLimit ?? courseDefault;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _limitController,
+            decoration: InputDecoration(
+              labelText: courseDefault != null
+                  ? 'Exercise limit (optional - default: $courseDefault)'
+                  : 'Exercise limit (optional)',
+            ),
+            keyboardType: TextInputType.number,
+            onChanged: (_) => setState(() {}),
+          ),
+          if (effectiveLimit != null && poolSize > effectiveLimit)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                'Pool: $poolSize exercises, showing $effectiveLimit — ${poolSize - effectiveLimit} excluded each session',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+            ),
+        ],
       ),
     );
   }

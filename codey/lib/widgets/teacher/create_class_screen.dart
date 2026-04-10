@@ -103,11 +103,11 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
                       formKey.currentState!.save();
                       userInteractionService
                           .createClass(className, students)
-                          .then(
-                            (createdClass) =>
-                                Navigator.of(context).pop(createdClass.name),
-                          )
-                          .catchError((error) {
+                          .then((createdClass) {
+                        if (!mounted) return;
+                        Navigator.of(context).pop(createdClass.name);
+                      }).catchError((error) {
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Error: ${error.toString()}"),

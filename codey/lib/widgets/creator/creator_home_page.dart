@@ -88,10 +88,11 @@ class _CreatorHomePageState extends State<CreatorHomePage> {
         padding: padd,
         child: ElevatedButton(
           onPressed: _loading ? null : () {
+            final course = _courses.firstWhere((c) => c.id == _selectedCourseId);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const EditLessonsScreen(),
+                builder: (context) => EditLessonsScreen(course: course),
               ),
             );
           },

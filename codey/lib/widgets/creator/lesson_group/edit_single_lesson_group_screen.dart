@@ -120,6 +120,7 @@ class _EditSingleLessonGroupScreenState
                                 .read<LessonGroupsService>()
                                 .updateLessonGroup(lessonGroup)
                                 .then((value) {
+                              if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Lesson group updated"),
@@ -128,6 +129,7 @@ class _EditSingleLessonGroupScreenState
                               );
                               Navigator.pop(context, value);
                             }).catchError((error) {
+                              if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Error: $error'),

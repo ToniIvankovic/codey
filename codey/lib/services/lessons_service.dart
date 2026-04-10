@@ -6,9 +6,9 @@ abstract class LessonsService {
   Future<List<Lesson>> getLessonsForGroup(LessonGroup lessonGroup);
   Future<List<Lesson>> getAllLessons();
   Future<List<Lesson>> getLessonsByIds(List<int> lessonIds);
-  Future<Lesson> updateLesson(int id, String name, String? tips, List<int> exerciseIds);
+  Future<Lesson> updateLesson(int id, String name, String? tips, List<int> exerciseIds, {int? exerciseLimit});
   void deleteLesson(Lesson lesson);
-  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds);
+  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds, {int? exerciseLimit});
 }
 
 // Intentionally thin — currently delegates directly to the repository.
@@ -34,8 +34,8 @@ class LessonsServiceV1 implements LessonsService {
   }
 
   @override
-  Future<Lesson> updateLesson(int id, String name, String? tips, List<int> exerciseIds) async {
-    return await _lessonsRepository.updateLesson(id, name, tips, exerciseIds);
+  Future<Lesson> updateLesson(int id, String name, String? tips, List<int> exerciseIds, {int? exerciseLimit}) async {
+    return await _lessonsRepository.updateLesson(id, name, tips, exerciseIds, exerciseLimit: exerciseLimit);
   }
 
   @override
@@ -44,7 +44,7 @@ class LessonsServiceV1 implements LessonsService {
   }
 
   @override
-  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds) {
-    return _lessonsRepository.createLesson(name, tips, exerciseIds);
+  Future<Lesson> createLesson(String name, String? tips, List<int> exerciseIds, {int? exerciseLimit}) {
+    return _lessonsRepository.createLesson(name, tips, exerciseIds, exerciseLimit: exerciseLimit);
   }
 }

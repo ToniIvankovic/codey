@@ -1,7 +1,7 @@
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
-import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import '../exercise/pick_exercise_screen.dart';
 
 class CreateLessonScreen extends StatefulWidget {
-  const CreateLessonScreen({super.key});
+  final Course course;
+
+  const CreateLessonScreen({super.key, required this.course});
 
   @override
   State<CreateLessonScreen> createState() => _CreateLessonScreenState();
@@ -19,15 +21,20 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   String? name;
   String? specificTips;
   List<Exercise> exercises = [];
-  late int courseId;
+  final TextEditingController _limitController = TextEditingController();
 
+  int get courseId => widget.course.id;
 
   @override
-  void initState() {
-    super.initState();
-    context.read<UserService>().userStream.first.then((user) => setState(() {
-          courseId = user.course.id;
-        }));
+  void dispose() {
+    _limitController.dispose();
+    super.dispose();
+  }
+
+  int? get _parsedLimit {
+    final text = _limitController.text.trim();
+    if (text.isEmpty) return null;
+    return int.tryParse(text);
   }
 
   @override
@@ -144,6 +151,30 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                   ),
                 ],
               ),
+              // LIMIT FIELD
+              TextField(
+                controller: _limitController,
+                decoration: InputDecoration(
+                  labelText: widget.course.defaultExerciseLimit != null
+                      ? 'Exercise limit (optional - default: ${widget.course.defaultExerciseLimit})'
+                      : 'Exercise limit (optional)',
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (_) => setState(() {}),
+              ),
+              Builder(builder: (context) {
+                final effectiveLimit = _parsedLimit ?? widget.course.defaultExerciseLimit;
+                if (effectiveLimit != null && exercises.length > effectiveLimit) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      'Pool: ${exercises.length} exercises, showing $effectiveLimit — ${exercises.length - effectiveLimit} excluded each session',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
               // CREATE LESSON BUTTON
               ElevatedButton(
                 onPressed: () {
@@ -153,8 +184,10 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                         name!,
                         specificTips,
                         exercises.map((e) => e.id).toList(),
+                        exerciseLimit: _parsedLimit,
                       )
                       .then((value) {
+                    if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Lesson created successfully'),

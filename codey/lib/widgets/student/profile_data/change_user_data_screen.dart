@@ -167,6 +167,8 @@ class ChangeUserDataScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
+                      final navigator = Navigator.of(context);
+                      final messenger = ScaffoldMessenger.of(context);
                       context
                           .read<UserService>()
                           .changeUserData(
@@ -179,14 +181,14 @@ class ChangeUserDataScreen extends StatelessWidget {
                             ),
                           )
                           .then((newUser) {
-                        Navigator.of(context).pop(newUser);
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        navigator.pop(newUser);
+                        messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Podatci uspješno promijenjeni'),
                           ),
                         );
                       }).catchError((error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: Text(error.toString()),
                           ),

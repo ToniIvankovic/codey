@@ -344,15 +344,17 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                                       context.read<ExercisesService>();
                                   exercisesService
                                       .createExercise(exercise)
-                                      .then((value) =>
-                                          Navigator.of(context).pop(value));
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Exercise created successfully'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
+                                      .then((value) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Exercise created successfully'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                    Navigator.of(context).pop(value);
+                                  });
                                 }
                               },
                               child: const Text('Create'),
@@ -367,6 +369,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                                   exercisesService
                                       .updateExercise(exercise)
                                       .then((value) {
+                                    if (!mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Changes saved'),
@@ -375,9 +378,9 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                                     );
                                     Navigator.of(context).pop(value);
                                   }).catchError((error) {
+                                    if (!mounted) return;
                                     if (error is NoChangesException) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                           content: Text('No changes made'),
                                           duration: Duration(seconds: 2),
