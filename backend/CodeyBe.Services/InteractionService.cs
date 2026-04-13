@@ -131,19 +131,19 @@ namespace CodeyBe.Services
         {
             ApplicationUser? student = await _userService.GetUser(userStudent)
                 ?? throw new EntityNotFoundException("Student not found in the database");
+
+            Class? _class = null;
             try
             {
-                Class? _class = await GetClassForStudentSelf(userStudent, student.UserName!)
+                _class = await GetClassForStudentSelf(userStudent, student.UserName!)
                     ?? throw new EntityNotFoundException("Student is not in any class");
-                return await ProduceLeaderboardForClass(_class);
             }
-            catch (EntityNotFoundException)
-            {
-                return await ProduceLeaderboardForSchool(student.School!);
-            }
+            catch (EntityNotFoundException) { }
+
+            return await ProduceLeaderboard(student.School!, _class, student.CourseId);
         }
 
-        public async Task<Leaderboard> GetLeaderboardForClass(ClaimsPrincipal userTeacher, int classId)
+        public async Task<Leaderboard> GetLeaderboardForClass(ClaimsPrincipal userTeacher, int classId, int courseId)
         {
             ApplicationUser? teacher = await _userService.GetUser(userTeacher)
                 ?? throw new EntityNotFoundException("Teacher not found in the database");
@@ -153,31 +153,26 @@ namespace CodeyBe.Services
             {
                 throw new UnauthorizedAccessException("Teacher is not allowed to access this class");
             }
-            return await ProduceLeaderboardForClass(_class);
+            return await ProduceLeaderboard(teacher.School!, _class, courseId);
         }
 
-        private async Task<Leaderboard> ProduceLeaderboardForClass(Class @class)
+        private async Task<Leaderboard> ProduceLeaderboard(string school, Class? @class, int courseId)
         {
             var allUsers = await _userService.GetAllUsersAsync();
-            return new Leaderboard
-            {
-                ClassId = @class.PrivateId,
-                Students = allUsers
-                    .Where(user => @class.Students.Contains(user.UserName!))
-                    .OrderByDescending(student => student.TotalXP)
-                    .Select(UserDataDTO.FromUser)
-                    .ToList(),
-            };
-        }
+            IEnumerable<ApplicationUser> filtered = allUsers;
 
-        private async Task<Leaderboard> ProduceLeaderboardForSchool(string school)
-        {
-            var allUsers = await _userService.GetAllUsersAsync();
+            if (@class != null)
+                filtered = filtered.Where(user => @class.Students.Contains(user.UserName!));
+
+            filtered = filtered.Where(user =>
+                user.School == school &&
+                user.CourseId == courseId &&
+                user.Roles.Contains("STUDENT"));
+
             return new Leaderboard
             {
-                ClassId = 0,
-                Students = allUsers
-                    .Where(user => user.School == school && user.Roles.Contains("STUDENT"))
+                ClassId = @class?.PrivateId ?? 0,
+                Students = filtered
                     .OrderByDescending(student => student.TotalXP)
                     .Select(UserDataDTO.FromUser)
                     .ToList(),

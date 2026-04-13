@@ -22,6 +22,6 @@ namespace CodeyBE.Contracts.Services
         public Task<Class?> GetClassForStuedntByTeacher(ApplicationUser teacher, string studentUsername);
         public Task<Class?> GetClassForStuedntByTeacher(ClaimsPrincipal userTeacher, string studentUsername);
         public Task<Leaderboard> GetLeaderboardForStudentSelf(ClaimsPrincipal user);
-        public Task<Leaderboard> GetLeaderboardForClass(ClaimsPrincipal user, int classId);
+        public Task<Leaderboard> GetLeaderboardForClass(ClaimsPrincipal user, int classId, int courseId);
     }
 }

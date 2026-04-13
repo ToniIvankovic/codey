@@ -110,6 +110,7 @@ class _ViewSingleClassScreenState extends State<ViewSingleClassScreen> {
                 else
                   ListView.builder(
                     shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: _selectedStudents.length,
                     itemBuilder: (context, index) {
                       final student = _selectedStudents[index];

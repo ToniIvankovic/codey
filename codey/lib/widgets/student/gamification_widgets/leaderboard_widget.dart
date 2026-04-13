@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/entities/leaderboard.dart';
+import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,8 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   bool leaderboardLoading = false;
   String? _currentUserEmail;
   StreamSubscription? _userSub;
+  List<Course> _courses = [];
+  Course? _selectedCourse;
 
   @override
   void initState() {
@@ -34,13 +38,28 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     _userSub = context.read<UserService>().userStream.listen((user) {
       if (mounted) setState(() => _currentUserEmail = user.email);
     });
+    if (widget.requestedByTeacher) {
+      context.read<CoursesService>().getAllCourses().then((courses) {
+        if (!mounted || courses.isEmpty) return;
+        setState(() {
+          _courses = courses;
+          _selectedCourse = courses.first;
+        });
+        _loadLeaderboard();
+      });
+    } else {
+      _loadLeaderboard();
+    }
+  }
+
+  void _loadLeaderboard() {
     fetchLeaderboard().then((value) {
       if (!mounted) return;
       setState(() {
         leaderboard = value;
         leaderboardLoading = false;
       });
-    }).catchError((onError) {
+    }).catchError((_) {
       if (!mounted) return;
       setState(() {
         leaderboard = null;
@@ -56,11 +75,12 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
   }
 
   Future<Leaderboard> fetchLeaderboard() async {
-    return widget.requestedByTeacher
-        ? await context
-            .read<UserInteractionService>()
-            .getLeaderboardClass(widget.classId!)
-        : await context.read<UserInteractionService>().getLeaderboardStudent();
+    if (widget.requestedByTeacher) {
+      return context
+          .read<UserInteractionService>()
+          .getLeaderboardClass(widget.classId!, _selectedCourse!.id);
+    }
+    return context.read<UserInteractionService>().getLeaderboardStudent();
   }
 
   @override
@@ -81,6 +101,22 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                 ),
               ),
             ),
+            if (widget.requestedByTeacher && _courses.isNotEmpty)
+              DropdownButton<Course>(
+                value: _selectedCourse,
+                items: _courses
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+                    .toList(),
+                onChanged: (course) {
+                  if (course == null || course == _selectedCourse) return;
+                  setState(() {
+                    _selectedCourse = course;
+                    leaderboardLoading = true;
+                    leaderboard = null;
+                  });
+                  _loadLeaderboard();
+                },
+              ),
             if (leaderboardLoading)
               const Padding(
                 padding: EdgeInsets.all(8.0),

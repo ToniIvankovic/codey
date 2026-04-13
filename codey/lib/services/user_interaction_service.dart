@@ -17,7 +17,7 @@ abstract class UserInteractionService {
   Future<List<AppUser>> getAllUsers();
   Future<List<String>> getAllSchools();
   Future<Leaderboard> getLeaderboardStudent();
-  Future<Leaderboard> getLeaderboardClass(int classId);
+  Future<Leaderboard> getLeaderboardClass(int classId, int courseId);
 }
 
 class UserInteractionServiceImpl implements UserInteractionService {
@@ -158,9 +158,10 @@ class UserInteractionServiceImpl implements UserInteractionService {
   }
 
   @override
-  Future<Leaderboard> getLeaderboardClass(int classId) async {
+  @override
+  Future<Leaderboard> getLeaderboardClass(int classId, int courseId) async {
     final response = await _authenticatedClient.get(
-      Uri.parse('$_baseEndpoint/leaderboard/$classId'),
+      Uri.parse('$_baseEndpoint/leaderboard/$classId?courseId=$courseId'),
     );
 
     if (response.statusCode != 200) {

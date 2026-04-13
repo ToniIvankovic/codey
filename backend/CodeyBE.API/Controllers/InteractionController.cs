@@ -176,9 +176,9 @@ namespace CodeyBE.API.Controllers
         [HttpGet("leaderboard/{classId}", Name = "getLeaderboardForClass")]
         [Authorize(Roles = "TEACHER")]
         [ProducesResponseType(typeof(Leaderboard), (int)HttpStatusCode.OK)]
-        public async Task<Leaderboard> GetLeaderboardForClass([FromRoute] int classId)
+        public async Task<Leaderboard> GetLeaderboardForClass([FromRoute] int classId, [FromQuery] int courseId)
         {
-            return await interactionService.GetLeaderboardForClass(User, classId);
+            return await interactionService.GetLeaderboardForClass(User, classId, courseId);
         }
     }
 }
