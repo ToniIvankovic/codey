@@ -58,8 +58,6 @@ Future main() async {
         Provider<ExercisesRepository>(
           create: (context) => ExercisesRepository1(
             context.read<AuthenticatedClient>(),
-            context.read<UserService>(),
-            context.read<SessionService>(),
           ),
         ),
         Provider<LessonGroupsRepository>(
@@ -76,7 +74,6 @@ Future main() async {
         Provider<LessonsRepository>(
           create: (context) => LessonsRepository1(
             context.read<AuthenticatedClient>(),
-            context.read<ExercisesRepository>(),
             context.read<UserService>(),
             context.read<SessionService>(),
           ),

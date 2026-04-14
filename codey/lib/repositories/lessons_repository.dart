@@ -5,7 +5,6 @@ import 'package:codey/models/entities/lesson_group.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/models/entities/lesson.dart';
-import 'package:codey/repositories/exercises_repository.dart';
 import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -27,13 +26,11 @@ class LessonsRepository1 implements LessonsRepository {
       Uri.parse('${dotenv.env["API_BASE"]}/lessons/all');
 
   final http.Client _authenticatedClient;
-  final ExercisesRepository _exercisesRepository;
   final UserService _userService;
   final Map<int, Lesson> _lessonCache = {};
 
   LessonsRepository1(
     this._authenticatedClient,
-    this._exercisesRepository,
     this._userService,
     SessionService sessionService,
   ) {
@@ -135,10 +132,8 @@ class LessonsRepository1 implements LessonsRepository {
   void invalidateCache(int? lessonId) {
     if (lessonId == null) {
       _lessonCache.clear();
-      _exercisesRepository.invalidateCache(null);
     } else {
       _lessonCache.remove(lessonId);
-      _exercisesRepository.invalidateCache(lessonId);
     }
   }
 

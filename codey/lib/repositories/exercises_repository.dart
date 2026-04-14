@@ -4,11 +4,8 @@ import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:codey/models/entities/lesson.dart';
 import 'package:codey/models/exceptions/no_changes_exception.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
-import 'package:codey/services/session_service.dart';
-import 'package:codey/services/user_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:rxdart/rxdart.dart';
 import '../models/entities/exercise.dart';
 
 abstract class ExercisesRepository {
@@ -16,7 +13,6 @@ abstract class ExercisesRepository {
   Future<List<Exercise>> getAllExercises();
   Future<void> deleteExercise(int exerciseId);
   Future<Exercise> createExercise(Exercise exercise);
-  void invalidateCache(int? id);
   Future<Exercise> updateExercise(Exercise exercise);
 }
 
@@ -26,28 +22,11 @@ class ExercisesRepository1 implements ExercisesRepository {
   static final Uri _apiAdaptiveUrl =
       Uri.parse('${dotenv.env["API_BASE"]}/exercises/lesson/adaptive');
   final http.Client _authenticatedClient;
-  final Map<int, List<Exercise>> _exercisesCache = {};
 
-  ExercisesRepository1(
-    this._authenticatedClient,
-    UserService userService,
-    SessionService sessionService,
-  ) {
-    Rx.merge([
-      userService.courseChanged,
-      sessionService.logoutStream,
-    ]).listen((_) => invalidateCache(null));
-  }
+  ExercisesRepository1(this._authenticatedClient);
 
   @override
-  Future<List<Exercise>> getExercisesForLesson(Lesson lesson) {
-    if (_exercisesCache.containsKey(lesson.id)) {
-      return Future.value(List.of(_exercisesCache[lesson.id]!));
-    }
-    return _fetchExercises(lesson);
-  }
-
-  Future<List<Exercise>> _fetchExercises(Lesson lesson) async {
+  Future<List<Exercise>> getExercisesForLesson(Lesson lesson) async {
     final uri = lesson.adaptive ? _apiAdaptiveUrl : _apiUrl(lesson.id);
     final response = await _authenticatedClient.get(uri);
 
@@ -74,10 +53,7 @@ class ExercisesRepository1 implements ExercisesRepository {
         });
       }
     }
-    if (!lesson.adaptive) {
-      _exercisesCache[lesson.id] = exercises;
-    }
-    return List.of(exercises);
+    return exercises;
   }
 
   @override
@@ -90,15 +66,6 @@ class ExercisesRepository1 implements ExercisesRepository {
     }
     final List<dynamic> data = json.decode(response.body);
     return data.map((exerciseJson) => Exercise.fromJson(exerciseJson)).toList();
-  }
-
-  @override
-  void invalidateCache(int? id) {
-    if (id != null) {
-      _exercisesCache.remove(id);
-    } else {
-      _exercisesCache.clear();
-    }
   }
 
   @override
@@ -148,7 +115,6 @@ class ExercisesRepository1 implements ExercisesRepository {
       throw Exception('Failed to update exercise');
     }
 
-    invalidateCache(null);
     final Map<String, dynamic> data = json.decode(response.body);
     return Exercise.fromJson(data);
   }
