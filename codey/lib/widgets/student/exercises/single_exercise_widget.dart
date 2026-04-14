@@ -54,7 +54,9 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   @override
   Widget build(BuildContext context) {
     if (exercise == null) {
-      widget.onSessionFinished();
+      if (widget.exercisesService.sessionActive) {
+        widget.onSessionFinished();
+      }
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

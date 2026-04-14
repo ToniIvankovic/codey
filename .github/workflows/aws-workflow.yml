@@ -32,7 +32,17 @@ jobs:
 
     - name: Sync output to S3
       run: |
-        aws s3 sync ./codey/build/web s3://codey-fe
+        aws s3 sync ./codey/build/web s3://codey-fe \
+          --exclude "index.html" \
+          --exclude "flutter_service_worker.js" \
+          --exclude "version.json"
+
+        aws s3 cp ./codey/build/web/index.html s3://codey-fe/index.html \
+          --cache-control "no-cache, no-store, must-revalidate"
+        aws s3 cp ./codey/build/web/flutter_service_worker.js s3://codey-fe/flutter_service_worker.js \
+          --cache-control "no-cache, no-store, must-revalidate"
+        aws s3 cp ./codey/build/web/version.json s3://codey-fe/version.json \
+          --cache-control "no-cache, no-store, must-revalidate"
 
   invalidate-cloudfront:
     needs: build-and-deploy
