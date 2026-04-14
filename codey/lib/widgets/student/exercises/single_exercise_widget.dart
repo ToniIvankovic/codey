@@ -60,6 +60,10 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Završavanje lekcije..."),
+            ),
           ],
         ),
       );

@@ -32,6 +32,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     final exercisesService = context.read<ExercisesService>();
     exercisesService
         .startSessionForLesson(widget.lesson, widget.lessonGroup)
+        .timeout(const Duration(seconds: 20))
         .then((value) {
       if (!mounted) return;
       final next = exercisesService.getNextExercise();
@@ -49,6 +50,20 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       setState(() {
         currentExercise = next;
       });
+    }).catchError((error, stackTrace) {
+      debugPrint(
+          'startSessionForLesson failed for lesson ${widget.lesson.id}: $error\n$stackTrace');
+      if (!mounted) return;
+      if (exercisesService.sessionActive) {
+        exercisesService.endSession(false);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Greška pri učitavanju lekcije: $error'),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      Navigator.pop(context);
     });
   }
 
@@ -112,6 +127,10 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircularProgressIndicator(),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("Učitavanje vježbi u lekciji..."),
+                      ),
                     ],
                   ),
                 )
@@ -128,19 +147,33 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                           key: ValueKey(currentExercise!.id),
                           exercisesService: exercisesService,
                           onSessionFinished: () async {
-                            int? awardedXP =
-                                await exercisesService.endSession(true);
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              Navigator.pushReplacement(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return PostLessonScreen(
-                                  endReport: exercisesService.getEndReport()!,
-                                  awardedXP: awardedXP,
-                                  gamificationEnabled:
-                                      widget.user.gamificationEnabled,
+                            try {
+                              int? awardedXP =
+                                  await exercisesService.endSession(true);
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                Navigator.pushReplacement(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return PostLessonScreen(
+                                    endReport: exercisesService.getEndReport()!,
+                                    awardedXP: awardedXP,
+                                    gamificationEnabled:
+                                        widget.user.gamificationEnabled,
+                                  );
+                                }));
+                              });
+                            } catch (e) {
+                              debugPrint('Greška pri završavanju lekcije: $e');
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Greška pri završavanju lekcije: $e'),
+                                    duration: const Duration(seconds: 5),
+                                  ),
                                 );
-                              }));
-                            });
+                                Navigator.pop(context);
+                              }
+                            }
                           },
                         ),
                       ),
