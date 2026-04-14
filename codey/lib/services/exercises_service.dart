@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:codey/models/entities/end_of_lesson_response.dart';
@@ -170,13 +171,18 @@ class ExercisesServiceV1 implements ExercisesService {
 
     if (_endReport == null) throw Exception('End report is null');
 
-    var response = await _authenticatedClient.post(
-      _endOfSessionEndpoint,
-      body: json.encode(_endReport!.toJson()),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+    http.Response response;
+    try {
+      response = await _authenticatedClient.post(
+        _endOfSessionEndpoint,
+        body: json.encode(_endReport!.toJson()),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 20));
+    } on TimeoutException {
+      return null;
+    }
     if (response.statusCode != 200) {
       //TODO: handle end of course
       return null;

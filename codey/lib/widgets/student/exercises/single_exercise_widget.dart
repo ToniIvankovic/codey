@@ -8,7 +8,9 @@ import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'exercise_LA_widget.dart';
 import 'exercise_MC_widget.dart';
@@ -406,12 +408,29 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     );
   }
 
+  Future<void> _onOpenLink(LinkableElement link) async {
+    final uri = Uri.tryParse(link.url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Widget _buildLinkifiedText(String text) {
+    return SelectableLinkify(
+      text: text,
+      style: const TextStyle(fontSize: 20.0),
+      linkStyle: TextStyle(
+        color: Theme.of(context).colorScheme.primary,
+        decoration: TextDecoration.underline,
+      ),
+      onOpen: _onOpenLink,
+    );
+  }
+
   Widget _buildStaticStatementArea() {
     if (exercise!.statement == null) {
       return const SizedBox.shrink();
     }
-    return Text('${exercise!.statement} ',
-        style: const TextStyle(fontSize: 20.0));
+    return _buildLinkifiedText('${exercise!.statement} ');
   }
 
   Widget _buildStaticQuestionArea() {
@@ -423,8 +442,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
     if ((exercise! as dynamic).question?.isEmpty) {
       return const SizedBox.shrink();
     }
-    return Text((exercise! as dynamic).question!,
-        style: const TextStyle(fontSize: 20.0));
+    return _buildLinkifiedText((exercise! as dynamic).question!);
   }
 
   Widget _buildStaticCodeArea() {

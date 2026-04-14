@@ -33,8 +33,21 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     exercisesService
         .startSessionForLesson(widget.lesson, widget.lessonGroup)
         .then((value) {
+      if (!mounted) return;
+      final next = exercisesService.getNextExercise();
+      if (next == null) {
+        exercisesService.endSession(false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Lekcija nema vježbi.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
+        return;
+      }
       setState(() {
-        currentExercise = exercisesService.getNextExercise();
+        currentExercise = next;
       });
     });
   }

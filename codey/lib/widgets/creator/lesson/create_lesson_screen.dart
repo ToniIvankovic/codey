@@ -37,6 +37,13 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
     return int.tryParse(text);
   }
 
+  bool get _limitInvalid {
+    final text = _limitController.text.trim();
+    if (text.isEmpty) return false;
+    final parsed = int.tryParse(text);
+    return parsed == null || parsed == 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     var exercisesService = context.read<ExercisesService>();
@@ -163,8 +170,17 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
                 onChanged: (_) => setState(() {}),
               ),
               Builder(builder: (context) {
+                if (_limitInvalid) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      'Invalid limit. Use -1 (all exercises), a positive number, or leave empty for course default.',
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  );
+                }
                 final effectiveLimit = _parsedLimit ?? widget.course.defaultExerciseLimit;
-                if (effectiveLimit != null && exercises.length > effectiveLimit) {
+                if (effectiveLimit != null && effectiveLimit > 0 && exercises.length > effectiveLimit) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Text(
@@ -177,7 +193,7 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
               }),
               // CREATE LESSON BUTTON
               ElevatedButton(
-                onPressed: () {
+                onPressed: _limitInvalid ? null : () {
                   context
                       .read<LessonsService>()
                       .createLesson(

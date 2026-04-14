@@ -78,14 +78,24 @@ namespace CodeyBe.Services
 
         public async Task<Lesson> CreateLessonAsync(LessonCreationDTO lesson)
         {
+            ValidateExerciseLimit(lesson.ExerciseLimit);
             Lesson createdLesson = await _lessonsRepository.CreateAsync(lesson);
             return createdLesson;
         }
 
         public async Task<Lesson> UpdateLessonAsync(int id, LessonCreationDTO lesson)
         {
+            ValidateExerciseLimit(lesson.ExerciseLimit);
             Lesson updatedGroup = await _lessonsRepository.UpdateAsync(id, lesson);
             return updatedGroup;
+        }
+
+        private static void ValidateExerciseLimit(int? exerciseLimit)
+        {
+            if (exerciseLimit.HasValue && exerciseLimit.Value == 0)
+            {
+                throw new ArgumentException("Exercise limit must be -1 (use all), a positive number, or empty (use course default). 0 is not allowed.");
+            }
         }
 
         public async Task DeleteLessonAsync(int id)

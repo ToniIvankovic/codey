@@ -96,7 +96,11 @@ class PostLessonScreen extends StatelessWidget {
                                   )),
                                   awardedXP != null
                                       ? Text(awardedXP.toString())
-                                      : const CircularProgressIndicator(),
+                                      : const Tooltip(
+                                          message:
+                                              'Nije uspjelo spremanje XP-a, pokušajte kasnije.',
+                                          child: Text('—'),
+                                        ),
                                 ],
                               ),
                           ],

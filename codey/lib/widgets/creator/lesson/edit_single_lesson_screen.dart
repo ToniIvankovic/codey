@@ -46,6 +46,13 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
     return int.tryParse(text);
   }
 
+  bool get _limitInvalid {
+    final text = _limitController.text.trim();
+    if (text.isEmpty) return false;
+    final parsed = int.tryParse(text);
+    return parsed == null || parsed == 0;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +90,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
         !listEquals(exercisesLocal, exercisesInitial);
     final editInProgress =
         nameEditable || specificTipsEditable || exercisesEditable;
+    final bool canSave = madeChanges && !editInProgress && !_limitInvalid;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit lesson'),
@@ -97,7 +105,7 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
               exercisesRow,
               _buildLimitRow(),
               ElevatedButton(
-                onPressed: madeChanges && !editInProgress
+                onPressed: canSave
                     ? () {
                         context
                             .read<LessonsService>()
@@ -172,7 +180,15 @@ class _EditSingleLessonScreenState extends State<EditSingleLessonScreen> {
             keyboardType: TextInputType.number,
             onChanged: (_) => setState(() {}),
           ),
-          if (effectiveLimit != null && poolSize > effectiveLimit)
+          if (_limitInvalid)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                'Invalid limit. Use -1 (all exercises), a positive number, or leave empty for course default.',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            )
+          else if (effectiveLimit != null && effectiveLimit > 0 && poolSize > effectiveLimit)
             Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: Text(

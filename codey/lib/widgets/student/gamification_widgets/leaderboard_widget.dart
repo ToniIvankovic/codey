@@ -150,105 +150,71 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
 
   Widget _generateLeaderboardRow(int i) {
     final student = leaderboard!.students[i];
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 400;
-        return Column(
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Builder(builder: (context) {
-                    final isSelf = _currentUserEmail == student.email;
-                    final nameStyle = TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                      fontWeight: isSelf ? FontWeight.bold : FontWeight.normal,
-                    );
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("${i + 1}. ", style: nameStyle),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${student.firstName} ${student.lastName}:",
-                                overflow: TextOverflow.clip,
-                                style: nameStyle,
-                              ),
-                              if (!isWide)
-                                Text(
-                                  student.course.shortName,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary
-                                        .withOpacity(0.6),
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-                if (student.streak > 0) ...[
-                  Text(
-                    "${student.streak}",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                    child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
-                  ),
-                ],
-                if (isWide)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Text(
-                      student.course.shortName,
-                      style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondary
-                            .withOpacity(0.6),
+            Expanded(
+              child: Builder(builder: (context) {
+                final isSelf = _currentUserEmail == student.email;
+                final nameStyle = TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontWeight: isSelf ? FontWeight.bold : FontWeight.normal,
+                );
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("${i + 1}. ", style: nameStyle),
+                    Expanded(
+                      child: Text(
+                        "${student.firstName} ${student.lastName}:",
+                        overflow: TextOverflow.clip,
+                        style: nameStyle,
                       ),
                     ),
-                  ),
-                Text(
-                  "${student.totalXp} XP",
-                  overflow: TextOverflow.visible,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                  ),
-                ),
-              ],
+                  ],
+                );
+              }),
             ),
-            if (widget.showUsernames)
-              Row(
-                children: [
-                  Text(
-                    "(${student.email})",
-                    style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSecondary
-                          .withOpacity(0.6),
-                      fontSize: 12.0,
-                    ),
-                  ),
-                ],
+            if (student.streak > 0) ...[
+              Text(
+                "${student.streak}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
               ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                child: Icon(Icons.whatshot, color: Colors.red, size: 20.0),
+              ),
+            ],
+            Text(
+              "${student.totalXp} XP",
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ),
           ],
-        );
-      },
+        ),
+        if (widget.showUsernames)
+          Row(
+            children: [
+              Text(
+                "(${student.email})",
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSecondary
+                      .withOpacity(0.6),
+                  fontSize: 12.0,
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }
