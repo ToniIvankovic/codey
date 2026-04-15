@@ -68,40 +68,23 @@ namespace CodeyBE.Contracts.Entities.Users
 
         public int CalculateHighestStreak()
         {
-            var highestStreak = 0;
-            var currentStreak = 0;
-            var sortedXP = XPachieved.OrderByDescending(x => x.Key).ToList();
-            DateTime? lastDate = null;
+            var activeDates = XPachieved
+                .Where(entry => entry.Value > 0)
+                .Select(entry => entry.Key.Date)
+                .Distinct()
+                .OrderBy(date => date)
+                .ToList();
 
-            for (int i = 0; i < sortedXP.Count; i++)
+            var highest = 0;
+            var current = 0;
+            DateTime? previous = null;
+            foreach (var date in activeDates)
             {
-                if (sortedXP[i].Value > 0 && (lastDate == null || sortedXP[i].Key.AddDays(1) == lastDate.Value))
-                {
-                    currentStreak++;
-                    lastDate = sortedXP[i].Key; // Update lastDate to the current date
-
-                    // Skip XP entries from the same day
-                    while (i < sortedXP.Count - 1 && sortedXP[i].Key.Date == sortedXP[i + 1].Key.Date)
-                    {
-                        i++;
-                    }
-                }
-                else
-                {
-                    if (currentStreak > highestStreak)
-                    {
-                        highestStreak = currentStreak;
-                    }
-                    currentStreak = 0;
-                }
+                current = previous is not null && date == previous.Value.AddDays(1) ? current + 1 : 1;
+                if (current > highest) highest = current;
+                previous = date;
             }
-
-            if (currentStreak > highestStreak)
-            {
-                highestStreak = currentStreak;
-            }
-
-            return highestStreak;
+            return highest;
         }
     }
 }

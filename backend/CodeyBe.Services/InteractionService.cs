@@ -90,8 +90,8 @@ namespace CodeyBe.Services
             var allStudents = await GetAllStudentsForTeacher(teacherCP);
             if (query == null) return allStudents;
             var selectedStudents = allStudents.Where(user => user.NormalizedEmail?.Contains(query.ToUpper()) ?? false);
-            selectedStudents.Concat(allStudents.Where(user => user.NormalizedUserName?.Contains(query.ToUpper()) ?? false));
-            return selectedStudents;
+            selectedStudents = selectedStudents.Concat(allStudents.Where(user => user.NormalizedUserName?.Contains(query.ToUpper()) ?? false));
+            return selectedStudents.Distinct();
         }
 
         public async Task<IEnumerable<Class>> GetAllClassesForTeacher(ClaimsPrincipal user)
