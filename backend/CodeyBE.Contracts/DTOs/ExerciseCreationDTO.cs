@@ -17,5 +17,6 @@
         public string? SpecificTip { get; set; }
         public required int CourseId { get; set; }
         public List<List<string>>? AnswerOptionsList { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

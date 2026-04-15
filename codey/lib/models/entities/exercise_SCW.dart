@@ -17,6 +17,7 @@ class ExerciseSCW extends Exercise {
     String? statementOutput,
     required this.defaultGapLengths,
     String? specificTip,
+    String? imageUrl,
     this.correctAnswers,
     required courseId,
   }) : super(
@@ -26,6 +27,7 @@ class ExerciseSCW extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -41,6 +43,7 @@ class ExerciseSCW extends Exercise {
       statement: json['statement'],
       statementCode: json['statementCode'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       defaultGapLengths: defaultGapLengthsInt,
       statementOutput: json['statementOutput'],
       correctAnswers: correctAnswersList,
@@ -56,6 +59,7 @@ class ExerciseSCW extends Exercise {
         'statement': statement,
         'statementCode': statementCode,
         'specificTip': specificTip,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'defaultGapLengths': defaultGapLengths,
         'statementOutput': statementOutput,
         'correctAnswers': correctAnswers,
@@ -69,6 +73,7 @@ class ExerciseSCW extends Exercise {
       statement: other.statement,
       statementCode: other.statementCode,
       specificTip: other.specificTip,
+      imageUrl: other.imageUrl,
       defaultGapLengths: other.defaultGapLengths,
       statementOutput: other.statementOutput,
       correctAnswers: other.correctAnswers,

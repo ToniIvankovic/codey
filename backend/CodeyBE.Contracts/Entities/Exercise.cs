@@ -66,6 +66,10 @@ namespace CodeyBE.Contracts.Entities
         [BsonIgnoreIfNull]
         public List<List<string>>? AnswerOptionsList { get; set; }
 
+        [BsonElement("imageUrl")]
+        [BsonIgnoreIfNull]
+        public string? ImageUrl { get; set; }
+
         public Exercise(Exercise ex)
         {
             Id = ex.Id;
@@ -84,6 +88,7 @@ namespace CodeyBE.Contracts.Entities
             SpecificTip = ex.SpecificTip;
             CourseId = ex.CourseId;
             AnswerOptionsList = ex.AnswerOptionsList;
+            ImageUrl = ex.ImageUrl;
         }
 
         public Exercise(int id, ExerciseCreationDTO exerciseCreationDTO)
@@ -103,6 +108,7 @@ namespace CodeyBE.Contracts.Entities
             SpecificTip = exerciseCreationDTO.SpecificTip;
             CourseId = exerciseCreationDTO.CourseId;
             AnswerOptionsList = exerciseCreationDTO.AnswerOptionsList;
+            ImageUrl = exerciseCreationDTO.ImageUrl;
         }
 
         override public bool Equals(object? obj)

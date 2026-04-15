@@ -12,6 +12,7 @@ class ExerciseORC extends Exercise {
     String? statement,
     String? statementOutput,
     String? specificTip,
+    String? imageUrl,
     required this.answerOptions,
     required courseId,
   }) : super(
@@ -21,6 +22,7 @@ class ExerciseORC extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -31,6 +33,7 @@ class ExerciseORC extends Exercise {
       statement: json['statement'],
       statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       answerOptions: List<String>.from(json['answerOptionsList'][0]),
       courseId: json['courseId'],
     );
@@ -44,6 +47,7 @@ class ExerciseORC extends Exercise {
         'statement': statement,
         'statementOutput': statementOutput,
         'specificTip': specificTip,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'answerOptionsList': [answerOptions],
         'courseId': courseId,
       };
@@ -55,6 +59,7 @@ class ExerciseORC extends Exercise {
       statement: other.statement,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
+      imageUrl: other.imageUrl,
       answerOptions: other.answerOptions,
       courseId: other.courseId,
     );

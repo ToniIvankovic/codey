@@ -120,7 +120,9 @@ class _ExerciseCreationMTCComponentState
                         });
                         widget.onChange(_packFields());
                       },
-                    ),
+                    )
+                  else
+                    const SizedBox(width: 48, height: 48),
                 ],
               ),
             );

@@ -18,6 +18,7 @@ class ExerciseSA extends Exercise {
     String? statementOutput,
     this.question,
     String? specificTip,
+    String? imageUrl,
     this.correctAnswers,
     this.raisesError,
     required courseId,
@@ -28,6 +29,7 @@ class ExerciseSA extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -40,6 +42,7 @@ class ExerciseSA extends Exercise {
       statementOutput: json['statementOutput'],
       question: json['question'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       correctAnswers: json['correctAnswers'] != null
           ? List<String>.from(json['correctAnswers'])
           : null,
@@ -58,6 +61,7 @@ class ExerciseSA extends Exercise {
         'statementOutput': statementOutput,
         'question': question,
         'specificTip': specificTip,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'correctAnswers': correctAnswers,
         'raisesError': raisesError,
         'courseId': courseId,
@@ -71,6 +75,7 @@ class ExerciseSA extends Exercise {
       statementCode: other.statementCode,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
+      imageUrl: other.imageUrl,
       question: (other).question,
       correctAnswers: (other).correctAnswers,
       raisesError: (other).raisesError,

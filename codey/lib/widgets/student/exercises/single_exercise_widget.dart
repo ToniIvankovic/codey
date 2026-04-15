@@ -433,10 +433,35 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
   }
 
   Widget _buildStaticStatementArea() {
-    if (exercise!.statement == null) {
+    final hasStatement = exercise!.statement != null;
+    final hasImage =
+        exercise!.imageUrl != null && exercise!.imageUrl!.isNotEmpty;
+    if (!hasStatement && !hasImage) {
       return const SizedBox.shrink();
     }
-    return _buildLinkifiedText('${exercise!.statement} ');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (hasStatement) _buildLinkifiedText('${exercise!.statement} '),
+        if (hasImage)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 240),
+                  child: Image.network(
+                    exercise!.imageUrl!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _buildStaticQuestionArea() {

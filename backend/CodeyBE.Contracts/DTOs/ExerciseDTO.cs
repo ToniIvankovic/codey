@@ -15,5 +15,6 @@ namespace CodeyBE.Contracts.DTOs
         public string? Statement { get; set; } = ex.Statement;
         public string? SpecificTip { get; set; } = ex.SpecificTip;
         public int CourseId { get; set; } = ex.CourseId;
+        public string? ImageUrl { get; set; } = ex.ImageUrl;
     }
 }

@@ -14,6 +14,7 @@ abstract class Exercise {
   final String? statement;
   final String? specificTip;
   final String? statementOutput;
+  final String? imageUrl;
   ExerciseStatistics? statistics;
   bool? repeated = false;
   final int courseId;
@@ -25,6 +26,7 @@ abstract class Exercise {
     this.statement,
     this.specificTip,
     this.statementOutput,
+    this.imageUrl,
     this.statistics,
     required this.courseId,
   });

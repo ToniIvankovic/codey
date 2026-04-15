@@ -72,22 +72,22 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
   void _attemptMatch(int leftIndex, int shuffledIndex) async {
     final originalRightIndex = _shuffledRightOrder[shuffledIndex];
     if (originalRightIndex == leftIndex) {
-      final isLast =
-          _matchedLeftIndices.length + 1 == widget.exercise.leftItems.length;
       setState(() {
         _selectedLeftIndex = null;
         _selectedRightShuffledIndex = null;
         _flashingCorrectLeftIndex = leftIndex;
         _flashingCorrectShuffledIndex = shuffledIndex;
+        _matchedLeftIndices.add(leftIndex);
+        _matchedRightIndices.add(originalRightIndex);
       });
+      final isLast =
+          _matchedLeftIndices.length == widget.exercise.leftItems.length;
       if (isLast) widget.onAnswerSelected(true);
       await Future.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
       setState(() {
         _flashingCorrectLeftIndex = null;
         _flashingCorrectShuffledIndex = null;
-        _matchedLeftIndices.add(leftIndex);
-        _matchedRightIndices.add(originalRightIndex);
       });
     } else {
       setState(() {
@@ -106,12 +106,15 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
     }
   }
 
-  static const double _columnWidth = 160;
-  static const double _columnGap = 120;
+  static const double _maxColumnWidth = 160;
+  static const double _minColumnWidth = 120;
+  static const double _maxColumnGap = 120;
+  static const double _minColumnGap = 20;
   static const double _itemVerticalMargin = 16;
 
   Widget _buildColumn({
     required BuildContext context,
+    required double columnWidth,
     required int itemCount,
     required String Function(int i) text,
     required bool Function(int i) matched,
@@ -120,7 +123,7 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
     required VoidCallback Function(int i) onTap,
   }) {
     return SizedBox(
-      width: _columnWidth,
+      width: columnWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: List.generate(
@@ -194,34 +197,48 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: widget.statementArea,
         ),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildColumn(
-                context: context,
-                itemCount: widget.exercise.leftItems.length,
-                text: (i) => widget.exercise.leftItems[i],
-                matched: (i) => _matchedLeftIndices.contains(i),
-                highlighted: (i) =>
-                    _selectedLeftIndex == i || _flashingCorrectLeftIndex == i,
-                flashingRed: (i) => _flashingLeftIndex == i,
-                onTap: (i) => () => _onLeftTap(i),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final available = constraints.maxWidth;
+            double gap = (available * 0.15).clamp(_minColumnGap, _maxColumnGap);
+            double columnWidth =
+                ((available - gap) / 2).clamp(_minColumnWidth, _maxColumnWidth);
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildColumn(
+                    context: context,
+                    columnWidth: columnWidth,
+                    itemCount: widget.exercise.leftItems.length,
+                    text: (i) => widget.exercise.leftItems[i],
+                    matched: (i) => _matchedLeftIndices.contains(i),
+                    highlighted: (i) =>
+                        _selectedLeftIndex == i ||
+                        _flashingCorrectLeftIndex == i,
+                    flashingRed: (i) => _flashingLeftIndex == i,
+                    onTap: (i) => () => _onLeftTap(i),
+                  ),
+                  SizedBox(width: gap),
+                  _buildColumn(
+                    context: context,
+                    columnWidth: columnWidth,
+                    itemCount: _shuffledRightOrder.length,
+                    text: (i) =>
+                        widget.exercise.rightItems[_shuffledRightOrder[i]],
+                    matched: (i) =>
+                        _matchedRightIndices.contains(_shuffledRightOrder[i]),
+                    highlighted: (i) =>
+                        _flashingCorrectShuffledIndex == i ||
+                        _selectedRightShuffledIndex == i,
+                    flashingRed: (i) => _flashingRightIndex == i,
+                    onTap: (i) => () => _onRightTap(i),
+                  ),
+                ],
               ),
-              const SizedBox(width: _columnGap),
-              _buildColumn(
-                context: context,
-                itemCount: _shuffledRightOrder.length,
-                text: (i) => widget.exercise.rightItems[_shuffledRightOrder[i]],
-                matched: (i) =>
-                    _matchedRightIndices.contains(_shuffledRightOrder[i]),
-                highlighted: (i) => _flashingCorrectShuffledIndex == i || _selectedRightShuffledIndex == i,
-                flashingRed: (i) => _flashingRightIndex == i,
-                onTap: (i) => () => _onRightTap(i),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );

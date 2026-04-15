@@ -40,6 +40,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
   ExerciseType? type;
   String? statementOutput;
   String? specificTip;
+  String? imageUrl;
   //TODO: consider creating a class for this, to avoid using dynamic and string keys
   dynamic innerFields;
   int? courseId;
@@ -52,6 +53,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     statement = widget.existingExercise?.statement;
     statementOutput = widget.existingExercise?.statementOutput;
     specificTip = widget.existingExercise?.specificTip;
+    imageUrl = widget.existingExercise?.imageUrl;
     courseId = widget.courseId;
   }
 
@@ -63,6 +65,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statement: statement,
         statementOutput: statementOutput,
         specificTip: specificTip,
+        imageUrl: imageUrl,
         statementCode: innerFields['statementCode'],
         question: innerFields['question'],
         answerOptions: innerFields['answerOptions'],
@@ -76,6 +79,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statement: statement,
         statementOutput: statementOutput,
         specificTip: specificTip,
+        imageUrl: imageUrl,
         correctAnswers: innerFields['correctAnswers']!.cast<String>(),
         statementCode: innerFields['statementCode'],
         question: innerFields['question'],
@@ -89,6 +93,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statement: statement,
         statementOutput: statementOutput,
         specificTip: specificTip,
+        imageUrl: imageUrl,
         correctAnswers: innerFields['correctAnswers'].cast<String>(),
         answerOptions: (innerFields['answerOptionsList'][0] as List).cast<String>(),
         courseId: courseId,
@@ -102,6 +107,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statementOutput: statementOutput,
         defaultGapLengths: innerFields['defaultGapLengths'],
         specificTip: specificTip,
+        imageUrl: imageUrl,
         correctAnswers: innerFields['correctAnswers'],
         courseId: courseId,
       );
@@ -112,6 +118,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statement: statement,
         statementOutput: statementOutput,
         specificTip: specificTip,
+        imageUrl: imageUrl,
         answerOptions: (innerFields['answerOptionsList'][0] as List).cast<String>(),
         courseId: courseId,
       );
@@ -122,6 +129,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
         statement: statement,
         statementOutput: statementOutput,
         specificTip: specificTip,
+        imageUrl: imageUrl,
         leftItems: (innerFields['answerOptionsList'][0] as List).cast<String>(),
         rightItems: (innerFields['answerOptionsList'][1] as List).cast<String>(),
         courseId: courseId,
@@ -288,6 +296,21 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                         specificTip = value;
                       } else {
                         specificTip = null;
+                      }
+                    });
+                  },
+                ),
+                // IMAGE URL
+                TextFormField(
+                  decoration:
+                      const InputDecoration(labelText: 'Image URL (optional)'),
+                  initialValue: widget.existingExercise?.imageUrl,
+                  onSaved: (value) {
+                    setState(() {
+                      if (value != null && value.isNotEmpty) {
+                        imageUrl = value;
+                      } else {
+                        imageUrl = null;
                       }
                     });
                   },

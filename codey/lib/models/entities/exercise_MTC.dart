@@ -13,6 +13,7 @@ class ExerciseMTC extends Exercise {
     String? statement,
     String? statementOutput,
     String? specificTip,
+    String? imageUrl,
     required this.leftItems,
     required this.rightItems,
     required courseId,
@@ -23,6 +24,7 @@ class ExerciseMTC extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -33,6 +35,7 @@ class ExerciseMTC extends Exercise {
       statement: json['statement'],
       statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       leftItems: List<String>.from(json['answerOptionsList'][0]),
       rightItems: List<String>.from(json['answerOptionsList'][1]),
       courseId: json['courseId'],
@@ -47,6 +50,7 @@ class ExerciseMTC extends Exercise {
         'statement': statement,
         'statementOutput': statementOutput,
         'specificTip': specificTip,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'answerOptionsList': [leftItems, rightItems],
         'courseId': courseId,
       };
@@ -58,6 +62,7 @@ class ExerciseMTC extends Exercise {
       statement: other.statement,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
+      imageUrl: other.imageUrl,
       leftItems: other.leftItems,
       rightItems: other.rightItems,
       courseId: other.courseId,

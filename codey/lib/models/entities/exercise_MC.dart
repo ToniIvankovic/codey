@@ -18,6 +18,7 @@ class ExerciseMC extends Exercise {
     this.question,
     String? specificTip,
     String? statementOutput,
+    String? imageUrl,
     required this.answerOptions,
     required this.correctAnswer,
     required courseId,
@@ -28,6 +29,7 @@ class ExerciseMC extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -40,6 +42,7 @@ class ExerciseMC extends Exercise {
       statementOutput: json['statementOutput'],
       question: json['question'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       answerOptions: json['answerOptions'],
       correctAnswer: json['correctAnswer'],
       courseId: json['courseId'],
@@ -72,6 +75,9 @@ class ExerciseMC extends Exercise {
     if (specificTip != null) {
       json['specificTip'] = specificTip;
     }
+    if (imageUrl != null) {
+      json['imageUrl'] = imageUrl;
+    }
 
     return json;
   }
@@ -85,6 +91,7 @@ class ExerciseMC extends Exercise {
       question: other.question,
       specificTip: other.specificTip,
       statementOutput: other.statementOutput,
+      imageUrl: other.imageUrl,
       answerOptions: other.answerOptions,
       correctAnswer: other.correctAnswer,
       courseId: other.courseId,

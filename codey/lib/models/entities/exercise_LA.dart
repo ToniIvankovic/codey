@@ -13,6 +13,7 @@ class ExerciseLA extends Exercise {
     String? statement,
     String? statementOutput,
     String? specificTip,
+    String? imageUrl,
     this.answerOptions,
     required this.correctAnswers,
     required courseId,
@@ -23,6 +24,7 @@ class ExerciseLA extends Exercise {
           statement: statement,
           statementOutput: statementOutput,
           specificTip: specificTip,
+          imageUrl: imageUrl,
           courseId: courseId,
         );
 
@@ -36,6 +38,7 @@ class ExerciseLA extends Exercise {
       statement: json['statement'],
       statementOutput: json['statementOutput'],
       specificTip: json['specificTip'],
+      imageUrl: json['imageUrl'],
       answerOptions: options,
       correctAnswers: json['correctAnswers'] != null
           ? List<String>.from(json['correctAnswers'])
@@ -52,6 +55,7 @@ class ExerciseLA extends Exercise {
         'statement': statement,
         'statementOutput': statementOutput,
         'specificTip': specificTip,
+        if (imageUrl != null) 'imageUrl': imageUrl,
         'answerOptionsList': answerOptions != null ? [answerOptions] : null,
         'correctAnswers': correctAnswers,
         'courseId': courseId,
@@ -64,6 +68,7 @@ class ExerciseLA extends Exercise {
       statement: other.statement,
       statementOutput: other.statementOutput,
       specificTip: other.specificTip,
+      imageUrl: other.imageUrl,
       answerOptions: other.answerOptions,
       correctAnswers: other.correctAnswers,
       courseId: other.courseId,
