@@ -64,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const _SectionTitle('Izgled'),
+                    const _SectionTitle('Tema'),
                     const SizedBox(height: 16),
                     const _ThemeSelector(),
                     const SizedBox(height: 50),
