@@ -16,4 +16,8 @@
     <ProjectReference Include="..\CodeyBE.Data.DB\CodeyBE.Data.DB.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="CodeyBe.Services.Tests" />
+  </ItemGroup>
+
 </Project>

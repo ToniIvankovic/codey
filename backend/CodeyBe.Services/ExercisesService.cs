@@ -21,13 +21,15 @@ namespace CodeyBe.Services
         ILessonsService lessonsService,
         ILessonGroupsService lessonGroupsService,
         ILogsService logsService,
-        ICoursesService coursesService) : IExercisesService
+        ICoursesService coursesService,
+        Func<double>? nextRandom = null) : IExercisesService
     {
         private readonly IExercisesRepository _exercisesRepository = exercisesRepository;
         private readonly ILessonsService _lessonsService = lessonsService;
         private readonly ILessonGroupsService _lessonGroupsService = lessonGroupsService;
         private readonly ILogsService _logsService = logsService;
         private readonly ICoursesService _coursesService = coursesService;
+        private readonly Func<double> _nextRandom = nextRandom ?? Random.Shared.NextDouble;
 
         public async Task<IEnumerable<Exercise>> GetAllExercisesAsync(int courseId)
         {
@@ -171,14 +173,14 @@ namespace CodeyBe.Services
             int nEasier = (int)(N_EXERCISES * RATIO_EASIER);
             int nHarder = N_EXERCISES - nEasier;
             List<Exercise> selectedExercises = [
-                .. PickNExercisesRouletteWheel(easierExercises, nEasier, user.Score),
-                .. PickNExercisesRouletteWheel(harderExercises, nHarder, user.Score)
+                .. PickNExercisesRouletteWheel(easierExercises, nEasier, user.Score, _nextRandom),
+                .. PickNExercisesRouletteWheel(harderExercises, nHarder, user.Score, _nextRandom)
             ];
             selectedExercises = EnrichExercisesList(selectedExercises).ToList();
             return selectedExercises.OrderBy(ex => ex.Difficulty);
         }
 
-        private static List<Exercise> PickNExercisesRouletteWheel(List<Exercise> exercises, int n, double userScore)
+        internal static List<Exercise> PickNExercisesRouletteWheel(List<Exercise> exercises, int n, double userScore, Func<double> nextRandom)
         {
             double sumDistances = (double)exercises
                 .Select(exercise => 1 / Math.Abs(exercise.Difficulty - userScore))
@@ -189,7 +191,7 @@ namespace CodeyBe.Services
             List<Exercise> selectedExercises = [];
             for (int i = 0; i < n; i++)
             {
-                double random = new Random().NextDouble();
+                double random = nextRandom();
                 double cumulativeProbability = 0;
                 for (int j = 0; j < exercises.Count; j++)
                 {

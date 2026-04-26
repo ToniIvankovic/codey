@@ -2,6 +2,7 @@ import 'package:codey/models/entities/course.dart';
 import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/session_service.dart';
 import 'package:codey/services/user_service.dart';
+import 'package:codey/widgets/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -120,6 +121,19 @@ class _CreatorHomePageState extends State<CreatorHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Postavke',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(

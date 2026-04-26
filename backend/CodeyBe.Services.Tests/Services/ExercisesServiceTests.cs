@@ -266,6 +266,138 @@ public class ExercisesServiceTests
     }
 
     [Fact]
+    public void PickNExercisesRouletteWheel_picks_first_when_random_is_zero()
+    {
+        var exercises = new List<Exercise>
+        {
+            ExerciseBuilders.MultipleChoice(1, difficulty: 1.0),
+            ExerciseBuilders.MultipleChoice(2, difficulty: 3.0),
+            ExerciseBuilders.MultipleChoice(3, difficulty: 7.0),
+        };
+
+        var picked = ExercisesService.PickNExercisesRouletteWheel(exercises, n: 1, userScore: 5.0, nextRandom: () => 0.0);
+
+        picked.Should().HaveCount(1);
+        picked[0].PrivateId.Should().Be(1);
+    }
+
+    [Fact]
+    public void PickNExercisesRouletteWheel_picks_last_when_random_is_nearly_one()
+    {
+        var exercises = new List<Exercise>
+        {
+            ExerciseBuilders.MultipleChoice(1, difficulty: 1.0),
+            ExerciseBuilders.MultipleChoice(2, difficulty: 3.0),
+            ExerciseBuilders.MultipleChoice(3, difficulty: 7.0),
+        };
+
+        var picked = ExercisesService.PickNExercisesRouletteWheel(exercises, n: 1, userScore: 5.0, nextRandom: () => 0.999999);
+
+        picked.Should().HaveCount(1);
+        picked[0].PrivateId.Should().Be(3);
+    }
+
+    [Fact]
+    public void PickNExercisesRouletteWheel_does_not_repeat_exercises()
+    {
+        var exercises = new List<Exercise>
+        {
+            ExerciseBuilders.MultipleChoice(1, difficulty: 1.0),
+            ExerciseBuilders.MultipleChoice(2, difficulty: 3.0),
+            ExerciseBuilders.MultipleChoice(3, difficulty: 7.0),
+        };
+        var scripted = new Queue<double>([0.0, 0.0, 0.0]);
+
+        var picked = ExercisesService.PickNExercisesRouletteWheel(exercises, n: 3, userScore: 5.0, nextRandom: scripted.Dequeue);
+
+        picked.Select(e => e.PrivateId).Should().OnlyHaveUniqueItems().And.HaveCount(3);
+    }
+
+    [Fact]
+    public void PickNExercisesRouletteWheel_weights_closer_exercises_higher()
+    {
+        // Distances from score=5: id1→4, id2→2, id3→2. Weights are 1/distance, normalized.
+        // Sum = 1/4 + 1/2 + 1/2 = 1.25. Probabilities: id1=0.2, id2=0.4, id3=0.4.
+        var exercises = new List<Exercise>
+        {
+            ExerciseBuilders.MultipleChoice(1, difficulty: 1.0),
+            ExerciseBuilders.MultipleChoice(2, difficulty: 3.0),
+            ExerciseBuilders.MultipleChoice(3, difficulty: 7.0),
+        };
+
+        // random=0.1 lands in id1's band [0, 0.2)
+        var pickedFirst = ExercisesService.PickNExercisesRouletteWheel([.. exercises], n: 1, userScore: 5.0, nextRandom: () => 0.1);
+        pickedFirst[0].PrivateId.Should().Be(1);
+
+        // random=0.5 lands in id2's band [0.2, 0.6)
+        var pickedSecond = ExercisesService.PickNExercisesRouletteWheel([.. exercises], n: 1, userScore: 5.0, nextRandom: () => 0.5);
+        pickedSecond[0].PrivateId.Should().Be(2);
+
+        // random=0.9 lands in id3's band [0.6, 1.0)
+        var pickedThird = ExercisesService.PickNExercisesRouletteWheel([.. exercises], n: 1, userScore: 5.0, nextRandom: () => 0.9);
+        pickedThird[0].PrivateId.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task GetExercisesForAdaptiveLessonAsync_splits_easier_harder_30_70()
+    {
+        // N_EXERCISES=10 → nEasier=3 (30%), nHarder=7 (70%).
+        var user = new ApplicationUserBuilder().WithScore(5.0).WithCourseId(1).WithHighestLesson(1, 1).Build();
+        var course = EntityBuilders.Course(1, defaultExerciseLimit: 10);
+        var group = EntityBuilders.LessonGroup(id: 1, order: 1, lessonIds: [1]);
+        var lesson = EntityBuilders.Lesson(id: 1, exercises: Enumerable.Range(1, 10).ToList());
+        _courses.Setup(s => s.GetCourseByIdAsync(1)).ReturnsAsync(course);
+        _lessonGroups.Setup(s => s.GetLessonGroupByIDAsync(1)).ReturnsAsync(group);
+        _lessonGroups.Setup(s => s.GetAllLessonGroupsAsync(1)).ReturnsAsync([group]);
+        _lessons.Setup(s => s.GetLessonByIDAsync(1)).ReturnsAsync(lesson);
+        for (int i = 1; i <= 3; i++)
+        {
+            int id = i;
+            _exercisesRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(ExerciseBuilders.MultipleChoice(id, difficulty: 1.0)); // easier
+        }
+        for (int i = 4; i <= 10; i++)
+        {
+            int id = i;
+            _exercisesRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(ExerciseBuilders.MultipleChoice(id, difficulty: 9.0)); // harder
+        }
+        var deterministicSut = new ExercisesService(_exercisesRepo.Object, _lessons.Object, _lessonGroups.Object, _logs.Object, _courses.Object, nextRandom: () => 0.0);
+
+        var result = (await deterministicSut.GetExercisesForAdaptiveLessonAsync(user)).ToList();
+
+        result.Count(e => e.Difficulty < 5.0).Should().Be(3);
+        result.Count(e => e.Difficulty > 5.0).Should().Be(7);
+    }
+
+    [Fact]
+    public async Task GetExercisesForAdaptiveLessonAsync_falls_back_to_15_when_course_limit_missing()
+    {
+        // Course has no DefaultExerciseLimit → ADAPTIVE_FALLBACK_EXERCISES=15 → nEasier=4, nHarder=11.
+        var user = new ApplicationUserBuilder().WithScore(5.0).WithCourseId(1).WithHighestLesson(1, 1).Build();
+        var course = EntityBuilders.Course(1, defaultExerciseLimit: null);
+        var group = EntityBuilders.LessonGroup(id: 1, order: 1, lessonIds: [1]);
+        var lesson = EntityBuilders.Lesson(id: 1, exercises: Enumerable.Range(1, 15).ToList());
+        _courses.Setup(s => s.GetCourseByIdAsync(1)).ReturnsAsync(course);
+        _lessonGroups.Setup(s => s.GetLessonGroupByIDAsync(1)).ReturnsAsync(group);
+        _lessonGroups.Setup(s => s.GetAllLessonGroupsAsync(1)).ReturnsAsync([group]);
+        _lessons.Setup(s => s.GetLessonByIDAsync(1)).ReturnsAsync(lesson);
+        for (int i = 1; i <= 4; i++)
+        {
+            int id = i;
+            _exercisesRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(ExerciseBuilders.MultipleChoice(id, difficulty: 1.0));
+        }
+        for (int i = 5; i <= 15; i++)
+        {
+            int id = i;
+            _exercisesRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(ExerciseBuilders.MultipleChoice(id, difficulty: 9.0));
+        }
+        var deterministicSut = new ExercisesService(_exercisesRepo.Object, _lessons.Object, _lessonGroups.Object, _logs.Object, _courses.Object, nextRandom: () => 0.0);
+
+        var result = (await deterministicSut.GetExercisesForAdaptiveLessonAsync(user)).ToList();
+
+        result.Should().HaveCount(15);
+    }
+
+    [Fact]
     public async Task GetExercisesForAdaptiveLessonAsync_does_not_divide_by_zero_when_exercise_difficulty_equals_user_score()
     {
         var user = new ApplicationUserBuilder().WithScore(5.0).WithCourseId(1).WithHighestLesson(1, 1).Build();

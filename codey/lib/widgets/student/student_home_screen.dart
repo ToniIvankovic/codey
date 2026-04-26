@@ -2,7 +2,7 @@ import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/models/entities/course.dart';
 import 'package:codey/models/exceptions/unauthorized_exception.dart';
 import 'package:codey/services/session_service.dart';
-import 'package:codey/widgets/student/profile_data/student_profile_screen.dart';
+import 'package:codey/widgets/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -79,16 +79,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   ),
                 ),
               ],
-              // PROFILE
+              // SETTINGS
               IconButton(
-                icon: const Icon(Icons.person),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => StudentProfileScreen(
-                        user: widget.user,
-                      ),
+                      builder: (context) => const SettingsScreen(),
                     ),
                   );
                 },

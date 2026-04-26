@@ -1,5 +1,5 @@
 import 'package:codey/services/session_service.dart';
-import 'package:codey/widgets/student/profile_data/change_password_screen.dart';
+import 'package:codey/widgets/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'view_classes_screen.dart';
@@ -12,6 +12,19 @@ class TeacherHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Naslovnica za Učitelje'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Postavke',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -36,27 +49,6 @@ class TeacherHomePage extends StatelessWidget {
                       "Pregled razreda",
                       style: TextStyle(
                         fontSize: 18,
-                        color: Theme.of(context).colorScheme.onInverseSurface,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ChangePasswordScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Promjena lozinke',
-                      style: TextStyle(
                         color: Theme.of(context).colorScheme.onInverseSurface,
                       ),
                     ),

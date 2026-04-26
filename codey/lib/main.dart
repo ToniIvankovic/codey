@@ -13,6 +13,7 @@ import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/services/session_service.dart';
+import 'package:codey/services/theme_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
 import 'package:codey/services/user_service.dart';
 import 'package:codey/widgets/admin/admin_home_page.dart';
@@ -101,22 +102,58 @@ Future main() async {
           create: (context) =>
               CoursesServiceV1(context.read<CoursesRepository>()),
         ),
+        ChangeNotifierProvider<ThemeService>(
+          create: (context) => ThemeServiceImpl(),
+        ),
       ],
       child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isLoggedIn = false;
+  StreamSubscription<void>? _loginSub;
+  StreamSubscription<void>? _logoutSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final authService = context.read<AuthService>();
+    final sessionService = context.read<SessionService>();
+    authService.token.then((token) {
+      if (mounted) setState(() => _isLoggedIn = token != null);
+    });
+    _loginSub = sessionService.loginStream.listen((_) {
+      if (mounted) setState(() => _isLoggedIn = true);
+    });
+    _logoutSub = sessionService.logoutStream.listen((_) {
+      if (mounted) setState(() => _isLoggedIn = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _loginSub?.cancel();
+    _logoutSub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final themeService = context.watch<ThemeService>();
     return MaterialApp(
       title: 'Codey',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: _isLoggedIn ? themeService.mode : ThemeMode.light,
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Codey'),
     );

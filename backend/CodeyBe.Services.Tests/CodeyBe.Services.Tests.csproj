@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CodeyBe.Services\CodeyBe.Services.csproj" />
     <ProjectReference Include="..\CodeyBE.Contracts\CodeyBE.Contracts.csproj" />
+    <ProjectReference Include="..\CodeyBE.API\CodeyBE.API.csproj" />
   </ItemGroup>
 
 </Project>

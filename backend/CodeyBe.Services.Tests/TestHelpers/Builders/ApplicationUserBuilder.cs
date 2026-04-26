@@ -31,6 +31,7 @@ public class ApplicationUserBuilder
     public ApplicationUserBuilder WithSchool(string? school) { _user.School = school; return this; }
     public ApplicationUserBuilder WithRoles(params string[] roles) { _user.Roles = [.. roles]; return this; }
     public ApplicationUserBuilder WithCourseId(int courseId) { _user.CourseId = courseId; return this; }
+    public ApplicationUserBuilder WithCourse(Course course) { _user.CourseId = course.PrivateId; _user.Course = course; return this; }
     public ApplicationUserBuilder WithTotalXP(int xp) { _user.TotalXP = xp; return this; }
     public ApplicationUserBuilder WithScore(double score) { _user.Score = score; return this; }
 
