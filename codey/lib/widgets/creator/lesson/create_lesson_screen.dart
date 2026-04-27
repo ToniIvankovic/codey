@@ -4,6 +4,7 @@ import 'package:codey/services/exercises_service.dart';
 import 'package:codey/services/lessons_service.dart';
 import 'package:codey/widgets/creator/exercise/create_exercise_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../exercise/pick_exercise_screen.dart';
@@ -22,12 +23,16 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   String? specificTips;
   List<Exercise> exercises = [];
   final TextEditingController _limitController = TextEditingController();
+  final _specificTipsFocus = FocusNode();
+  final _limitFocus = FocusNode();
 
   int get courseId => widget.course.id;
 
   @override
   void dispose() {
     _limitController.dispose();
+    _specificTipsFocus.dispose();
+    _limitFocus.dispose();
     super.dispose();
   }
 
@@ -59,12 +64,21 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
             children: <Widget>[
               TextField(
                 decoration: const InputDecoration(labelText: 'Name'),
+                textInputAction: TextInputAction.next,
+                onSubmitted: (_) => _specificTipsFocus.requestFocus(),
                 onChanged: (value) => setState(() => name = value),
               ),
-              TextField(
-                decoration: const InputDecoration(labelText: 'Specific tips'),
-                onChanged: (value) => setState(() => specificTips = value),
-                maxLines: null,
+              CallbackShortcuts(
+                bindings: {
+                  const SingleActivator(LogicalKeyboardKey.enter): () =>
+                      _limitFocus.requestFocus(),
+                },
+                child: TextField(
+                  focusNode: _specificTipsFocus,
+                  decoration: const InputDecoration(labelText: 'Specific tips'),
+                  onChanged: (value) => setState(() => specificTips = value),
+                  maxLines: null,
+                ),
               ),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -161,12 +175,15 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
               // LIMIT FIELD
               TextField(
                 controller: _limitController,
+                focusNode: _limitFocus,
                 decoration: InputDecoration(
                   labelText: widget.course.defaultExerciseLimit != null
                       ? 'Exercise limit (optional - default: ${widget.course.defaultExerciseLimit})'
                       : 'Exercise limit (optional)',
                 ),
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => FocusScope.of(context).unfocus(),
                 onChanged: (_) => setState(() {}),
               ),
               Builder(builder: (context) {

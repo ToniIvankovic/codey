@@ -3,12 +3,14 @@
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ExerciseCreationSAComponent extends ExerciseCreationComponent {
   const ExerciseCreationSAComponent({
     super.key,
     required super.formKey,
     required super.onChange,
+    super.firstFocusNode,
     this.existingExercise,
   });
 
@@ -25,11 +27,23 @@ class _ExerciseCreationSAComponentState
   List<String?> answers = [null];
   List<String> answerKeys = ["1"];
   bool raisesError = false;
+  final _questionFocus = FocusNode();
+  final List<FocusNode> _answerFocuses = [FocusNode()];
+
+  @override
+  void dispose() {
+    _questionFocus.dispose();
+    for (final node in _answerFocuses) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   void _addAnswer() {
     setState(() {
       answers.add('');
-      answerKeys.add(DateTime.now().toIso8601String()); // Add this line
+      answerKeys.add(DateTime.now().toIso8601String());
+      _answerFocuses.add(FocusNode());
     });
     widget.onChange(_packFields());
   }
@@ -58,6 +72,9 @@ class _ExerciseCreationSAComponentState
         return (index + 1).toString();
       });
       raisesError = widget.existingExercise!.raisesError ?? false;
+      while (_answerFocuses.length < answers.length) {
+        _answerFocuses.add(FocusNode());
+      }
     }
   }
 
@@ -66,35 +83,55 @@ class _ExerciseCreationSAComponentState
     return Column(
       children: [
         FormField(builder: (FormFieldState<String> state) {
-          return TextFormField(
+          return CallbackShortcuts(
+            bindings: {
+              const SingleActivator(LogicalKeyboardKey.enter): () =>
+                  _questionFocus.requestFocus(),
+            },
+            child: TextFormField(
+              focusNode: widget.firstFocusNode,
+              minLines: 1,
+              maxLines: 10,
+              decoration: const InputDecoration(labelText: 'Statement code'),
+              initialValue: statementCode,
+              onSaved: (value) {
+                setState(() {
+                  statementCode = value;
+                });
+                widget.onChange(_packFields());
+              },
+              // validator: (value) => value == null || value.isEmpty
+              //     ? 'Please enter statement code'
+              //     : null,
+            ),
+          );
+        }),
+        CallbackShortcuts(
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.enter): () {
+              if (_answerFocuses.isNotEmpty && !raisesError) {
+                _answerFocuses[0].requestFocus();
+              } else {
+                FocusScope.of(context).unfocus();
+              }
+            },
+          },
+          child: TextFormField(
+            focusNode: _questionFocus,
             minLines: 1,
-            maxLines: 10,
-            decoration: const InputDecoration(labelText: 'Statement code'),
-            initialValue: statementCode,
+            maxLines: 5,
+            decoration: const InputDecoration(labelText: 'Question'),
+            initialValue: question,
             onSaved: (value) {
               setState(() {
-                statementCode = value;
+                question = value;
               });
               widget.onChange(_packFields());
             },
-            // validator: (value) => value == null || value.isEmpty
-            //     ? 'Please enter statement code'
-            //     : null,
-          );
-        }),
-        TextFormField(
-          minLines: 1,
-          maxLines: 5,
-          decoration: const InputDecoration(labelText: 'Question'),
-          initialValue: question,
-          onSaved: (value) {
-            setState(() {
-              question = value;
-            });
-            widget.onChange(_packFields());
-          },
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Please enter a question' : null,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter a question'
+                : null,
+          ),
         ),
         if (!raisesError) ...[
           ListView.builder(
@@ -104,27 +141,39 @@ class _ExerciseCreationSAComponentState
               return Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      key: ValueKey('${answerKeys[index]}_$index'),
-                      minLines: 1,
-                      maxLines: 3,
-                      decoration:
-                          const InputDecoration(labelText: 'Correct answer:'),
-                      initialValue: answers[index],
-                      onChanged: (value) {
-                        setState(() {
-                          answers[index] = value;
-                        });
+                    child: CallbackShortcuts(
+                      bindings: {
+                        const SingleActivator(LogicalKeyboardKey.enter): () {
+                          if (index + 1 < _answerFocuses.length) {
+                            _answerFocuses[index + 1].requestFocus();
+                          } else {
+                            FocusScope.of(context).unfocus();
+                          }
+                        },
                       },
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Please enter an answer'
-                          : null,
-                      onSaved: (value) {
-                        setState(() {
-                          answers[index] = value;
-                        });
-                        widget.onChange(_packFields());
-                      },
+                      child: TextFormField(
+                        key: ValueKey('${answerKeys[index]}_$index'),
+                        focusNode: _answerFocuses[index],
+                        minLines: 1,
+                        maxLines: 3,
+                        decoration:
+                            const InputDecoration(labelText: 'Correct answer:'),
+                        initialValue: answers[index],
+                        onChanged: (value) {
+                          setState(() {
+                            answers[index] = value;
+                          });
+                        },
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Please enter an answer'
+                            : null,
+                        onSaved: (value) {
+                          setState(() {
+                            answers[index] = value;
+                          });
+                          widget.onChange(_packFields());
+                        },
+                      ),
                     ),
                   ),
                   if (index > 0)
@@ -134,6 +183,7 @@ class _ExerciseCreationSAComponentState
                         setState(() {
                           answers.removeAt(index);
                           answerKeys.removeAt(index);
+                          _answerFocuses.removeAt(index).dispose();
                         });
                         widget.onChange(_packFields());
                       },

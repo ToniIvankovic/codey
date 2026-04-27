@@ -26,6 +26,7 @@ class ExerciseSCWWidget extends StatefulWidget {
 
 class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
   late List<TextEditingController> controllers;
+  late List<FocusNode> focusNodes;
   final _scrollController = ScrollController();
 
   @override
@@ -36,6 +37,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
       gaps,
       (index) => TextEditingController(),
     );
+    focusNodes = List<FocusNode>.generate(gaps, (_) => FocusNode());
   }
 
   @override
@@ -73,6 +75,9 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
   void dispose() {
     for (var controller in controllers) {
       controller.dispose();
+    }
+    for (var node in focusNodes) {
+      node.dispose();
     }
     super.dispose();
   }
@@ -163,19 +168,29 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
         }
 
         if (j < parts.length - 1) {
+          final int gapIndex = usedLines;
           rowWidgets.add(
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                    minWidth: widget.exercise.defaultGapLengths[usedLines] * 16,
-                    maxWidth: widget.exercise.defaultGapLengths[usedLines] *
+                    minWidth: widget.exercise.defaultGapLengths[gapIndex] * 16,
+                    maxWidth: widget.exercise.defaultGapLengths[gapIndex] *
                         16 *
                         2.5),
                 child: IntrinsicWidth(
                   // stepWidth: 2.0,
                   child: TextField(
-                    controller: controllers[usedLines],
+                    controller: controllers[gapIndex],
+                    focusNode: focusNodes[gapIndex],
+                    textInputAction: TextInputAction.next,
+                    onSubmitted: (_) {
+                      if (gapIndex + 1 < focusNodes.length) {
+                        focusNodes[gapIndex + 1].requestFocus();
+                      } else {
+                        focusNodes[gapIndex].unfocus();
+                      }
+                    },
                     onChanged: (value) {
                       var answer = controllers.map((e) => e.text).toList();
                       widget.onAnswerSelected(answer);

@@ -20,12 +20,31 @@ class _LoginWidgetState extends State<LoginWidget> {
   Widget build(BuildContext context) {
     SessionService sessionService = context.read<SessionService>();
 
+    void submit() {
+      if (waitingResponse) return;
+      setState(() {
+        waitingResponse = true;
+      });
+      TextInput.finishAutofillContext(shouldSave: true);
+      sessionService
+          .login(username: email, password: password)
+          .then((value) {
+        if (mounted) setState(() { waitingResponse = false; });
+      }).onError((error, stackTrace) {
+        setState(() {
+          waitingResponse = false;
+          errorMessage = error.toString();
+        });
+      });
+    }
+
     TextField emailTextField = TextField(
       autofillHints: const [AutofillHints.username, AutofillHints.email],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Korisničko ime',
       ),
+      textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
           email = value;
@@ -41,6 +60,8 @@ class _LoginWidgetState extends State<LoginWidget> {
         labelText: 'Lozinka',
       ),
       obscureText: true,
+      textInputAction: TextInputAction.done,
+      onSubmitted: (_) => submit(),
       onChanged: (value) {
         setState(() {
           password = value;
@@ -75,22 +96,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  waitingResponse = true;
-                });
-                TextInput.finishAutofillContext(shouldSave: true);
-                sessionService
-                    .login(username: email, password: password)
-                    .then((value) {
-                  if (mounted) setState(() { waitingResponse = false; });
-                }).onError((error, stackTrace) {
-                  setState(() {
-                    waitingResponse = false;
-                    errorMessage = error.toString();
-                  });
-                });
-              },
+              onPressed: submit,
               child: const Padding(
                 padding: EdgeInsets.all(5),
                 child: Text('Prijava'),

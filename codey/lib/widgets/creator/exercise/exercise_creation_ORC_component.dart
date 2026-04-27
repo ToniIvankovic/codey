@@ -9,6 +9,7 @@ class ExerciseCreationORCComponent extends ExerciseCreationComponent {
     super.key,
     required super.formKey,
     required super.onChange,
+    super.firstFocusNode,
     this.existingExercise,
   });
 
@@ -23,6 +24,14 @@ class _ExerciseCreationORCComponentState
     extends State<ExerciseCreationORCComponent> {
   List<String> lines = [''];
   List<String> lineKeys = ['0'];
+  late final FocusNode _firstLineFocus;
+  // Focus nodes for indices >= 1; index 0 uses _firstLineFocus.
+  final List<FocusNode> _extraLineFocuses = [];
+
+  FocusNode _lineFocus(int index) =>
+      index == 0 ? _firstLineFocus : _extraLineFocuses[index - 1];
+
+  int get _lineFocusCount => 1 + _extraLineFocuses.length;
 
   dynamic _packFields() {
     return {
@@ -33,17 +42,35 @@ class _ExerciseCreationORCComponentState
   @override
   void initState() {
     super.initState();
+    _firstLineFocus = widget.firstFocusNode ?? FocusNode();
     if (widget.existingExercise != null) {
       lines = List.of(widget.existingExercise!.answerOptions);
       lineKeys = List.generate(lines.length, (i) => i.toString());
     }
+    while (_lineFocusCount < lines.length) {
+      _extraLineFocuses.add(FocusNode());
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.firstFocusNode == null) {
+      _firstLineFocus.dispose();
+    }
+    for (final node in _extraLineFocuses) {
+      node.dispose();
+    }
+    super.dispose();
   }
 
   void _addLine() {
     setState(() {
       lines.add('');
       lineKeys.add(DateTime.now().toIso8601String());
+      _extraLineFocuses.add(FocusNode());
     });
+    widget.onChange(_packFields());
+    _lineFocus(lines.length - 1).requestFocus();
   }
 
   @override
@@ -53,7 +80,7 @@ class _ExerciseCreationORCComponentState
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Text('Redci koda (u ispravnom redoslijedu):'),
+          child: Text('Code lines (in correct order):'),
         ),
         ListView.builder(
           shrinkWrap: true,
@@ -72,9 +99,12 @@ class _ExerciseCreationORCComponentState
                 Expanded(
                   child: TextFormField(
                     key: ValueKey('${lineKeys[index]}_$index'),
-                    decoration: InputDecoration(labelText: 'Redak ${index + 1}'),
+                    focusNode: _lineFocus(index),
+                    decoration: InputDecoration(labelText: 'Line ${index + 1}'),
                     initialValue: lines[index],
                     style: const TextStyle(fontFamily: 'courier new'),
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (_) => _addLine(),
                     onChanged: (value) {
                       setState(() {
                         lines[index] = value;
@@ -82,7 +112,7 @@ class _ExerciseCreationORCComponentState
                       widget.onChange(_packFields());
                     },
                     validator: (value) => value == null || value.isEmpty
-                        ? 'Unesi redak koda'
+                        ? 'Enter code line'
                         : null,
                     onSaved: (value) {
                       setState(() {
@@ -99,6 +129,7 @@ class _ExerciseCreationORCComponentState
                       setState(() {
                         lines.removeAt(index);
                         lineKeys.removeAt(index);
+                        _extraLineFocuses.removeAt(index - 1).dispose();
                       });
                       widget.onChange(_packFields());
                     },
@@ -112,7 +143,7 @@ class _ExerciseCreationORCComponentState
           child: ElevatedButton.icon(
             onPressed: _addLine,
             icon: const Icon(Icons.add),
-            label: const Text('Dodaj redak'),
+            label: const Text('Add line'),
           ),
         ),
       ],

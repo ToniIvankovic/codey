@@ -40,6 +40,7 @@ class UserService1 implements UserService {
 
   @override
   void updateUser(AppUser user) {
+    if (_userSubject.isClosed) return;
     _userSubject.add(user);
   }
 

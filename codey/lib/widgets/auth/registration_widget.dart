@@ -54,18 +54,53 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
 
   @override
   Widget build(BuildContext context) {
+    void submit() {
+      if (waitingResponse) return;
+      if (!formKey.currentState!.validate()) {
+        return;
+      }
+      formKey.currentState!.save();
+      setState(() {
+        errorMessage = null;
+        waitingResponse = true;
+      });
+      context
+          .read<AuthService>()
+          .registerUser(
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            school: school!,
+            courseId: course!.id,
+          )
+          .then((value) {
+        setState(() {
+          waitingResponse = false;
+        });
+        widget.onRegistration();
+      }).onError((error, stackTrace) {
+        setState(() {
+          waitingResponse = false;
+          errorMessage = error.toString();
+        });
+      });
+    }
+
     final firstNameField = TextFormField(
       autofillHints: const [AutofillHints.givenName, AutofillHints.name],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Ime *',
       ),
+      textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
           firstName = value;
           errorMessage = null;
         });
       },
+      onFieldSubmitted: (_) => submit(),
       validator: (value) => (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
     );
     final lastNameField = TextFormField(
@@ -74,12 +109,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         border: OutlineInputBorder(),
         labelText: 'Prezime *',
       ),
+      textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
           lastName = value;
           errorMessage = null;
         });
       },
+      onFieldSubmitted: (_) => submit(),
       validator: (value) =>
           (value ?? "").isEmpty ? 'Molimo unesite prezime' : null,
     );
@@ -246,12 +283,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         border: OutlineInputBorder(),
         labelText: 'Korisničko ime *',
       ),
+      textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
           email = value;
           errorMessage = null;
         });
       },
+      onFieldSubmitted: (_) => submit(),
       validator: (value) =>
           (value ?? "").isEmpty ? 'Molimo unesite e-mail' : null,
     );
@@ -263,12 +302,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         labelText: 'Lozinka *',
       ),
       obscureText: true,
+      textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
           password = value;
           errorMessage = null;
         });
       },
+      onFieldSubmitted: (_) => submit(),
       validator: (value) =>
           (value ?? "").isEmpty ? 'Molimo unesite lozinku' : null,
     );
@@ -280,12 +321,14 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           labelText: 'Ponovljena lozinka *',
         ),
         obscureText: true,
+        textInputAction: TextInputAction.done,
         onChanged: (value) {
           setState(() {
             confirmPassword = value;
             errorMessage = null;
           });
         },
+        onFieldSubmitted: (_) => submit(),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Molimo ponovite lozinku';
@@ -425,39 +468,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) {
-                    return;
-                  }
-                  formKey.currentState!.save();
-                  setState(() {
-                    errorMessage = null;
-                    waitingResponse = true;
-                    // dateOfBirth = DateTime(year!, month!, day!);
-                  });
-                  context
-                      .read<AuthService>()
-                      .registerUser(
-                        firstName: firstName,
-                        lastName: lastName,
-                        // dateOfBirth: dateOfBirth!,
-                        email: email,
-                        password: password,
-                        school: school!,
-                        courseId: course!.id,
-                      )
-                      .then((value) {
-                    setState(() {
-                      waitingResponse = false;
-                    });
-                    widget.onRegistration();
-                  }).onError((error, stackTrace) {
-                    setState(() {
-                      waitingResponse = false;
-                      errorMessage = error.toString();
-                    });
-                  });
-                },
+                onPressed: submit,
                 child: const Padding(
                   padding: EdgeInsets.all(5),
                   child: Text('Registracija'),

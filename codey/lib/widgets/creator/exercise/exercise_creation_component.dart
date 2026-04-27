@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 abstract class ExerciseCreationComponent extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final void Function(dynamic) onChange;
+  final FocusNode? firstFocusNode;
   const ExerciseCreationComponent({
     super.key,
     required this.formKey,
     required this.onChange,
+    this.firstFocusNode,
   });
 }

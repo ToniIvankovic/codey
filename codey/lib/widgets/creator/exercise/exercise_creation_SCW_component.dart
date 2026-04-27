@@ -4,12 +4,14 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ExerciseCreationSCWComponent extends ExerciseCreationComponent {
   const ExerciseCreationSCWComponent({
     super.key,
     required super.formKey,
     required super.onChange,
+    super.firstFocusNode,
     this.existingExercise,
   });
 
@@ -27,7 +29,18 @@ class _ExerciseCreationSCWComponentState
   // List<int> defaultGapLengths = [];
   List<List<String>> answers = [];
   List<List<String>> answerKeys = [];
+  final List<List<FocusNode>> _answerFocuses = [];
   int numberOfGaps = 0;
+
+  @override
+  void dispose() {
+    for (final gap in _answerFocuses) {
+      for (final node in gap) {
+        node.dispose();
+      }
+    }
+    super.dispose();
+  }
 
   dynamic _packFields() {
     List<int> defaultGapLengths = answers
@@ -56,12 +69,16 @@ class _ExerciseCreationSCWComponentState
           (index) => List.generate(answers[index].length,
               (index) => DateTime.now().toIso8601String()));
     }
+    for (final gap in answers) {
+      _answerFocuses.add(List.generate(gap.length, (_) => FocusNode()));
+    }
   }
 
   void _addAnswer(int index) {
     setState(() {
       answers[index].add("");
-      answerKeys[index].add(DateTime.now().toIso8601String()); // Add this line
+      answerKeys[index].add(DateTime.now().toIso8601String());
+      _answerFocuses[index].add(FocusNode());
     });
     widget.onChange(_packFields());
   }
@@ -70,34 +87,51 @@ class _ExerciseCreationSCWComponentState
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextFormField(
-          minLines: 1,
-          maxLines: 10,
-          decoration: const InputDecoration(labelText: 'Statement code'),
-          onChanged: (value) {
-            numberOfGaps = value.split("\\gap").length - 1;
-            setState(() {
-              statementCode = value;
-              while (answers.length < numberOfGaps) {
-                answers.add([""]);
-                answerKeys.add([DateTime.now().toIso8601String()]);
+        CallbackShortcuts(
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.enter): () {
+              if (_answerFocuses.isNotEmpty &&
+                  _answerFocuses[0].isNotEmpty) {
+                _answerFocuses[0][0].requestFocus();
+              } else {
+                FocusScope.of(context).unfocus();
               }
-              while (answerKeys.length > numberOfGaps) {
-                answers.removeLast();
-                answerKeys.removeLast();
-              }
-            });
+            },
           },
-          controller: codeController,
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter statement code'
-              : null,
-          onSaved: (value) {
-            setState(() {
-              statementCode = value;
-            });
-            widget.onChange(_packFields());
-          },
+          child: TextFormField(
+            focusNode: widget.firstFocusNode,
+            minLines: 1,
+            maxLines: 10,
+            decoration: const InputDecoration(labelText: 'Statement code'),
+            onChanged: (value) {
+              numberOfGaps = value.split("\\gap").length - 1;
+              setState(() {
+                statementCode = value;
+                while (answers.length < numberOfGaps) {
+                  answers.add([""]);
+                  answerKeys.add([DateTime.now().toIso8601String()]);
+                  _answerFocuses.add([FocusNode()]);
+                }
+                while (answerKeys.length > numberOfGaps) {
+                  answers.removeLast();
+                  answerKeys.removeLast();
+                  for (final node in _answerFocuses.removeLast()) {
+                    node.dispose();
+                  }
+                }
+              });
+            },
+            controller: codeController,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter statement code'
+                : null,
+            onSaved: (value) {
+              setState(() {
+                statementCode = value;
+              });
+              widget.onChange(_packFields());
+            },
+          ),
         ),
         TextButton.icon(
             onPressed: () {
@@ -107,6 +141,7 @@ class _ExerciseCreationSCWComponentState
                 codeController.text = statementCode!;
                 answers.add([""]);
                 answerKeys.add([DateTime.now().toIso8601String()]);
+                _answerFocuses.add([FocusNode()]);
               });
               widget.onChange(_packFields());
             },
@@ -121,27 +156,42 @@ class _ExerciseCreationSCWComponentState
               return Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      key: ValueKey('${answerKeys[gapIndex][index]}_$index'),
-                      initialValue: answers[gapIndex][index],
-                      minLines: 1,
-                      maxLines: 3,
-                      decoration:
-                          const InputDecoration(labelText: 'Correct answer:'),
-                      onChanged: (value) {
-                        setState(() {
-                          answers[gapIndex][index] = value;
-                        });
+                    child: CallbackShortcuts(
+                      bindings: {
+                        const SingleActivator(LogicalKeyboardKey.enter): () {
+                          if (index + 1 < _answerFocuses[gapIndex].length) {
+                            _answerFocuses[gapIndex][index + 1].requestFocus();
+                          } else if (gapIndex + 1 < _answerFocuses.length &&
+                              _answerFocuses[gapIndex + 1].isNotEmpty) {
+                            _answerFocuses[gapIndex + 1][0].requestFocus();
+                          } else {
+                            FocusScope.of(context).unfocus();
+                          }
+                        },
                       },
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Please enter an answer'
-                          : null,
-                      onSaved: (value) {
-                        setState(() {
-                          answers[gapIndex][index] = value!;
-                        });
-                        widget.onChange(_packFields());
-                      },
+                      child: TextFormField(
+                        key: ValueKey('${answerKeys[gapIndex][index]}_$index'),
+                        focusNode: _answerFocuses[gapIndex][index],
+                        initialValue: answers[gapIndex][index],
+                        minLines: 1,
+                        maxLines: 3,
+                        decoration:
+                            const InputDecoration(labelText: 'Correct answer:'),
+                        onChanged: (value) {
+                          setState(() {
+                            answers[gapIndex][index] = value;
+                          });
+                        },
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Please enter an answer'
+                            : null,
+                        onSaved: (value) {
+                          setState(() {
+                            answers[gapIndex][index] = value!;
+                          });
+                          widget.onChange(_packFields());
+                        },
+                      ),
                     ),
                   ),
                   if (index > 0)
@@ -151,6 +201,7 @@ class _ExerciseCreationSCWComponentState
                         setState(() {
                           answers[gapIndex].removeAt(index);
                           answerKeys[gapIndex].removeAt(index);
+                          _answerFocuses[gapIndex].removeAt(index).dispose();
                         });
                         widget.onChange(_packFields());
                       },

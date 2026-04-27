@@ -9,6 +9,7 @@ class ExerciseCreationMTCComponent extends ExerciseCreationComponent {
     super.key,
     required super.formKey,
     required super.onChange,
+    super.firstFocusNode,
     this.existingExercise,
   });
 
@@ -25,6 +26,13 @@ class _ExerciseCreationMTCComponentState
   List<String> leftItems = [''];
   List<String> rightItems = [''];
   List<String> rowKeys = ['0'];
+  late final FocusNode _firstLeftFocus;
+  // Focus nodes for left indices >= 1; index 0 uses _firstLeftFocus.
+  final List<FocusNode> _extraLeftFocuses = [];
+  final List<FocusNode> _rightFocuses = [];
+
+  FocusNode _leftFocus(int index) =>
+      index == 0 ? _firstLeftFocus : _extraLeftFocuses[index - 1];
 
   dynamic _packFields() {
     return {
@@ -35,12 +43,33 @@ class _ExerciseCreationMTCComponentState
   @override
   void initState() {
     super.initState();
+    _firstLeftFocus = widget.firstFocusNode ?? FocusNode();
     if (widget.existingExercise != null) {
       final ex = widget.existingExercise!;
       leftItems = List.of(ex.leftItems);
       rightItems = List.of(ex.rightItems);
       rowKeys = List.generate(leftItems.length, (i) => i.toString());
     }
+    while (_extraLeftFocuses.length < leftItems.length - 1) {
+      _extraLeftFocuses.add(FocusNode());
+    }
+    while (_rightFocuses.length < leftItems.length) {
+      _rightFocuses.add(FocusNode());
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.firstFocusNode == null) {
+      _firstLeftFocus.dispose();
+    }
+    for (final node in _extraLeftFocuses) {
+      node.dispose();
+    }
+    for (final node in _rightFocuses) {
+      node.dispose();
+    }
+    super.dispose();
   }
 
   void _addPair() {
@@ -48,7 +77,11 @@ class _ExerciseCreationMTCComponentState
       leftItems.add('');
       rightItems.add('');
       rowKeys.add(DateTime.now().toIso8601String());
+      _extraLeftFocuses.add(FocusNode());
+      _rightFocuses.add(FocusNode());
     });
+    widget.onChange(_packFields());
+    _leftFocus(leftItems.length - 1).requestFocus();
   }
 
   @override
@@ -58,7 +91,7 @@ class _ExerciseCreationMTCComponentState
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Text('Parovi (lijevo → desno):'),
+          child: Text('Pairs (left → right):'),
         ),
         ListView.builder(
           shrinkWrap: true,
@@ -72,14 +105,18 @@ class _ExerciseCreationMTCComponentState
                   Expanded(
                     child: TextFormField(
                       key: ValueKey('left_${rowKeys[index]}_$index'),
-                      decoration: InputDecoration(labelText: 'Lijevo ${index + 1}'),
+                      focusNode: _leftFocus(index),
+                      decoration: InputDecoration(labelText: 'Left ${index + 1}'),
                       initialValue: leftItems[index],
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) =>
+                          _rightFocuses[index].requestFocus(),
                       onChanged: (value) {
                         setState(() => leftItems[index] = value);
                         widget.onChange(_packFields());
                       },
                       validator: (value) => value == null || value.isEmpty
-                          ? 'Unesi pojam'
+                          ? 'Enter term'
                           : null,
                       onSaved: (value) {
                         setState(() => leftItems[index] = value ?? '');
@@ -94,14 +131,17 @@ class _ExerciseCreationMTCComponentState
                   Expanded(
                     child: TextFormField(
                       key: ValueKey('right_${rowKeys[index]}_$index'),
-                      decoration: InputDecoration(labelText: 'Desno ${index + 1}'),
+                      focusNode: _rightFocuses[index],
+                      decoration: InputDecoration(labelText: 'Right ${index + 1}'),
                       initialValue: rightItems[index],
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => _addPair(),
                       onChanged: (value) {
                         setState(() => rightItems[index] = value);
                         widget.onChange(_packFields());
                       },
                       validator: (value) => value == null || value.isEmpty
-                          ? 'Unesi pojam'
+                          ? 'Enter term'
                           : null,
                       onSaved: (value) {
                         setState(() => rightItems[index] = value ?? '');
@@ -117,6 +157,8 @@ class _ExerciseCreationMTCComponentState
                           leftItems.removeAt(index);
                           rightItems.removeAt(index);
                           rowKeys.removeAt(index);
+                          _extraLeftFocuses.removeAt(index - 1).dispose();
+                          _rightFocuses.removeAt(index).dispose();
                         });
                         widget.onChange(_packFields());
                       },
@@ -133,7 +175,7 @@ class _ExerciseCreationMTCComponentState
           child: ElevatedButton.icon(
             onPressed: _addPair,
             icon: const Icon(Icons.add),
-            label: const Text('Dodaj par'),
+            label: const Text('Add pair'),
           ),
         ),
       ],

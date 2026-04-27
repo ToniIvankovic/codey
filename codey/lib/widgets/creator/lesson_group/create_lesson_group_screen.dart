@@ -3,6 +3,7 @@ import 'package:codey/services/lesson_groups_service.dart';
 import 'package:codey/widgets/creator/lesson/edit_single_lesson_screen.dart';
 import 'package:codey/widgets/creator/lesson/pick_lesson_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class CreateLessonGroup extends StatefulWidget {
@@ -19,6 +20,13 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
   String? tips;
   List<Lesson> lessons = [];
   bool adaptive = false;
+  final _tipsFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _tipsFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +43,21 @@ class _CreateLessonGroupState extends State<CreateLessonGroup> {
             TextField(
               onChanged: (value) => setState(() => name = value),
               decoration: const InputDecoration(labelText: "Name"),
+              textInputAction: TextInputAction.next,
+              onSubmitted: (_) => _tipsFocus.requestFocus(),
             ),
-            TextField(
-              onChanged: (value) => setState(() => tips = value),
-              decoration: const InputDecoration(labelText: "Tips"),
-              maxLines: 5,
-              minLines: 2,
+            CallbackShortcuts(
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.enter): () =>
+                    FocusScope.of(context).unfocus(),
+              },
+              child: TextField(
+                focusNode: _tipsFocus,
+                onChanged: (value) => setState(() => tips = value),
+                decoration: const InputDecoration(labelText: "Tips"),
+                maxLines: 5,
+                minLines: 2,
+              ),
             ),
             Row(
               children: [

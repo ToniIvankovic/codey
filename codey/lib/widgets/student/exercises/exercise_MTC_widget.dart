@@ -106,15 +106,37 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
     }
   }
 
-  static const double _maxColumnWidth = 160;
-  static const double _minColumnWidth = 120;
-  static const double _maxColumnGap = 120;
+  static const double _maxColumnWidth = 240;
+  static const double _minColumnWidth = 140;
+  static const double _maxColumnGap = 80;
   static const double _minColumnGap = 20;
   static const double _itemVerticalMargin = 16;
+
+  static const double _cardHorizontalPadding = 12.0;
+  static const double _cardVerticalPadding = 12.0;
+  static const double _cardBorderWidth = 2.0;
+
+  double _measureCardHeight(
+    String text,
+    double columnWidth,
+    TextStyle style,
+    TextScaler textScaler,
+  ) {
+    final innerWidth =
+        columnWidth - _cardHorizontalPadding * 2 - _cardBorderWidth * 2;
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+      textScaler: textScaler,
+    )..layout(maxWidth: innerWidth.clamp(0, double.infinity));
+    return painter.height + _cardVerticalPadding * 2 + _cardBorderWidth * 2;
+  }
 
   Widget _buildColumn({
     required BuildContext context,
     required double columnWidth,
+    required double cardHeight,
     required int itemCount,
     required String Function(int i) text,
     required bool Function(int i) matched,
@@ -131,6 +153,7 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
             (i) => _buildCard(
                   context: context,
                   text: text(i),
+                  height: cardHeight,
                   matched: matched(i),
                   highlighted: highlighted(i),
                   flashingRed: flashingRed(i),
@@ -143,6 +166,7 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
   Widget _buildCard({
     required BuildContext context,
     required String text,
+    required double height,
     required bool matched,
     required bool highlighted, // selected (left) or flashingGreen (right)
     required bool flashingRed, // only right column uses this
@@ -170,10 +194,13 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
+        height: height,
         margin: const EdgeInsets.symmetric(vertical: _itemVerticalMargin),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(
+            horizontal: _cardHorizontalPadding, vertical: _cardVerticalPadding),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: borderColor, width: 2.0),
+          border: Border.all(color: borderColor, width: _cardBorderWidth),
           borderRadius: BorderRadius.circular(8.0),
           color: bgColor,
         ),
@@ -203,40 +230,55 @@ class _ExerciseMTCWidgetState extends State<ExerciseMTCWidget> {
             double gap = (available * 0.15).clamp(_minColumnGap, _maxColumnGap);
             double columnWidth =
                 ((available - gap) / 2).clamp(_minColumnWidth, _maxColumnWidth);
-            return IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildColumn(
-                    context: context,
-                    columnWidth: columnWidth,
-                    itemCount: widget.exercise.leftItems.length,
-                    text: (i) => widget.exercise.leftItems[i],
-                    matched: (i) => _matchedLeftIndices.contains(i),
-                    highlighted: (i) =>
-                        _selectedLeftIndex == i ||
-                        _flashingCorrectLeftIndex == i,
-                    flashingRed: (i) => _flashingLeftIndex == i,
-                    onTap: (i) => () => _onLeftTap(i),
-                  ),
-                  SizedBox(width: gap),
-                  _buildColumn(
-                    context: context,
-                    columnWidth: columnWidth,
-                    itemCount: _shuffledRightOrder.length,
-                    text: (i) =>
-                        widget.exercise.rightItems[_shuffledRightOrder[i]],
-                    matched: (i) =>
-                        _matchedRightIndices.contains(_shuffledRightOrder[i]),
-                    highlighted: (i) =>
-                        _flashingCorrectShuffledIndex == i ||
-                        _selectedRightShuffledIndex == i,
-                    flashingRed: (i) => _flashingRightIndex == i,
-                    onTap: (i) => () => _onRightTap(i),
-                  ),
-                ],
-              ),
+
+            final textStyle = DefaultTextStyle.of(context).style;
+            final textScaler = MediaQuery.textScalerOf(context);
+            double cardHeight = 0;
+            for (final t in widget.exercise.leftItems) {
+              final h =
+                  _measureCardHeight(t, columnWidth, textStyle, textScaler);
+              if (h > cardHeight) cardHeight = h;
+            }
+            for (final t in widget.exercise.rightItems) {
+              final h =
+                  _measureCardHeight(t, columnWidth, textStyle, textScaler);
+              if (h > cardHeight) cardHeight = h;
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildColumn(
+                  context: context,
+                  columnWidth: columnWidth,
+                  cardHeight: cardHeight,
+                  itemCount: widget.exercise.leftItems.length,
+                  text: (i) => widget.exercise.leftItems[i],
+                  matched: (i) => _matchedLeftIndices.contains(i),
+                  highlighted: (i) =>
+                      _selectedLeftIndex == i ||
+                      _flashingCorrectLeftIndex == i,
+                  flashingRed: (i) => _flashingLeftIndex == i,
+                  onTap: (i) => () => _onLeftTap(i),
+                ),
+                SizedBox(width: gap),
+                _buildColumn(
+                  context: context,
+                  columnWidth: columnWidth,
+                  cardHeight: cardHeight,
+                  itemCount: _shuffledRightOrder.length,
+                  text: (i) =>
+                      widget.exercise.rightItems[_shuffledRightOrder[i]],
+                  matched: (i) =>
+                      _matchedRightIndices.contains(_shuffledRightOrder[i]),
+                  highlighted: (i) =>
+                      _flashingCorrectShuffledIndex == i ||
+                      _selectedRightShuffledIndex == i,
+                  flashingRed: (i) => _flashingRightIndex == i,
+                  onTap: (i) => () => _onRightTap(i),
+                ),
+              ],
             );
           },
         ),

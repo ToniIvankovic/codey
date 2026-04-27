@@ -15,6 +15,7 @@ import 'package:codey/widgets/creator/exercise/exercise_creation_SCW_component.d
 import 'package:codey/widgets/creator/exercise/exercise_creation_component.dart';
 import 'package:codey/widgets/student/exercises/single_exercise_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'exercise_creation_MC_component.dart';
@@ -35,6 +36,11 @@ class CreateExerciseScreen extends StatefulWidget {
 
 class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _statementFocus = FocusNode();
+  final _statementOutputFocus = FocusNode();
+  final _specificTipFocus = FocusNode();
+  final _imageUrlFocus = FocusNode();
+  final _innerFirstFocus = FocusNode();
   int? difficulty;
   String? statement;
   ExerciseType? type;
@@ -55,6 +61,16 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     specificTip = widget.existingExercise?.specificTip;
     imageUrl = widget.existingExercise?.imageUrl;
     courseId = widget.courseId;
+  }
+
+  @override
+  void dispose() {
+    _statementFocus.dispose();
+    _statementOutputFocus.dispose();
+    _specificTipFocus.dispose();
+    _imageUrlFocus.dispose();
+    _innerFirstFocus.dispose();
+    super.dispose();
   }
 
   Exercise createExercise() {
@@ -145,6 +161,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     if (type == ExerciseType.MC) {
       exerciseCreationComponent = ExerciseCreationMCComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise is ExerciseMC ? widget.existingExercise as ExerciseMC : null,
           onChange: (innerFields) {
             setState(() {
@@ -154,6 +171,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.SA) {
       exerciseCreationComponent = ExerciseCreationSAComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise is ExerciseSA ? widget.existingExercise as ExerciseSA : null,
           onChange: (innerFields) {
             setState(() {
@@ -163,6 +181,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.LA) {
       exerciseCreationComponent = ExerciseCreationLAComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise,
           onChange: (innerFields) {
             setState(() {
@@ -172,6 +191,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.SCW) {
       exerciseCreationComponent = ExerciseCreationSCWComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise,
           onChange: (innerFields) {
             setState(() {
@@ -181,6 +201,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.ORC) {
       exerciseCreationComponent = ExerciseCreationORCComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise is ExerciseORC ? widget.existingExercise as ExerciseORC : null,
           onChange: (innerFields) {
             setState(() {
@@ -190,6 +211,7 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
     } else if (type == ExerciseType.MTC) {
       exerciseCreationComponent = ExerciseCreationMTCComponent(
           formKey: _formKey,
+          firstFocusNode: _innerFirstFocus,
           existingExercise: widget.existingExercise is ExerciseMTC ? widget.existingExercise as ExerciseMTC : null,
           onChange: (innerFields) {
             setState(() {
@@ -234,6 +256,8 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Difficulty'),
                   initialValue: widget.existingExercise?.difficulty.toString(),
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _statementFocus.requestFocus(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a difficulty';
@@ -252,59 +276,83 @@ class _CreateExerciseScreenState extends State<CreateExerciseScreen> {
                   },
                 ),
                 // STATEMENT
-                TextFormField(
-                  minLines: 1,
-                  maxLines: 5,
-                  decoration: const InputDecoration(labelText: 'Statement'),
-                  initialValue: widget.existingExercise?.statement,
-                  onSaved: (value) {
-                    setState(() {
-                      if (value != null && value.isNotEmpty) {
-                        statement = value;
-                      } else {
-                        statement = null;
-                      }
-                    });
+                CallbackShortcuts(
+                  bindings: {
+                    const SingleActivator(LogicalKeyboardKey.enter): () =>
+                        _statementOutputFocus.requestFocus(),
                   },
+                  child: TextFormField(
+                    focusNode: _statementFocus,
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration: const InputDecoration(labelText: 'Statement'),
+                    initialValue: widget.existingExercise?.statement,
+                    onSaved: (value) {
+                      setState(() {
+                        if (value != null && value.isNotEmpty) {
+                          statement = value;
+                        } else {
+                          statement = null;
+                        }
+                      });
+                    },
+                  ),
                 ),
                 // STATEMENT OUTPUT
-                TextFormField(
-                  minLines: 1,
-                  maxLines: 5,
-                  decoration:
-                      const InputDecoration(labelText: 'Statement output'),
-                  initialValue: widget.existingExercise?.statementOutput,
-                  onSaved: (value) {
-                    setState(() {
-                      if (value != null && value.isNotEmpty) {
-                        statementOutput = value;
-                      } else {
-                        statementOutput = null;
-                      }
-                    });
+                CallbackShortcuts(
+                  bindings: {
+                    const SingleActivator(LogicalKeyboardKey.enter): () =>
+                        _specificTipFocus.requestFocus(),
                   },
+                  child: TextFormField(
+                    focusNode: _statementOutputFocus,
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration:
+                        const InputDecoration(labelText: 'Statement output'),
+                    initialValue: widget.existingExercise?.statementOutput,
+                    onSaved: (value) {
+                      setState(() {
+                        if (value != null && value.isNotEmpty) {
+                          statementOutput = value;
+                        } else {
+                          statementOutput = null;
+                        }
+                      });
+                    },
+                  ),
                 ),
                 // SPECIFIC TIP
-                TextFormField(
-                  minLines: 1,
-                  maxLines: 5,
-                  decoration: const InputDecoration(labelText: 'Specific tip'),
-                  initialValue: widget.existingExercise?.specificTip,
-                  onSaved: (value) {
-                    setState(() {
-                      if (value != null && value.isNotEmpty) {
-                        specificTip = value;
-                      } else {
-                        specificTip = null;
-                      }
-                    });
+                CallbackShortcuts(
+                  bindings: {
+                    const SingleActivator(LogicalKeyboardKey.enter): () =>
+                        _imageUrlFocus.requestFocus(),
                   },
+                  child: TextFormField(
+                    focusNode: _specificTipFocus,
+                    minLines: 1,
+                    maxLines: 5,
+                    decoration: const InputDecoration(labelText: 'Specific tip'),
+                    initialValue: widget.existingExercise?.specificTip,
+                    onSaved: (value) {
+                      setState(() {
+                        if (value != null && value.isNotEmpty) {
+                          specificTip = value;
+                        } else {
+                          specificTip = null;
+                        }
+                      });
+                    },
+                  ),
                 ),
                 // IMAGE URL
                 TextFormField(
+                  focusNode: _imageUrlFocus,
                   decoration:
                       const InputDecoration(labelText: 'Image URL (optional)'),
                   initialValue: widget.existingExercise?.imageUrl,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _innerFirstFocus.requestFocus(),
                   onSaved: (value) {
                     setState(() {
                       if (value != null && value.isNotEmpty) {

@@ -447,20 +447,90 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 240),
-                  child: Image.network(
-                    exercise!.imageUrl!,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () => _showImageViewer(exercise!.imageUrl!),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 240),
+                      child: Image.network(
+                        exercise!.imageUrl!,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
       ],
+    );
+  }
+
+  void _showImageViewer(String imageUrl) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (dialogContext) {
+        final size = MediaQuery.of(dialogContext).size;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.zero,
+          elevation: 0,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => Navigator.of(dialogContext).pop(),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    constrained: false,
+                    minScale: 1,
+                    maxScale: 5,
+                    child: SizedBox(
+                      width: size.width,
+                      height: size.height,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: size.width * 0.8,
+                              maxHeight: size.height * 0.8,
+                            ),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox.shrink(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: Material(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: const CircleBorder(),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      tooltip: 'Natrag',
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
