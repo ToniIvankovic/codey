@@ -17,7 +17,7 @@ class EndReport {
     answersReport = [];
   }
 
-  double get accuracy => correctAnswers / totalAnswers;
+  double get accuracy => totalAnswers == 0 ? 0 : correctAnswers / totalAnswers;
   Duration get duration => DateTime.now().difference(_startTime);
 
   Map<String, dynamic> toJson() {

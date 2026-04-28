@@ -212,6 +212,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                               (element) => element.isNotEmpty);
                                     });
                                   },
+                                  onSubmit: _submitAnswer,
                                   statementArea: _buildStaticStatementArea(),
                                 );
                               })
@@ -423,6 +424,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10.0),
                   child: ElevatedButton(
+                    autofocus: true,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCorrectResponse == true
                           ? Theme.of(context).colorScheme.primary

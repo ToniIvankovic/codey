@@ -13,6 +13,7 @@ class ExerciseSCWWidget extends StatefulWidget {
     required this.statementArea,
     required this.changesEnabled,
     required this.wrapText,
+    this.onSubmit,
   }) : super(key: key);
 
   final ExerciseSCW exercise;
@@ -20,6 +21,7 @@ class ExerciseSCWWidget extends StatefulWidget {
   final Widget statementArea;
   final ValueListenable<bool> changesEnabled;
   final bool wrapText;
+  final VoidCallback? onSubmit;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -195,12 +197,15 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
                   child: TextField(
                     controller: controllers[gapIndex],
                     focusNode: focusNodes[gapIndex],
-                    textInputAction: TextInputAction.next,
+                    textInputAction: gapIndex + 1 < focusNodes.length
+                        ? TextInputAction.next
+                        : TextInputAction.done,
                     onSubmitted: (_) {
                       if (gapIndex + 1 < focusNodes.length) {
                         focusNodes[gapIndex + 1].requestFocus();
                       } else {
                         focusNodes[gapIndex].unfocus();
+                        widget.onSubmit?.call();
                       }
                     },
                     onChanged: (value) {
