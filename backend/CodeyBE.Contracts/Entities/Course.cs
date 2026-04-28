@@ -18,5 +18,8 @@ namespace CodeyBE.Contracts.Entities
         [BsonElement("defaultExerciseLimit")]
         [BsonIgnoreIfNull]
         public int? DefaultExerciseLimit { get; set; }
+        [BsonElement("scwTextWrap")]
+        [BsonIgnoreIfDefault]
+        public bool ScwTextWrap { get; set; }
     }
 }

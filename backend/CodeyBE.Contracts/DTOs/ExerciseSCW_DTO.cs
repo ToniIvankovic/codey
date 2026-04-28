@@ -18,10 +18,12 @@ namespace CodeyBE.Contracts.DTOs
             DefaultGapLengths = ex.DefaultGapLengths!;
             StatementOutput = ex.StatementOutput;
             CorrectAnswers = ex.CorrectAnswers!;
+            ScwTextWrap = ex.ScwTextWrap;
         }
         public string StatementCode { get; set; }
         public List<int> DefaultGapLengths { get; set; }
         public string? StatementOutput { get; set; }
         public List<dynamic> CorrectAnswers { get; set; }
+        public bool? ScwTextWrap { get; set; }
     }
 }

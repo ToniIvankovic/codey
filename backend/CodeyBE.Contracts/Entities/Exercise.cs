@@ -70,6 +70,10 @@ namespace CodeyBE.Contracts.Entities
         [BsonIgnoreIfNull]
         public string? ImageUrl { get; set; }
 
+        [BsonElement("scwTextWrap")]
+        [BsonIgnoreIfNull]
+        public bool? ScwTextWrap { get; set; }
+
         public Exercise(Exercise ex)
         {
             Id = ex.Id;
@@ -89,6 +93,7 @@ namespace CodeyBE.Contracts.Entities
             CourseId = ex.CourseId;
             AnswerOptionsList = ex.AnswerOptionsList;
             ImageUrl = ex.ImageUrl;
+            ScwTextWrap = ex.ScwTextWrap;
         }
 
         public Exercise(int id, ExerciseCreationDTO exerciseCreationDTO)
@@ -109,6 +114,7 @@ namespace CodeyBE.Contracts.Entities
             CourseId = exerciseCreationDTO.CourseId;
             AnswerOptionsList = exerciseCreationDTO.AnswerOptionsList;
             ImageUrl = exerciseCreationDTO.ImageUrl;
+            ScwTextWrap = exerciseCreationDTO.ScwTextWrap;
         }
 
         override public bool Equals(object? obj)

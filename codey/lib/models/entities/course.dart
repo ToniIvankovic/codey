@@ -4,8 +4,16 @@ class Course {
   final String shortName;
   final String description;
   final int? defaultExerciseLimit;
+  final bool scwTextWrap;
 
-  Course({required this.id, required this.name, required this.shortName, required this.description, this.defaultExerciseLimit});
+  Course({
+    required this.id,
+    required this.name,
+    required this.shortName,
+    required this.description,
+    this.defaultExerciseLimit,
+    this.scwTextWrap = false,
+  });
 
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
@@ -14,6 +22,7 @@ class Course {
       shortName: json['shortName'],
       description: json['description'],
       defaultExerciseLimit: json['defaultExerciseLimit'],
+      scwTextWrap: json['scwTextWrap'] ?? false,
     );
   }
 }

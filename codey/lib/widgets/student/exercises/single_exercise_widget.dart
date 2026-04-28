@@ -6,6 +6,7 @@ import 'package:codey/models/entities/exercise_ORC.dart';
 import 'package:codey/models/entities/exercise_SA.dart';
 import 'package:codey/models/entities/exercise_SCW.dart';
 import 'package:codey/services/exercises_service.dart';
+import 'package:codey/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -175,20 +176,32 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                 // questionArea: _buildStaticQuestionArea(),
                               )
                             else if (exercise is ExerciseSCW)
-                              ExerciseSCWWidget(
-                                key: ValueKey(exercise!.id + 100 * repeatCount),
-                                changesEnabled: childrenEnabledChanges,
-                                exercise: exercise! as ExerciseSCW,
-                                onAnswerSelected: (answer) {
-                                  setState(() {
-                                    this.answer = answer;
-                                    enableCheck = answer.isNotEmpty &&
-                                        answer.every(
-                                            (element) => element.isNotEmpty);
-                                  });
-                                },
-                                statementArea: _buildStaticStatementArea(),
-                              )
+                              Builder(builder: (context) {
+                                final scwExercise = exercise! as ExerciseSCW;
+                                final course = context
+                                    .read<UserService>()
+                                    .currentUser
+                                    ?.course;
+                                final wrapText = scwExercise.scwTextWrap ??
+                                    course?.scwTextWrap ??
+                                    false;
+                                return ExerciseSCWWidget(
+                                  key: ValueKey(
+                                      exercise!.id + 100 * repeatCount),
+                                  changesEnabled: childrenEnabledChanges,
+                                  exercise: scwExercise,
+                                  wrapText: wrapText,
+                                  onAnswerSelected: (answer) {
+                                    setState(() {
+                                      this.answer = answer;
+                                      enableCheck = answer.isNotEmpty &&
+                                          answer.every(
+                                              (element) => element.isNotEmpty);
+                                    });
+                                  },
+                                  statementArea: _buildStaticStatementArea(),
+                                );
+                              })
                             else if (exercise is ExerciseORC)
                               ExerciseORCWidget(
                                 key: ValueKey(exercise!.id + 100 * repeatCount),

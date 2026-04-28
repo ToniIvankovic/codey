@@ -155,6 +155,21 @@ class _MyAppState extends State<MyApp> {
       darkTheme: AppTheme.dark,
       themeMode: _isLoggedIn ? themeService.mode : ThemeMode.light,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth >= 300) return child!;
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: 300,
+                height: constraints.maxHeight,
+                child: child,
+              ),
+            );
+          },
+        );
+      },
       home: const MyHomePage(title: 'Codey'),
     );
   }
@@ -235,7 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       const Text("Učitavanje podataka o korisniku..."),
                       const Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(20.0),
                         child: CircularProgressIndicator(),
                       ),
                       ElevatedButton(

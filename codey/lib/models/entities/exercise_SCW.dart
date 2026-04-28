@@ -8,6 +8,7 @@ class ExerciseSCW extends Exercise {
   final List<int> defaultGapLengths;
   final String statementCode;
   final List<List<String>>? correctAnswers;
+  final bool? scwTextWrap;
 
   ExerciseSCW({
     required id,
@@ -19,6 +20,7 @@ class ExerciseSCW extends Exercise {
     String? specificTip,
     String? imageUrl,
     this.correctAnswers,
+    this.scwTextWrap,
     required courseId,
   }) : super(
           type: ExerciseType.SCW,
@@ -47,6 +49,7 @@ class ExerciseSCW extends Exercise {
       defaultGapLengths: defaultGapLengthsInt,
       statementOutput: json['statementOutput'],
       correctAnswers: correctAnswersList,
+      scwTextWrap: json['scwTextWrap'],
       courseId: json['courseId'],
     );
   }
@@ -63,6 +66,7 @@ class ExerciseSCW extends Exercise {
         'defaultGapLengths': defaultGapLengths,
         'statementOutput': statementOutput,
         'correctAnswers': correctAnswers,
+        if (scwTextWrap != null) 'scwTextWrap': scwTextWrap,
         'courseId': courseId,
       };
 
@@ -77,6 +81,7 @@ class ExerciseSCW extends Exercise {
       defaultGapLengths: other.defaultGapLengths,
       statementOutput: other.statementOutput,
       correctAnswers: other.correctAnswers,
+      scwTextWrap: other.scwTextWrap,
       courseId: other.courseId,
     );
   }

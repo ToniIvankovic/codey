@@ -9,6 +9,7 @@ import 'package:rxdart/rxdart.dart';
 
 abstract class UserService {
   Stream<AppUser> get userStream;
+  AppUser? get currentUser;
   Stream<void> get courseChanged;
   Future<void> initializeUser();
   void logout();
@@ -34,6 +35,10 @@ class UserService1 implements UserService {
 
   @override
   Stream<AppUser> get userStream => _userSubject.stream;
+
+  @override
+  AppUser? get currentUser =>
+      _userSubject.isClosed ? null : _userSubject.valueOrNull;
 
   @override
   Stream<void> get courseChanged => _courseChangedSubject.stream;

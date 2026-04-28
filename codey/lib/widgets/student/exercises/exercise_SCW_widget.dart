@@ -12,12 +12,14 @@ class ExerciseSCWWidget extends StatefulWidget {
     required this.onAnswerSelected,
     required this.statementArea,
     required this.changesEnabled,
+    required this.wrapText,
   }) : super(key: key);
 
   final ExerciseSCW exercise;
   final ValueChanged<List<String>> onAnswerSelected;
   final Widget statementArea;
   final ValueListenable<bool> changesEnabled;
+  final bool wrapText;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -84,6 +86,15 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
 
   Widget _generateCodeArea() {
     var textLines = widget.exercise.statementCode.split("\n");
+    final innerColumn = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ..._generateLinesWithGaps(textLines),
+        ],
+      ),
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Container(
@@ -97,34 +108,49 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
           radius: const Radius.circular(10.0),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 1.5,
-                minWidth: MediaQuery.of(context).size.width,
-              ),
-              width: MediaQuery.of(context).size.width,
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ..._generateLinesWithGaps(textLines),
-                      ],
+            child: widget.wrapText
+                ? SizedBox(
+                    width: double.infinity,
+                    child: innerColumn,
+                  )
+                : Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 1.5,
+                      minWidth: MediaQuery.of(context).size.width,
+                    ),
+                    width: MediaQuery.of(context).size.width,
+                    child: Scrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        child: innerColumn,
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
           ),
         ),
       ),
     );
+  }
+
+  TextStyle _baseTextStyle() => TextStyle(
+        fontSize: 20.0,
+        fontFamily: widget.wrapText ? null : 'courier new',
+      );
+
+  List<Widget> _textParts(String part) {
+    if (!widget.wrapText) {
+      return [Text(part, style: _baseTextStyle())];
+    }
+    // Split into per-word widgets so the surrounding Wrap can break at
+    // word boundaries; preserve a trailing space after each word.
+    final words = part.split(RegExp(r'(?<=\s)'));
+    return [
+      for (final word in words)
+        if (word.isNotEmpty) Text(word, style: _baseTextStyle()),
+    ];
   }
 
   List<Widget> _generateLinesWithGaps(List<String> lines) {
@@ -133,19 +159,13 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
     for (var line in lines) {
       if (!line.contains('\\gap')) {
         widgets.add(
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: Text(
-                  line,
-                  style: const TextStyle(
-                    fontFamily: 'courier new',
-                    fontSize: 20.0,
-                  ),
-                ),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Text(
+              line,
+              style: _baseTextStyle(),
+              softWrap: widget.wrapText,
+            ),
           ),
         );
         continue;
@@ -156,15 +176,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
       for (int j = 0; j < parts.length; j++) {
         var part = parts[j];
         if (part.isNotEmpty) {
-          rowWidgets.add(
-            Text(
-              part,
-              style: const TextStyle(
-                fontFamily: 'courier new',
-                fontSize: 20.0,
-              ),
-            ),
-          );
+          rowWidgets.addAll(_textParts(part));
         }
 
         if (j < parts.length - 1) {
@@ -196,10 +208,7 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
                       widget.onAnswerSelected(answer);
                     },
                     readOnly: !widget.changesEnabled.value,
-                    style: const TextStyle(
-                      fontFamily: 'courier new',
-                      fontSize: 20.0,
-                    ),
+                    style: _baseTextStyle(),
                   ),
                 ),
               ),
@@ -208,7 +217,16 @@ class _ExerciseSCWWidgetState extends State<ExerciseSCWWidget> {
           usedLines++;
         }
       }
-      widgets.add(Row(children: rowWidgets));
+      widgets.add(
+        widget.wrapText
+            ? Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 4,
+                runSpacing: 4,
+                children: rowWidgets,
+              )
+            : Row(children: rowWidgets),
+      );
     }
     return widgets;
   }

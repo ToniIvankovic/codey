@@ -294,18 +294,20 @@ class _LessonsScreenState extends State<LessonsScreen> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  lesson.name,
-                  textAlign: TextAlign.center,
-                  style: isClickable
-                      ? null
-                      : TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.5),
-                        ),
-                  overflow: TextOverflow.ellipsis,
+                Flexible(
+                  child: Text(
+                    lesson.name,
+                    textAlign: TextAlign.center,
+                    style: isClickable
+                        ? null
+                        : TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.5),
+                          ),
+                    softWrap: true,
+                  ),
                 ),
                 if (solved)
                   Padding(

@@ -24,38 +24,46 @@ class StudentHomeScreen extends StatefulWidget {
 }
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
+  double _measureTextWidth(String text, TextStyle style) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    )..layout();
+    return painter.width;
+  }
+
   @override
   Widget build(BuildContext context) {
     try {
+      final titleStyle = TextStyle(
+          color: Theme.of(context).colorScheme.onPrimary, fontSize: 18);
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.primary,
-          titleTextStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary, fontSize: 18),
+          titleTextStyle: titleStyle,
           iconTheme:
               IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                child: Text(widget.course.name),
-              ),
-              if (widget.user.gamificationEnabled) ...[
-                Row(
-                  children: [
-                    Icon(
-                      Icons.whatshot,
-                      color: widget.user.didLessonToday
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context)
-                              .colorScheme
-                              .onInverseSurface
-                              .withOpacity(0.5),
-                    ),
-                    Text(
-                      widget.user.streak.toString(),
-                      style: TextStyle(
+          title: LayoutBuilder(builder: (context, constraints) {
+            const reservedForActions = 300.0;
+            final courseNameWidth =
+                _measureTextWidth(widget.course.name, titleStyle);
+            final showCourseName =
+                courseNameWidth <= constraints.maxWidth - reservedForActions;
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (showCourseName)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                    child: Text(widget.course.name),
+                  ),
+                if (widget.user.gamificationEnabled) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.whatshot,
                         color: widget.user.didLessonToday
                             ? Theme.of(context).colorScheme.secondary
                             : Theme.of(context)
@@ -63,68 +71,79 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 .onInverseSurface
                                 .withOpacity(0.5),
                       ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  //chest icon
-                  icon: const Icon(Icons.military_tech),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StudentGamificationScreen(
-                        user: widget.user,
+                      Text(
+                        widget.user.streak.toString(),
+                        style: TextStyle(
+                          color: widget.user.didLessonToday
+                              ? Theme.of(context).colorScheme.secondary
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onInverseSurface
+                                  .withOpacity(0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    //chest icon
+                    icon: const Icon(Icons.military_tech),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentGamificationScreen(
+                          user: widget.user,
+                        ),
                       ),
                     ),
                   ),
+                ],
+                // SETTINGS
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                // LOGOUT
+                IconButton(
+                  icon: const Icon(Icons.logout),
+                  //alert dialog
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Odjava'),
+                          content: const Text('Sigurno se želiš odjaviti?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Odustani'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                context.read<SessionService>().logout();
+                              },
+                              child: const Text('Odjavi se'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
-              // SETTINGS
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-
-              // LOGOUT
-              IconButton(
-                icon: const Icon(Icons.logout),
-                //alert dialog
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Odjava'),
-                        content: const Text('Sigurno se želiš odjaviti?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Odustani'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              context.read<SessionService>().logout();
-                            },
-                            child: const Text('Odjavi se'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+            );
+          }),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Row(

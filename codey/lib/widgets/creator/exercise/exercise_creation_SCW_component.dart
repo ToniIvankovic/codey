@@ -31,6 +31,7 @@ class _ExerciseCreationSCWComponentState
   List<List<String>> answerKeys = [];
   final List<List<FocusNode>> _answerFocuses = [];
   int numberOfGaps = 0;
+  bool? scwTextWrap;
 
   @override
   void dispose() {
@@ -52,6 +53,7 @@ class _ExerciseCreationSCWComponentState
       "defaultGapLengths": defaultGapLengths,
       "correctAnswers":
           answers.map((answer) => List<String>.from(answer)).toList(),
+      "scwTextWrap": scwTextWrap,
     };
   }
 
@@ -68,6 +70,7 @@ class _ExerciseCreationSCWComponentState
           answers.length,
           (index) => List.generate(answers[index].length,
               (index) => DateTime.now().toIso8601String()));
+      scwTextWrap = exercise.scwTextWrap;
     }
     for (final gap in answers) {
       _answerFocuses.add(List.generate(gap.length, (_) => FocusNode()));
@@ -128,6 +131,33 @@ class _ExerciseCreationSCWComponentState
             onSaved: (value) {
               setState(() {
                 statementCode = value;
+              });
+              widget.onChange(_packFields());
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: DropdownButtonFormField<bool?>(
+            value: scwTextWrap,
+            decoration: const InputDecoration(labelText: 'Text wrap'),
+            items: const [
+              DropdownMenuItem<bool?>(
+                value: null,
+                child: Text('Use course default'),
+              ),
+              DropdownMenuItem<bool?>(
+                value: true,
+                child: Text('Wrap text (no horizontal scroll)'),
+              ),
+              DropdownMenuItem<bool?>(
+                value: false,
+                child: Text('Scroll horizontally'),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                scwTextWrap = value;
               });
               widget.onChange(_packFields());
             },

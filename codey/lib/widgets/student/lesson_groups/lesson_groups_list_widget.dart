@@ -34,6 +34,8 @@ class LessonGroupsListView extends StatefulWidget {
 
 class _LessonGroupsListViewState extends State<LessonGroupsListView> {
   List<ListItem>? data;
+  final double tileHeight = 125.0;
+  final double tileWidth = 200.0;
 
   @override
   void initState() {
@@ -82,7 +84,6 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
       );
     }
 
-    double tileSize = 125.0;
     double paddingVertical = 25.0;
     double paddingHorizontal = 10.0;
     return Stack(
@@ -98,10 +99,10 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
                 ),
                 child: Container(
                   constraints: BoxConstraints(
-                      minWidth: tileSize,
-                      minHeight: tileSize,
-                      maxHeight: tileSize,
-                      maxWidth: tileSize),
+                      minWidth: tileWidth,
+                      minHeight: tileHeight,
+                      maxHeight: tileHeight,
+                      maxWidth: tileWidth),
                   child: Builder(builder: (context) {
                     var buttonBackgroundColor = group.clickable
                         ? Theme.of(context).colorScheme.secondary
@@ -174,14 +175,14 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
               ),
             ],
             Padding(
-              padding: EdgeInsets.only(top: tileSize + 2 * paddingVertical),
+              padding: EdgeInsets.only(top: tileHeight + 2 * paddingVertical),
             ),
           ],
         ),
         for (int i = 0; i < data!.length; i++) ...[
           Positioned(
             top: 10 +
-                (i + 1) * (tileSize + 2 * paddingVertical) -
+                (i + 1) * (tileHeight + 2 * paddingVertical) -
                 paddingVertical,
             child: _FloatingWindow(
               key: ValueKey(data![i].finished),
@@ -192,6 +193,7 @@ class _LessonGroupsListViewState extends State<LessonGroupsListView> {
               lessonGroup: data![i].lessonGroup,
               lessonGroupFinished: data![i].finished,
               user: widget.user,
+              tileHeight: tileHeight,
             ),
           ),
         ],
@@ -206,6 +208,7 @@ class _FloatingWindow extends StatefulWidget {
   final bool lessonGroupFinished;
   final void Function(bool) onVisibleChange;
   final AppUser user;
+  final double tileHeight;
 
   const _FloatingWindow({
     Key? key,
@@ -214,6 +217,7 @@ class _FloatingWindow extends StatefulWidget {
     required this.lessonGroupFinished,
     required this.onVisibleChange,
     required this.user,
+    required this.tileHeight,
   }) : super(key: key);
 
   @override
@@ -242,7 +246,7 @@ class _FloatingWindowState extends State<_FloatingWindow> {
         duration: const Duration(milliseconds: 100),
         opacity: isVisible ? 1.0 : 0.0,
         child: Container(
-          width: 2.5 * 125.0,
+          width: 3 * widget.tileHeight,
           height: 150,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.inverseSurface,
