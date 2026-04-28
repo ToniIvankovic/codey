@@ -13,6 +13,7 @@ class ExerciseSAWidget extends StatelessWidget {
     required this.codeArea,
     required this.questionArea,
     required this.changesEnabled,
+    this.onSubmit,
   });
 
   final Exercise exercise;
@@ -21,6 +22,7 @@ class ExerciseSAWidget extends StatelessWidget {
   final Widget codeArea;
   final Widget questionArea;
   final ValueListenable<bool> changesEnabled;
+  final VoidCallback? onSubmit;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,8 @@ class ExerciseSAWidget extends StatelessWidget {
             labelText: 'Odgovor',
           ),
           onChanged: onAnswerSelected,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => onSubmit?.call(),
           minLines: 1,
           maxLines: 1,
           readOnly: !changesEnabled.value,

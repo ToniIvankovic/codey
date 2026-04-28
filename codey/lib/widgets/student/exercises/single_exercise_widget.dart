@@ -107,12 +107,24 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
-                                    child: LinearProgressIndicator(
-                                      value: context
-                                          .read<ExercisesService>()
-                                          .sessionProgress,
-                                      borderRadius: BorderRadius.circular(10),
-                                      minHeight: 20,
+                                    child: TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(
+                                        begin: 0,
+                                        end: context
+                                            .read<ExercisesService>()
+                                            .sessionProgress,
+                                      ),
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeOut,
+                                      builder: (context, value, _) {
+                                        return LinearProgressIndicator(
+                                          value: value,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          minHeight: 20,
+                                        );
+                                      },
                                     ),
                                   )
                                 ],
@@ -157,6 +169,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                                     enableCheck = true;
                                   });
                                 },
+                                onSubmit: _submitAnswer,
                                 statementArea: _buildStaticStatementArea(),
                                 codeArea: _buildStaticCodeArea(),
                                 questionArea: _buildStaticQuestionArea(),
@@ -258,9 +271,44 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
               ),
             ),
           ),
-          if (isCorrectResponse != null) _buildNextButtonArea(),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, animation) => SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                ),
+                child: child,
+              ),
+              child: isCorrectResponse != null
+                  ? _buildNextButtonArea()
+                  : const SizedBox.shrink(key: ValueKey('result-pane-hidden')),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _submitAnswer() {
+    if (!enableCheck) return;
+    setState(() {
+      enableCheck = false;
+      childrenEnabledChanges.value = false;
+    });
+    widget.exercisesService.checkAnswer(exercise!, answer).then(
+      (value) {
+        setState(() {
+          isCorrectResponse = value;
+          childrenSignalCorrect.value = value;
+        });
+      },
     );
   }
 
@@ -279,22 +327,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: null),
-            onPressed: enableCheck
-                ? () {
-                    setState(() {
-                      enableCheck = false;
-                      childrenEnabledChanges.value = false;
-                    });
-                    widget.exercisesService.checkAnswer(exercise!, answer).then(
-                      (value) {
-                        setState(() {
-                          isCorrectResponse = value;
-                          childrenSignalCorrect.value = value;
-                        });
-                      },
-                    );
-                  }
-                : null,
+            onPressed: enableCheck ? _submitAnswer : null,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: content,
@@ -327,17 +360,16 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
           ? Theme.of(context).colorScheme.onPrimary
           : Theme.of(context).colorScheme.onError,
     );
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width,
-          maxWidth: MediaQuery.of(context).size.width,
-        ),
-        color: isCorrectResponse == true
-            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.95)
-            : Theme.of(context).colorScheme.errorContainer.withOpacity(0.9),
+    return Container(
+      key: ValueKey(
+          'result-pane-${isCorrectResponse == true ? 'correct' : 'wrong'}'),
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width,
+        maxWidth: MediaQuery.of(context).size.width,
+      ),
+      color: isCorrectResponse == true
+          ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.95)
+          : Theme.of(context).colorScheme.errorContainer.withOpacity(0.9),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
           child: Column(
@@ -368,6 +400,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Točan odgovor:',
@@ -423,8 +456,7 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Future<void> _onOpenLink(LinkableElement link) async {
