@@ -4,6 +4,8 @@ import 'package:codey/models/entities/exercise.dart';
 import 'package:codey/models/entities/exercise_MC.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ExerciseMCWidget extends StatefulWidget {
   const ExerciseMCWidget({
@@ -43,6 +45,12 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
         .where((entry) => entry.value != null)
         .toList();
     answerOptions.shuffle();
+  }
+
+  Future<void> _onOpenLink(LinkableElement link) async {
+    final uri = Uri.tryParse(link.url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -91,12 +99,17 @@ class _ExerciseMCWidgetState extends State<ExerciseMCWidget> {
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(25.0),
-                      child: Text(
-                        option.value,
+                      child: Linkify(
+                        text: option.value,
                         style: TextStyle(
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onInverseSurface,
                         ),
+                        linkStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                        onOpen: _onOpenLink,
                       ),
                     ),
                   ),
