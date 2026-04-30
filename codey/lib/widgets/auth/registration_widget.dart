@@ -2,6 +2,8 @@ import 'package:codey/models/entities/course.dart';
 import 'package:codey/services/auth_service.dart';
 import 'package:codey/services/courses_service.dart';
 import 'package:codey/services/user_interaction_service.dart';
+import 'package:codey/widgets/auth/terms_dialog.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,6 +34,8 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
 
   Course? course;
   final List<Course> courses = [];
+
+  bool consentedToTerms = false;
 
   @override
   void initState() {
@@ -73,6 +77,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
             password: password,
             school: school!,
             courseId: course!.id,
+            consentedToTerms: consentedToTerms,
           )
           .then((value) {
         setState(() {
@@ -92,8 +97,10 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Ime *',
+        counterText: "",
       ),
       textInputAction: TextInputAction.next,
+      maxLength: 20,
       onChanged: (value) {
         setState(() {
           firstName = value;
@@ -101,15 +108,22 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       onFieldSubmitted: (_) => submit(),
-      validator: (value) => (value ?? "").isEmpty ? 'Molimo unesite ime' : null,
+      validator: (value) {
+        final trimmed = (value ?? "").trim();
+        if (trimmed.isEmpty) return 'Molimo unesite ime';
+        if (trimmed.length > 20) return 'Najviše 20 znakova';
+        return null;
+      },
     );
     final lastNameField = TextFormField(
       autofillHints: const [AutofillHints.familyName],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Prezime *',
+        counterText: "",
       ),
       textInputAction: TextInputAction.next,
+      maxLength: 20,
       onChanged: (value) {
         setState(() {
           lastName = value;
@@ -117,8 +131,12 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
         });
       },
       onFieldSubmitted: (_) => submit(),
-      validator: (value) =>
-          (value ?? "").isEmpty ? 'Molimo unesite prezime' : null,
+      validator: (value) {
+        final trimmed = (value ?? "").trim();
+        if (trimmed.isEmpty) return 'Molimo unesite prezime';
+        if (trimmed.length > 20) return 'Najviše 20 znakova';
+        return null;
+      },
     );
 
     DateTime? dateOfBirth;
@@ -375,6 +393,71 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
       ],
     );
 
+    final consentField = FormField<bool>(
+      initialValue: consentedToTerms,
+      validator: (_) => consentedToTerms
+          ? null
+          : 'Morate prihvatiti uvjete korištenja',
+      builder: (FormFieldState<bool> state) {
+        final colorScheme = Theme.of(context).colorScheme;
+        final hasError = state.hasError;
+        final linkColor = colorScheme.primary;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Checkbox(
+                  value: consentedToTerms,
+                  isError: hasError,
+                  onChanged: (value) {
+                    final newValue = value ?? false;
+                    setState(() {
+                      consentedToTerms = newValue;
+                      errorMessage = null;
+                    });
+                    state.didChange(newValue);
+                  },
+                ),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: [
+                        const TextSpan(text: 'Slažem se s '),
+                        TextSpan(
+                          text: 'uvjetima korištenja',
+                          style: TextStyle(
+                            color: linkColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => showTermsDialog(context),
+                        ),
+                        const TextSpan(text: '.'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (hasError)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12.0, 0, 0, 0),
+                child: Text(
+                  state.errorText!,
+                  style: TextStyle(
+                    color: colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+
     final coursesDropdown = Row(
       children: [
         Expanded(
@@ -450,6 +533,10 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: coursesDropdown,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: consentField,
           ),
           if (errorMessage != null)
             Text(

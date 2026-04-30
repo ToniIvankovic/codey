@@ -6,6 +6,7 @@ class UserRegistrationDTO {
   final String password;
   final String school;
   final int courseId;
+  final bool consentedToTerms;
 
   UserRegistrationDTO({
     required this.firstName,
@@ -15,6 +16,7 @@ class UserRegistrationDTO {
     required this.password,
     required this.school,
     required this.courseId,
+    required this.consentedToTerms,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,5 +27,6 @@ class UserRegistrationDTO {
         'password': password,
         'school': school,
         'courseId': courseId,
+        'consentedToTerms': consentedToTerms,
       };
 }

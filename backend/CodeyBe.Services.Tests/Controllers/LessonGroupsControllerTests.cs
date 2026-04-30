@@ -46,7 +46,7 @@ public class LessonGroupsControllerTests
     public async Task CreateLessonGroup_wraps_service_result_in_ok()
     {
         var created = EntityBuilders.LessonGroup(9);
-        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Order = 1, Lessons = [] };
+        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Lessons = [] };
         _lessonGroups.Setup(s => s.CreateLessonGroupAsync(dto)).ReturnsAsync(created);
 
         var result = await _sut.CreateLessonGroup(dto);
@@ -58,7 +58,7 @@ public class LessonGroupsControllerTests
     public async Task UpdateLessonGroup_returns_ok_on_success()
     {
         var updated = EntityBuilders.LessonGroup(3);
-        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Order = 1, Lessons = [] };
+        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Lessons = [] };
         _lessonGroups.Setup(s => s.UpdateLessonGroupAsync(3, dto)).ReturnsAsync(updated);
 
         var result = await _sut.UpdateLessonGroup(3, dto);
@@ -69,7 +69,7 @@ public class LessonGroupsControllerTests
     [Fact]
     public async Task UpdateLessonGroup_maps_exception_to_not_found()
     {
-        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Order = 1, Lessons = [] };
+        var dto = new LessonGroupCreationDTO { Name = "G", CourseId = 1, Lessons = [] };
         _lessonGroups.Setup(s => s.UpdateLessonGroupAsync(3, dto)).ThrowsAsync(new Exception("missing"));
 
         var result = await _sut.UpdateLessonGroup(3, dto);

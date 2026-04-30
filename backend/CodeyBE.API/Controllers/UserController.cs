@@ -201,12 +201,39 @@ namespace CodeyBE.API.Controllers
             try
             {
                 ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
-                var firstName = body["firstName"];
-                var lastName = body["lastName"];
-                var dob = body["dateOfBirth"];
+                var firstName = body["firstName"]?.Trim() ?? "";
+                var lastName = body["lastName"]?.Trim() ?? "";
+                if (firstName.Length > 20)
+                {
+                    return StatusCode(400, "Ime smije imati najviše 20 znakova");
+                }
+                if (lastName.Length > 20)
+                {
+                    return StatusCode(400, "Prezime smije imati najviše 20 znakova");
+                }
                 applicationUser.FirstName = firstName;
                 applicationUser.LastName = lastName;
-                applicationUser.DateOfBirth = DateOnly.Parse(dob);
+                if (body.TryGetValue("dateOfBirth", out var rawDob) && !string.IsNullOrWhiteSpace(rawDob))
+                {
+                    applicationUser.DateOfBirth = DateOnly.Parse(rawDob);
+                }
+                else
+                {
+                    applicationUser.DateOfBirth = null;
+                }
+                if (body.TryGetValue("leaderboardName", out var rawLeaderboardName))
+                {
+                    var leaderboardName = rawLeaderboardName?.Trim() ?? "";
+                    if (string.IsNullOrEmpty(leaderboardName))
+                    {
+                        return StatusCode(400, "Ime na ljestvici ne smije biti prazno");
+                    }
+                    if (leaderboardName.Length > 30)
+                    {
+                        return StatusCode(400, "Ime na ljestvici smije imati najviše 30 znakova");
+                    }
+                    applicationUser.LeaderboardName = leaderboardName;
+                }
                 var newUser = await userService.UpdateUserData(applicationUser);
                 return new OkObjectResult(await ProduceUserDataDTO(newUser));
             }
@@ -214,6 +241,27 @@ namespace CodeyBE.API.Controllers
             {
                 return StatusCode(401, e.Message);
             } catch (Exception e)
+            {
+                return StatusCode(400, e.Message);
+            }
+        }
+
+        [HttpDelete("leaderboard-name", Name = "resetLeaderboardName")]
+        [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ResetLeaderboardName()
+        {
+            try
+            {
+                ApplicationUser? applicationUser = await userService.GetUser(User) ?? throw new EntityNotFoundException();
+                applicationUser.LeaderboardName = null;
+                var newUser = await userService.UpdateUserData(applicationUser);
+                return new OkObjectResult(await ProduceUserDataDTO(newUser));
+            }
+            catch (Exception e) when (e is UserAuthenticationException || e is EntityNotFoundException)
+            {
+                return StatusCode(401, e.Message);
+            }
+            catch (Exception e)
             {
                 return StatusCode(400, e.Message);
             }

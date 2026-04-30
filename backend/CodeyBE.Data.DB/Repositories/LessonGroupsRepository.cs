@@ -14,12 +14,14 @@ namespace CodeyBE.Data.DB.Repositories
         {
             return (await base.GetAllAsync())
                 .OrderBy(lgr => lgr.Order)
+                .ThenBy(lgr => lgr.PrivateId)
                 .ToList();
         }
         public async Task<IEnumerable<LessonGroup>> GetAllAsync(int courseId)
         {
             return (await base.GetAllAsync())
                 .OrderBy(lgr => lgr.Order)
+                .ThenBy(lgr => lgr.PrivateId)
                 .Where(lgr => lgr.CourseId == courseId)
                 .ToList();
         }
@@ -69,7 +71,6 @@ namespace CodeyBE.Data.DB.Repositories
                                 .Set(lessonGroup => lessonGroup.Name, lessonGroup.Name)
                                 .Set(lessonGroup => lessonGroup.Tips, lessonGroup.Tips)
                                 .Set(lessonGroup => lessonGroup.LessonIds, lessonGroup.Lessons.ToList())
-                                .Set(lessonGroup => lessonGroup.Order, lessonGroup.Order)
                                 .Set(lessonGroup => lessonGroup.Adaptive, lessonGroup.Adaptive)
                                 );
             if (!updateResult.IsAcknowledged || updateResult.ModifiedCount == 0)

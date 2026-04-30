@@ -23,6 +23,7 @@ abstract class AuthService {
     required String password,
     required String school,
     required int courseId,
+    required bool consentedToTerms,
   });
   Future<void> changePassword({
     required String oldPassword,
@@ -73,6 +74,7 @@ class AuthService1 implements AuthService {
     required String password,
     required String school,
     required int courseId,
+    required bool consentedToTerms,
   }) async {
     final response = await http.post(
       _registerEndpoint,
@@ -83,7 +85,8 @@ class AuthService1 implements AuthService {
               email: email,
               password: password,
               school: school,
-              courseId: courseId)
+              courseId: courseId,
+              consentedToTerms: consentedToTerms)
           .toJson()),
       headers: {'Content-Type': 'application/json'},
     );

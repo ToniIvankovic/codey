@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:codey/models/entities/app_user.dart';
 import 'package:codey/services/theme_service.dart';
 import 'package:codey/services/user_service.dart';
-import 'package:codey/widgets/student/profile_data/change_password_screen.dart';
 import 'package:codey/widgets/student/profile_data/change_user_data_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -165,6 +164,7 @@ class _UserDataSection extends StatelessWidget {
                   builder: (context) => ChangeUserDataScreen(
                     firstName: user.firstName,
                     lastName: user.lastName,
+                    leaderboardName: user.leaderboardName,
                     dateOfBirth: user.dateOfBirth,
                   ),
                 ),
@@ -172,16 +172,6 @@ class _UserDataSection extends StatelessWidget {
             },
             child: const Text('Promijeni podatke'),
           ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ChangePasswordScreen(),
-              ),
-            );
-          },
-          child: const Text('Promijeni lozinku'),
         ),
       ],
     );

@@ -12,6 +12,8 @@ namespace CodeyBE.Contracts.Entities.Users
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        [BsonIgnoreIfNull]
+        public string? LeaderboardName { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public int? HighestLessonId { get; set; }
         public int? HighestLessonGroupId { get; set; }
@@ -23,6 +25,8 @@ namespace CodeyBE.Contracts.Entities.Users
         public List<KeyValuePair<DateOnly, ISet<Quest>>>? Quests { get; set; } = [];
         public double Score { get; set; } = 1;
         public int GamificationGroup { get; set; }
+        public bool ConsentedToTerms { get; set; }
+        public DateTime? ConsentedAt { get; set; }
         [BsonElement("courseId")]
         public int CourseId { get; set; }
         [BsonIgnore]

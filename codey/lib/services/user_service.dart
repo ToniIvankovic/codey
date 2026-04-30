@@ -17,8 +17,10 @@ abstract class UserService {
   Future<AppUser> changeUserData({
     required String firstName,
     required String lastName,
-    required DateTime dateOfBirth,
+    DateTime? dateOfBirth,
+    String? leaderboardName,
   });
+  Future<AppUser> resetLeaderboardName();
   Future<AppUser> switchCourse(int courseId);
 }
 
@@ -78,20 +80,48 @@ class UserService1 implements UserService {
   Future<AppUser> changeUserData({
     required String firstName,
     required String lastName,
-    required DateTime dateOfBirth,
+    DateTime? dateOfBirth,
+    String? leaderboardName,
   }) async {
+    final body = <String, String>{
+      'firstName': firstName,
+      'lastName': lastName,
+    };
+    if (dateOfBirth != null) {
+      body['dateOfBirth'] = dateOfBirth.toIso8601String();
+    }
+    final trimmedLeaderboardName = leaderboardName?.trim();
+    if (trimmedLeaderboardName != null && trimmedLeaderboardName.isNotEmpty) {
+      body['leaderboardName'] = trimmedLeaderboardName;
+    }
+
     var response = await _authenticatedClient.put(
       _userEndpoint,
-      body: json.encode({
-        'firstName': firstName,
-        'lastName': lastName,
-        'dateOfBirth': dateOfBirth.toIso8601String(),
-      }),
+      body: json.encode(body),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to change user data');
+      throw Exception(response.body.isNotEmpty
+          ? response.body
+          : 'Failed to change user data');
+    }
+
+    var user = AppUser.fromJson(jsonDecode(response.body));
+    updateUser(user);
+    return user;
+  }
+
+  @override
+  Future<AppUser> resetLeaderboardName() async {
+    var response = await _authenticatedClient.delete(
+      Uri.parse('$_userEndpoint/leaderboard-name'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.body.isNotEmpty
+          ? response.body
+          : 'Failed to reset leaderboard name');
     }
 
     var user = AppUser.fromJson(jsonDecode(response.body));

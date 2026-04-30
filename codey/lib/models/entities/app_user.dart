@@ -4,6 +4,7 @@ import 'package:codey/models/entities/quest.dart';
 class AppUser {
   final String? firstName;
   final String? lastName;
+  final String? leaderboardName;
   final DateTime? dateOfBirth;
   final String email;
   final int? highestLessonId;
@@ -25,6 +26,7 @@ class AppUser {
   AppUser({
     this.firstName,
     this.lastName,
+    this.leaderboardName,
     this.dateOfBirth,
     required this.email,
     this.highestLessonId,
@@ -48,6 +50,7 @@ class AppUser {
     return AppUser(
       firstName: json['firstName'],
       lastName: json['lastName'],
+      leaderboardName: json['leaderboardName'],
       dateOfBirth: json['dateOfBirth'] != null
           ? DateTime.parse(json['dateOfBirth'])
           : null,

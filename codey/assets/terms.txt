@@ -1,0 +1,43 @@
+UVJETI KORIŠTENJA I OBAVIJEST O OBRADI OSOBNIH PODATAKA
+
+Codey je obrazovna platforma razvijena u sklopu istraživačkog diplomskog rada. Cilj projekta je istražiti utjecaj gamifikacije na motivaciju i napredak učenika u učenju programiranja.
+
+1. PODACI KOJE PRIKUPLJAMO
+
+Prilikom registracije i korištenja platforme prikupljamo sljedeće osobne podatke:
+- ime i prezime
+- e-mail adresu (koristi se i kao korisničko ime)
+- naziv škole koju polaziš
+- odabrani tečaj
+- podatke o aktivnosti i napretku unutar platforme (riješene lekcije, odgovori na zadatke, ostvareni bodovi, dnevni nizovi i ispunjeni izazovi)
+
+2. SVRHA OBRADE
+
+Prikupljene podatke koristimo isključivo u sljedeće svrhe:
+- omogućavanje korisničkog računa, prijave i praćenja vlastitog napretka
+- prikaz ljestvice najboljih unutar tvoje škole i razreda
+- znanstvena analiza utjecaja gamifikacijskih elemenata na motivaciju i učinak učenja u sklopu diplomskog rada
+- agregirano i anonimizirano izvještavanje o rezultatima istraživanja
+
+Tvoje podatke ne prodajemo i ne dijelimo s trećim stranama u marketinške svrhe.
+
+3. ČUVANJE PODATAKA
+
+Podaci se čuvaju dok god imaš aktivan korisnički račun, odnosno do završetka istraživanja na kojem se temelji diplomski rad. Nakon toga se osobni podaci brišu ili anonimiziraju, a u radu i daljnjim publikacijama koriste se isključivo zbirni, anonimizirani rezultati iz kojih te nije moguće identificirati.
+
+4. TVOJA PRAVA
+
+U skladu s Općom uredbom o zaštiti podataka (GDPR), u svakom trenutku imaš pravo:
+- zatražiti pristup svojim osobnim podacima
+- zatražiti ispravak netočnih podataka
+- zatražiti brisanje računa i pripadajućih podataka
+- povući danu privolu, pri čemu povlačenje ne utječe na zakonitost obrade prije povlačenja
+- podnijeti prigovor nadležnom tijelu za zaštitu osobnih podataka
+
+5. KONTAKT
+
+Za sva pitanja vezana uz obradu osobnih podataka ili ostvarivanje gore navedenih prava možeš se obratiti voditelju istraživanja na e-mail: toni.ivankovic@alumni.fer.hr.
+
+6. PRIVOLA
+
+Označavanjem polja "Slažem se s uvjetima korištenja" potvrđuješ da si pročitao/la ovu obavijest, da razumiješ koje podatke prikupljamo i u koje svrhe te da dobrovoljno dopuštaš njihovu obradu pod gore navedenim uvjetima.

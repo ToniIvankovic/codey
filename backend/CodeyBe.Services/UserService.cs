@@ -59,6 +59,13 @@ namespace CodeyBe.Services
 
         public async Task<IdentityResult> RegisterStudent(UserRegistrationRequestDTO user)
         {
+            if (!user.ConsentedToTerms)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = "Morate prihvatiti uvjete korištenja."
+                });
+            }
             var userCount = _userManager.Users.Count();
             IdentityResult result = await _userManager.CreateAsync(new ApplicationUser
             {
@@ -84,6 +91,8 @@ namespace CodeyBe.Services
                 School = user.School,
                 GamificationGroup = user.School == "Ostali" ? 0 : userCount % 2 + 1,
                 CourseId = user.CourseId,
+                ConsentedToTerms = true,
+                ConsentedAt = DateTime.UtcNow,
             }, user.Password);
             return result;
         }

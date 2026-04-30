@@ -1,22 +1,31 @@
 import 'package:codey/services/user_service.dart';
+import 'package:codey/widgets/student/profile_data/change_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ChangeUserDataScreen extends StatelessWidget {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
+  final leaderboardNameController = TextEditingController();
   final dayController = TextEditingController();
   final monthController = TextEditingController();
   final yearController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  final String? _firstName;
+  final String? _lastName;
+
   ChangeUserDataScreen({
     Key? key,
     String? firstName,
     String? lastName,
+    String? leaderboardName,
     DateTime? dateOfBirth,
-  }) : super(key: key) {
+  })  : _firstName = firstName,
+        _lastName = lastName,
+        super(key: key) {
     firstNameController.text = firstName ?? '';
     lastNameController.text = lastName ?? '';
+    leaderboardNameController.text = leaderboardName ?? '';
     dayController.text = dateOfBirth?.day.toString() ?? '';
     monthController.text = dateOfBirth?.month.toString() ?? '';
     yearController.text = dateOfBirth?.year.toString() ?? '';
@@ -24,6 +33,11 @@ class ChangeUserDataScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool dobAllEmpty() =>
+        dayController.text.isEmpty &&
+        monthController.text.isEmpty &&
+        yearController.text.isEmpty;
+
     final dateOfBirthRow = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -41,6 +55,7 @@ class ChangeUserDataScreen extends StatelessWidget {
               controller: dayController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
+                  if (dobAllEmpty()) return null;
                   return 'Molimo unesite dan rođenja';
                 }
                 if (int.tryParse(value) == null) {
@@ -69,6 +84,7 @@ class ChangeUserDataScreen extends StatelessWidget {
               controller: monthController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
+                  if (dobAllEmpty()) return null;
                   return 'Molimo unesite mjesec rođenja';
                 }
                 if (int.tryParse(value) == null) {
@@ -96,6 +112,7 @@ class ChangeUserDataScreen extends StatelessWidget {
               controller: yearController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
+                  if (dobAllEmpty()) return null;
                   return 'Molimo unesite godinu rođenja';
                 }
                 if (int.tryParse(value) == null) {
@@ -143,8 +160,19 @@ class ChangeUserDataScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'Unesite svoje ime',
+                      counterText: "",
                     ),
                     controller: firstNameController,
+                    maxLength: 20,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Molimo unesite ime';
+                      }
+                      if (value.trim().length > 20) {
+                        return 'Najviše 20 znakova';
+                      }
+                      return null;
+                    },
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -154,8 +182,19 @@ class ChangeUserDataScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'Unesite svoje prezime',
+                      counterText: "",
                     ),
                     controller: lastNameController,
+                    maxLength: 20,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Molimo unesite prezime';
+                      }
+                      if (value.trim().length > 20) {
+                        return 'Najviše 20 znakova';
+                      }
+                      return null;
+                    },
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -163,28 +202,94 @@ class ChangeUserDataScreen extends StatelessWidget {
                         Text("Datum rođenja:", style: TextStyle(fontSize: 16)),
                   ),
                   dateOfBirthRow,
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text("Ime na ljestvici:",
+                        style: TextStyle(fontSize: 16)),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: 'Zadano: '
+                                '${(_firstName ?? '').trim()} '
+                                '${(_lastName ?? '').trim()}'
+                                    .trim(),
+                          ),
+                          controller: leaderboardNameController,
+                          maxLength: 30,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) return null;
+                            if (value.trim().isEmpty) {
+                              return 'Ime na ljestvici ne smije biti prazno';
+                            }
+                            if (value.trim().length > 30) {
+                              return 'Najviše 30 znakova';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        tooltip: 'Vrati zadano',
+                        icon: const Icon(Icons.restart_alt),
+                        onPressed: () {
+                          final messenger = ScaffoldMessenger.of(context);
+                          context
+                              .read<UserService>()
+                              .resetLeaderboardName()
+                              .then((_) {
+                            leaderboardNameController.clear();
+                            messenger.showSnackBar(
+                              const SnackBar(
+                                content: Text('Ime na ljestvici vraćeno'),
+                              ),
+                            );
+                          }).catchError((error) {
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(error.toString())),
+                            );
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       if (!formKey.currentState!.validate()) return;
                       final navigator = Navigator.of(context);
                       final messenger = ScaffoldMessenger.of(context);
+                      final leaderboardNameInput =
+                          leaderboardNameController.text.trim();
+                      final hasDob = dayController.text.isNotEmpty &&
+                          monthController.text.isNotEmpty &&
+                          yearController.text.isNotEmpty;
                       context
                           .read<UserService>()
                           .changeUserData(
-                            firstName: firstNameController.text,
-                            lastName: lastNameController.text,
-                            dateOfBirth: DateTime(
-                              int.parse(yearController.text),
-                              int.parse(monthController.text),
-                              int.parse(dayController.text),
-                            ),
+                            firstName: firstNameController.text.trim(),
+                            lastName: lastNameController.text.trim(),
+                            dateOfBirth: hasDob
+                                ? DateTime(
+                                    int.parse(yearController.text),
+                                    int.parse(monthController.text),
+                                    int.parse(dayController.text),
+                                  )
+                                : null,
+                            leaderboardName: leaderboardNameInput.isEmpty
+                                ? null
+                                : leaderboardNameInput,
                           )
                           .then((newUser) {
                         navigator.pop(newUser);
                         messenger.showSnackBar(
                           const SnackBar(
-                            content: Text('Podatci uspješno promijenjeni'),
+                            content: Text('Podatci uspješno spremljeni'),
                           ),
                         );
                       }).catchError((error) {
@@ -195,7 +300,18 @@ class ChangeUserDataScreen extends StatelessWidget {
                         );
                       });
                     },
-                    child: const Text('Promijeni podatke'),
+                    child: const Text('Spremi podatke'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ChangePasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Promijeni lozinku'),
                   ),
                 ],
               ),

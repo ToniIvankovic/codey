@@ -12,6 +12,7 @@ namespace CodeyBE.Contracts.DTOs
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? LeaderboardName { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public required string Email { get; set; }
         public int? HighestLessonId { get; set; }
@@ -37,6 +38,7 @@ namespace CodeyBE.Contracts.DTOs
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                LeaderboardName = user.LeaderboardName,
                 DateOfBirth = user.DateOfBirth,
                 Email = user.Email ?? throw new MissingFieldException("Email missing for user"),
                 HighestLessonId = user.HighestLessonId,

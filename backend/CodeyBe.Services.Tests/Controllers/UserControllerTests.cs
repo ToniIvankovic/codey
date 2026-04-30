@@ -31,7 +31,7 @@ public class UserControllerTests
     [Fact]
     public async Task RegisterUser_returns_ok_on_success()
     {
-        var request = new UserRegistrationRequestDTO { Email = "new@school.hr", Password = "Password1", CourseId = 1 };
+        var request = new UserRegistrationRequestDTO { Email = "new@school.hr", Password = "Password1", CourseId = 1, ConsentedToTerms = true };
         _users.Setup(s => s.RegisterStudent(request)).ReturnsAsync(IdentityResult.Success);
 
         var result = await _sut.RegisterUser(request);
@@ -42,7 +42,7 @@ public class UserControllerTests
     [Fact]
     public async Task RegisterUser_returns_400_on_failure()
     {
-        var request = new UserRegistrationRequestDTO { Email = "new@school.hr", Password = "bad", CourseId = 1 };
+        var request = new UserRegistrationRequestDTO { Email = "new@school.hr", Password = "bad", CourseId = 1, ConsentedToTerms = true };
         _users.Setup(s => s.RegisterStudent(request)).ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "too short" }));
 
         var result = await _sut.RegisterUser(request);

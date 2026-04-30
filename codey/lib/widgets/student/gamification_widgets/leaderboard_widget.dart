@@ -169,7 +169,7 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                     Text("${i + 1}. ", style: nameStyle),
                     Expanded(
                       child: Text(
-                        "${student.firstName} ${student.lastName}:",
+                        "${student.leaderboardName ?? '${student.firstName ?? ''} ${student.lastName ?? ''}'.trim()}:",
                         overflow: TextOverflow.clip,
                         style: nameStyle,
                       ),

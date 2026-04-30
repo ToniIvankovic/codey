@@ -88,7 +88,7 @@ public class UserServiceTests
 
         var result = await _sut.RegisterStudent(new UserRegistrationRequestDTO
         {
-            Email = "new@school.hr", Password = "pw", School = "Test School", CourseId = 1,
+            Email = "new@school.hr", Password = "pw", School = "Test School", CourseId = 1, ConsentedToTerms = true,
         });
 
         result.Succeeded.Should().BeTrue();

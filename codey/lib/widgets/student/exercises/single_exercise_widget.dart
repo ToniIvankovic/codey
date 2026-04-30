@@ -341,15 +341,20 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
 
   Widget _buildNextButtonArea() {
     var correctAnswer = widget.exercisesService.getCorrectAnswer(exercise!);
+    List<TextSpan>? scwAnswerSpans;
     if (exercise is ExerciseSCW) {
-      var answerWithCode = (exercise as ExerciseSCW).statementCode;
-      for (var answer in correctAnswer) {
-        answerWithCode = answerWithCode.replaceFirst(
-          "\\gap",
-          answer,
-        );
+      final parts = (exercise as ExerciseSCW).statementCode.split('\\gap');
+      final answers = List<String>.from(correctAnswer);
+      scwAnswerSpans = [];
+      for (var i = 0; i < parts.length; i++) {
+        scwAnswerSpans.add(TextSpan(text: parts[i]));
+        if (i < parts.length - 1 && i < answers.length) {
+          scwAnswerSpans.add(TextSpan(
+            text: answers[i],
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ));
+        }
       }
-      correctAnswer = answerWithCode;
     }
     var containerTextColor = TextStyle(
       color: isCorrectResponse == true
@@ -410,12 +415,20 @@ class _SingleExerciseWidgetState extends State<SingleExerciseWidget> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        correctAnswer,
-                        style: containerTextColor.copyWith(
-                          fontSize: 16.0,
+                      if (scwAnswerSpans != null)
+                        Text.rich(
+                          TextSpan(children: scwAnswerSpans),
+                          style: containerTextColor.copyWith(
+                            fontSize: 16.0,
+                          ),
+                        )
+                      else
+                        Text(
+                          correctAnswer,
+                          style: containerTextColor.copyWith(
+                            fontSize: 16.0,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
