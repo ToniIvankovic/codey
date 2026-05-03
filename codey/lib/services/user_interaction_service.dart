@@ -18,6 +18,7 @@ abstract class UserInteractionService {
   Future<List<String>> getAllSchools();
   Future<Leaderboard> getLeaderboardStudent();
   Future<Leaderboard> getLeaderboardClass(int classId, int courseId);
+  Future<Leaderboard> getLeaderboardCourse(int courseId);
 }
 
 class UserInteractionServiceImpl implements UserInteractionService {
@@ -166,6 +167,19 @@ class UserInteractionServiceImpl implements UserInteractionService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to get class leaderboard');
+    }
+
+    return Leaderboard.fromJson(json.decode(response.body));
+  }
+
+  @override
+  Future<Leaderboard> getLeaderboardCourse(int courseId) async {
+    final response = await _authenticatedClient.get(
+      Uri.parse('$_baseEndpoint/leaderboard/course/$courseId'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get course leaderboard');
     }
 
     return Leaderboard.fromJson(json.decode(response.body));

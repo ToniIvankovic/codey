@@ -12,11 +12,13 @@ class LeaderboardWidget extends StatefulWidget {
   final bool requestedByTeacher;
   final int? classId;
   final bool showUsernames;
+  final bool persistCourseChange;
   const LeaderboardWidget({
     super.key,
     this.requestedByTeacher = false,
     this.classId,
     this.showUsernames = false,
+    this.persistCourseChange = false,
   });
 
   @override
@@ -41,9 +43,20 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
     if (widget.requestedByTeacher) {
       context.read<CoursesService>().getAllCourses().then((courses) {
         if (!mounted || courses.isEmpty) return;
+        Course initial = courses.first;
+        if (widget.persistCourseChange) {
+          final userCourseId =
+              context.read<UserService>().currentUser?.course.id;
+          if (userCourseId != null) {
+            initial = courses.firstWhere(
+              (c) => c.id == userCourseId,
+              orElse: () => courses.first,
+            );
+          }
+        }
         setState(() {
           _courses = courses;
-          _selectedCourse = courses.first;
+          _selectedCourse = initial;
         });
         _loadLeaderboard();
       });
@@ -76,6 +89,11 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
 
   Future<Leaderboard> fetchLeaderboard() async {
     if (widget.requestedByTeacher) {
+      if (widget.classId == null) {
+        return context
+            .read<UserInteractionService>()
+            .getLeaderboardCourse(_selectedCourse!.id);
+      }
       return context
           .read<UserInteractionService>()
           .getLeaderboardClass(widget.classId!, _selectedCourse!.id);
@@ -114,6 +132,9 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                     leaderboardLoading = true;
                     leaderboard = null;
                   });
+                  if (widget.persistCourseChange) {
+                    context.read<UserService>().switchCourse(course.id);
+                  }
                   _loadLeaderboard();
                 },
               ),
@@ -163,13 +184,19 @@ class _LeaderboardWidgetState extends State<LeaderboardWidget> {
                   color: Theme.of(context).colorScheme.onSecondary,
                   fontWeight: isSelf ? FontWeight.bold : FontWeight.normal,
                 );
+                final fullName =
+                    '${student.firstName ?? ''} ${student.lastName ?? ''}'
+                        .trim();
+                final displayName = widget.requestedByTeacher
+                    ? fullName
+                    : (student.leaderboardName ?? fullName);
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("${i + 1}. ", style: nameStyle),
                     Expanded(
                       child: Text(
-                        "${student.leaderboardName ?? '${student.firstName ?? ''} ${student.lastName ?? ''}'.trim()}:",
+                        "$displayName:",
                         overflow: TextOverflow.clip,
                         style: nameStyle,
                       ),

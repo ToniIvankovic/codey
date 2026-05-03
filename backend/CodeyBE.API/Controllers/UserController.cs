@@ -160,7 +160,7 @@ namespace CodeyBE.API.Controllers
             });
         }
 
-        [Authorize(Roles = "CREATOR")]
+        [Authorize(Roles = "CREATOR,TEACHER")]
         [HttpPut("course", Name = "switchCourse")]
         [ProducesResponseType(typeof(UserDataDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> SwitchCourse([FromBody] Dictionary<string, int> body)

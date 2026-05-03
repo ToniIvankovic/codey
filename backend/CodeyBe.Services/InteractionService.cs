@@ -156,6 +156,13 @@ namespace CodeyBe.Services
             return await ProduceLeaderboard(teacher.School!, _class, courseId);
         }
 
+        public async Task<Leaderboard> GetLeaderboardForCourse(ClaimsPrincipal userTeacher, int courseId)
+        {
+            ApplicationUser? teacher = await _userService.GetUser(userTeacher)
+                ?? throw new EntityNotFoundException("Teacher not found in the database");
+            return await ProduceLeaderboard(teacher.School!, null, courseId);
+        }
+
         private async Task<Leaderboard> ProduceLeaderboard(string school, Class? @class, int courseId)
         {
             var allUsers = await _userService.GetAllUsersAsync();

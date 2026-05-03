@@ -180,5 +180,13 @@ namespace CodeyBE.API.Controllers
         {
             return await interactionService.GetLeaderboardForClass(User, classId, courseId);
         }
+
+        [HttpGet("leaderboard/course/{courseId}", Name = "getLeaderboardForCourse")]
+        [Authorize(Roles = "TEACHER")]
+        [ProducesResponseType(typeof(Leaderboard), (int)HttpStatusCode.OK)]
+        public async Task<Leaderboard> GetLeaderboardForCourse([FromRoute] int courseId)
+        {
+            return await interactionService.GetLeaderboardForCourse(User, courseId);
+        }
     }
 }

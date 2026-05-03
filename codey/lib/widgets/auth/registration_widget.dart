@@ -299,7 +299,7 @@ class _RegistrationWidgetState extends State<RegistrationWidget> {
       autofillHints: const [AutofillHints.email, AutofillHints.username],
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText: 'Korisničko ime *',
+        labelText: 'Korisničko ime / e-mail *',
       ),
       textInputAction: TextInputAction.next,
       onChanged: (value) {

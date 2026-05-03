@@ -1,5 +1,6 @@
 import 'package:codey/services/session_service.dart';
 import 'package:codey/widgets/settings/settings_screen.dart';
+import 'package:codey/widgets/student/gamification_widgets/leaderboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'view_classes_screen.dart';
@@ -26,11 +27,10 @@ class TeacherHomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
+          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
@@ -45,14 +45,19 @@ class TeacherHomePage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Pregled razreda",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Theme.of(context).colorScheme.onInverseSurface,
-                      ),
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: LeaderboardWidget(
+                  requestedByTeacher: true,
+                  showUsernames: true,
+                  persistCourseChange: true,
                 ),
               ),
               Padding(
@@ -63,12 +68,7 @@ class TeacherHomePage extends StatelessWidget {
                     onPressed: () {
                       context.read<SessionService>().logout();
                     },
-                    child: Text(
-                      'Odjava',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onInverseSurface,
-                      ),
-                    ),
+                    child: const Text('Odjava'),
                   ),
                 ),
               ),
